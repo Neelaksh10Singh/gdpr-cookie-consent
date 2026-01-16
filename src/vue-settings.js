@@ -11313,13 +11313,9 @@ var adv = new Vue({
           }
 
           // Convert the settings object to JSON with indentation
-          const settingsJSON = JSON.stringify(
-            JSON.stringify(settingsCopy, null, 2)
-          );
-
+          const settingsJSON = JSON.stringify(settingsCopy, null, 2);
           // Create a Blob containing the JSON data
           const blob = new Blob([settingsJSON], { type: "application/json" });
-
           // Create a download link for the Blob
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
@@ -11350,11 +11346,11 @@ var adv = new Vue({
         reader.onload = function (event) {
           var jsonData = event.target.result;
           try {
-            const parsedData = JSON.parse(JSON.parse(jsonData));
+            const parsedData = JSON.parse(jsonData);
             var data = {
               action: "gcc_update_imported_settings",
               security: settings_obj.import_settings_nonce,
-              settings: parsedData,
+              settings: JSON.stringify(parsedData),
             };
             jQuery.ajax({
               url: settings_obj.ajaxurl,
