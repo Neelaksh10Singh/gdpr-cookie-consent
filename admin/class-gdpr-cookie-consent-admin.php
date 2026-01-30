@@ -5971,10 +5971,10 @@ class Gdpr_Cookie_Consent_Admin {
 	public function change_option_language( $key, $language ) {
 		$translations_file = plugin_dir_path( __FILE__ ) . 'translations/translations.json';
 
+
 		if ( file_exists( $translations_file ) ) {
 			$translations = json_decode( file_get_contents( $translations_file ), true );
 		}
-
 		$translated_key = $this->translated_text( $key, $translations, $language );
 
 		return $translated_key;
@@ -8377,6 +8377,12 @@ class Gdpr_Cookie_Consent_Admin {
 
 		$ab_testing_data = $request->get_param('ab_testing_object') ?: null;
 		$ab_option       = get_option( 'wpl_ab_options' );
+		$iabtcfVendorData = $request->get_param('iabtcfVendorData') ?: null;
+
+		if(!empty($iabtcfVendorData)){
+			$iabtcfVendorData = json_decode($iabtcfVendorData);
+			update_option(GDPR_COOKIE_CONSENT_SETTINGS_VENDOR, $iabtcfVendorData);
+		}
 
 		
 
@@ -8396,14 +8402,24 @@ class Gdpr_Cookie_Consent_Admin {
 		$custom_css = $request->get_param( 'gdpr_css_text' );
 
 		$advanced_scripts = $request->get_param( 'advanced_scripts' );
-
-		$whitelist_scripts = $request->get_param( 'whitelist_scripts' );
-
+		
+		$whitelist_scripts = $request->get_param( 'whitelist_scripts' ) ?: null;
+		
 		$the_options = Gdpr_Cookie_Consent::gdpr_get_settings();
 
 		if(!empty($save_object) && is_array($save_object)){
 
-			if($save_object['lang_selected'] !== $the_options['lang_selected']){
+			if(($the_options['is_gacm_on'] == "false" || $the_options['is_gacm_on'] == false || $the_options['is_gacm_on'] === "0") && ($save_object['is_gacm_on'] == "true" || $save_object['is_gacm_on'] == true || $save_object['is_gacm_on'] == "1")){
+				if(!get_option(GDPR_COOKIE_CONSENT_SETTINGS_GACM_VENDOR)){
+					$this->get_gacm_data();
+				}
+				$this->activate_gacm_updater();	
+			}
+			else if(($the_options['is_gacm_on'] == "true" || $the_options['is_gacm_on'] == true || $the_options['is_gacm_on'] === "1") && ($save_object['is_gacm_on'] == "false" || $save_object['is_gacm_on'] == false || $save_object['is_gacm_on'] == "0")){
+				$this->deactivate_gacm_updater();
+			}
+
+			if(isset($save_object['lang_selected']) && $save_object['lang_selected'] !== $the_options['lang_selected']){
 				$this->gdpr_translate_cookie_categories($save_object['lang_selected']);
 			}
 			
@@ -8483,11 +8499,12 @@ class Gdpr_Cookie_Consent_Admin {
 			// Writing the CSS code to the minified CSS file.
 			$wp_filesystem->put_contents( $css_min_file_path, $custom_css, FS_CHMOD_FILE ) ;
 	
-			$encode_css                   = $this->encode_css( $the_options['gdpr_css_text'] );
+			$encode_css                   = $this->encode_css( $custom_css );
 			$the_options['gdpr_css_text'] = $encode_css;
 		}
 
 		global $wpdb;
+		$advanced_scripts_table = $wpdb->prefix . 'wpl_cookie_scripts';
 		if ( ! empty( $advanced_scripts ) ) {
 			foreach ( $advanced_scripts as $row ) {
 				$wpdb->update(
@@ -8506,7 +8523,8 @@ class Gdpr_Cookie_Consent_Admin {
 			}
 		}
 
-		if ( ! empty( $whitelist_scripts ) ) {
+		if ( $whitelist_scripts !== null ) {
+			if($whitelist_scripts === 'empty array') $whitelist_scripts = array();
 
 			$whitelist_scripts = array(
 				'whitelist_script' => $whitelist_scripts,
@@ -11344,6 +11362,13 @@ public function gdpr_support_request_handler() {
 		$option_name     = 'wpl_consent_timestamp';
 		$timestamp_value = time();
 
+		$the_options = get_option(GDPR_COOKIE_CONSENT_SETTINGS_FIELD);
+
+		if(!isset($the_options['consent_version'])) $the_options['consent_version'] = 2;
+		else $the_options['consent_version'] = $the_options['consent_version'] + 1;
+
+		update_option(GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options);
+
 		// Check if the option already exists.
 		if ( false === get_option( $option_name ) ) {
 			// If it doesn't exist, add the option.
@@ -11980,7 +12005,7 @@ public function gdpr_support_request_handler() {
 		return new WP_REST_Response(
 			array(
 				'status'  => 'success',
-				'message' => 'Translation Successful',
+				'message' => 'Content translated successfully. Please check in design tab and Save Chnages.',
 				'data'	  => array(
 					'notify_message_eprivacy'				=> $new_options['notify_message_eprivacy'],
 					'notify_message_lgpd'					=> $new_options['notify_message_lgpd'],

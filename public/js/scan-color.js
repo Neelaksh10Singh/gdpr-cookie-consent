@@ -90,9 +90,6 @@
   window.addEventListener('message', function (event) {
     var data = event.data || {};
 
-    console.log('TYPE -> ', data.type);
-    console.log('Event Origin -> ', event.origin);
-    console.log('Allowed Origin -> ', ALLOWED_ORIGIN);
 
     if (event.origin !== ALLOWED_ORIGIN) return;
     if (data.type !== 'GET_SITE_COLORS') return;
