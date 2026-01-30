@@ -1186,9 +1186,8 @@ $selected_script_category = $wpdb->get_var(
 			}
 			$the_options['credits'] = $the_options['show_credits'] ? $credit_link : '';
 			$ab_options    = get_option( 'wpl_ab_options' );
-			
-			$template_object = json_decode($the_options['selected_template_json'], true);
-			
+						
+			$template_object = json_decode($the_options['selected_template_json'], true);			
 			// include plugin_dir_path( __FILE__ ) . 'templates/default.php';
 			include plugin_dir_path(__FILE__) . 'templates/cookie-notice.php';
 			?>

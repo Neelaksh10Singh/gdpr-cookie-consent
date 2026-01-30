@@ -8384,7 +8384,6 @@ class Gdpr_Cookie_Consent_Admin {
 			update_option(GDPR_COOKIE_CONSENT_SETTINGS_VENDOR, $iabtcfVendorData);
 		}
 
-		
 
 		if ( $save_object['data_req_editor_message'] !== '' && $save_object['data_req_editor_message'] !== null ) {
 			$save_object['data_req_editor_message'] = htmlentities( $save_object['data_req_editor_message'] );
@@ -8421,6 +8420,10 @@ class Gdpr_Cookie_Consent_Admin {
 
 			if(isset($save_object['lang_selected']) && $save_object['lang_selected'] !== $the_options['lang_selected']){
 				$this->gdpr_translate_cookie_categories($save_object['lang_selected']);
+			}
+
+			if (isset($save_object['selected_template_json']) && is_array($save_object['selected_template_json'])) {
+			    $save_object['selected_template_json'] = json_encode($save_object['selected_template_json']);
 			}
 			
 			$the_options = array_merge($the_options, $save_object);
@@ -10144,20 +10147,18 @@ public function gdpr_support_request_handler() {
 			$select_countries_ccpa = $the_options['select_countries_ccpa'];
 		}
 
-		$get_categories = Gdpr_Cookie_Consent_Cookie_Custom::get_categories();
-
-		$categories = $this->gdpr_get_categories();
+		$get_categories = Gdpr_Cookie_Consent_Cookie_Custom::get_categories(true);
 		$category_descriptions =  array();
-		foreach ( $categories as $category ) {
-				$cat_description = isset( $category['description'] ) ? addslashes( $category['description'] ) : '';
+		foreach ( $get_categories as $category ) {
+				$cat_description = isset( $category['gdpr_cookie_category_description'] ) ? addslashes( $category['gdpr_cookie_category_description'] ) : '';
 				$category_descriptions[] = $cat_description;
 		}
 
 		$cookies_categories = array_map(
-			fn ( $label, $value ) => [
-				'value' => $value,
-				'label' => $label,
-			],
+			fn($cat) => [
+    		    'value' => (int) $cat['id_gdpr_cookie_category'], 
+    		    'label' => $cat['gdpr_cookie_category_name'], // translated name
+    		],
 			$get_categories,
 			array_keys( $get_categories )
 		);
@@ -10224,7 +10225,6 @@ public function gdpr_support_request_handler() {
 				// Time remaining
 				$remaining_days    = floor($remaining_time / DAY_IN_SECONDS);
 				$remaining_hours   = floor(($remaining_time % DAY_IN_SECONDS) / HOUR_IN_SECONDS);
-				$remaining_minutes = floor(($remaining_time % HOUR_IN_SECONDS) / MINUTE_IN_SECONDS);
 			} 
 		}
 
@@ -11113,14 +11113,13 @@ public function gdpr_support_request_handler() {
 				'negative_percentage2'						=> $negative_percentage2,
 				'banner_performance1'						=> $banner1_performance,
 				'banner_performance2'						=> $banner2_performance,
-				'remaining_days'							=> isset($remaining_days) ? $remaining_days : 0,
-				'remaining_hours'							=> isset($remaining_hours) ? $remaining_hours : 0,
+				'remaining_days'							=> isset($remaining_days) ? $remaining_days : 29,
+				'remaining_hours'							=> isset($remaining_hours) ? $remaining_hours : 23,
 			)
 		);
 	}
 
 	public function wplp_set_default_ab_banner_for_react_app( WP_REST_Request $request ) {
-		error_log("DODODO setting up default AB banner");
 
 		$bannerChoice = $request->get_param( 'bannerChoice' );
 		if ( empty( $bannerChoice ) ) {
@@ -11285,33 +11284,32 @@ public function gdpr_support_request_handler() {
 	}
 
 	public function saas_upload_logo( WP_REST_Request $request ) {
-		error_log("DODODO uploading saas logo.....");
 
 		 $image_base64 = $request->get_param('image_base64');
     	$file_name    = sanitize_file_name($request->get_param('file_name'));
-		
+
     	$upload_dir = wp_upload_dir();
     	$file_path = $upload_dir['path'] . '/' . $file_name;
-		
+
     	$image_data = base64_decode($image_base64);
     	file_put_contents($file_path, $image_data);
-		
+
     	$filetype = wp_check_filetype($file_name);
-		
+
     	$attachment = [
     	    'post_mime_type' => $filetype['type'],
     	    'post_title'     => pathinfo($file_name, PATHINFO_FILENAME),
     	    'post_status'    => 'inherit'
     	];
-	
+
     	$attach_id = wp_insert_attachment($attachment, $file_path);
     	require_once ABSPATH . 'wp-admin/includes/image.php';
-	
+
     	wp_update_attachment_metadata(
     	    $attach_id,
     	    wp_generate_attachment_metadata($attach_id, $file_path)
     	);
-	
+
     	return [
     	    'attachment_id' => $attach_id,
     	    'url' => wp_get_attachment_url($attach_id)
@@ -11995,13 +11993,14 @@ public function gdpr_support_request_handler() {
 				'label' => $translated_category_name_unclassified,
 			),
 		);
-		$translated_cookie_descriptions = array(
+		$translated_category_descriptions = array(
 			$translated_category_description_analytics,
 			$translated_category_description_marketing,
 			$translated_category_description_necessary,
 			$translated_category_description_preferences,
 			$translated_category_description_unclassified,
 		);
+
 		return new WP_REST_Response(
 			array(
 				'status'  => 'success',
