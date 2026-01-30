@@ -8378,7 +8378,6 @@ class Gdpr_Cookie_Consent_Admin {
 		$ab_testing_data = $request->get_param('ab_testing_object') ?: null;
 		$ab_option       = get_option( 'wpl_ab_options' );
 
-		
 
 		if ( $save_object['data_req_editor_message'] !== '' && $save_object['data_req_editor_message'] !== null ) {
 			$save_object['data_req_editor_message'] = htmlentities( $save_object['data_req_editor_message'] );
@@ -8405,6 +8404,10 @@ class Gdpr_Cookie_Consent_Admin {
 
 			if($save_object['lang_selected'] !== $the_options['lang_selected']){
 				$this->gdpr_translate_cookie_categories($save_object['lang_selected']);
+			}
+
+			if (isset($save_object['selected_template_json']) && is_array($save_object['selected_template_json'])) {
+			    $save_object['selected_template_json'] = json_encode($save_object['selected_template_json']);
 			}
 			
 			$the_options = array_merge($the_options, $save_object);
@@ -10126,20 +10129,18 @@ public function gdpr_support_request_handler() {
 			$select_countries_ccpa = $the_options['select_countries_ccpa'];
 		}
 
-		$get_categories = Gdpr_Cookie_Consent_Cookie_Custom::get_categories();
-
-		$categories = $this->gdpr_get_categories();
+		$get_categories = Gdpr_Cookie_Consent_Cookie_Custom::get_categories(true);
 		$category_descriptions =  array();
-		foreach ( $categories as $category ) {
-				$cat_description = isset( $category['description'] ) ? addslashes( $category['description'] ) : '';
+		foreach ( $get_categories as $category ) {
+				$cat_description = isset( $category['gdpr_cookie_category_description'] ) ? addslashes( $category['gdpr_cookie_category_description'] ) : '';
 				$category_descriptions[] = $cat_description;
 		}
 
 		$cookies_categories = array_map(
-			fn ( $label, $value ) => [
-				'value' => $value,
-				'label' => $label,
-			],
+			fn($cat) => [
+    		    'value' => (int) $cat['id_gdpr_cookie_category'], 
+    		    'label' => $cat['gdpr_cookie_category_name'], // translated name
+    		],
 			$get_categories,
 			array_keys( $get_categories )
 		);
@@ -11101,7 +11102,6 @@ public function gdpr_support_request_handler() {
 	}
 
 	public function wplp_set_default_ab_banner_for_react_app( WP_REST_Request $request ) {
-		error_log("DODODO setting up default AB banner");
 
 		$bannerChoice = $request->get_param( 'bannerChoice' );
 		if ( empty( $bannerChoice ) ) {
@@ -11266,7 +11266,6 @@ public function gdpr_support_request_handler() {
 	}
 
 	public function saas_upload_logo( WP_REST_Request $request ) {
-		error_log("DODODO uploading saas logo.....");
 
 		 $image_base64 = $request->get_param('image_base64');
     	$file_name    = sanitize_file_name($request->get_param('file_name'));
@@ -11969,13 +11968,14 @@ public function gdpr_support_request_handler() {
 				'label' => $translated_category_name_unclassified,
 			),
 		);
-		$translated_cookie_descriptions = array(
+		$translated_category_descriptions = array(
 			$translated_category_description_analytics,
 			$translated_category_description_marketing,
 			$translated_category_description_necessary,
 			$translated_category_description_preferences,
 			$translated_category_description_unclassified,
 		);
+
 		return new WP_REST_Response(
 			array(
 				'status'  => 'success',
