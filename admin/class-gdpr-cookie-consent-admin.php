@@ -8470,14 +8470,36 @@ class Gdpr_Cookie_Consent_Admin {
 			if ( empty( $image['value'] ) ) {
 				continue;
 			}
+			if(!isset($image['value']['image'])) continue;
+			$image_base64 = $image['value']['image'];
+			$file_name    = $image['value']['name'];
 
-			$attachment_id = media_handle_upload( 'image', 0 );
+			$upload_dir = wp_upload_dir();
+			$file_path = $upload_dir['path'] . '/' . $file_name;
 
-			if ( is_wp_error( $attachment_id ) ) {
-				continue;
-			}
+			$image_data = base64_decode($image_base64);
+			file_put_contents($file_path, $image_data);
 
-			$image_url = wp_get_attachment_url( $attachment_id );
+			$filetype = wp_check_filetype($file_name);
+
+			$attachment = [
+				'post_mime_type' => $filetype['type'],
+				'post_title'     => pathinfo($file_name, PATHINFO_FILENAME),
+				'post_status'    => 'inherit'
+			];
+
+			$attach_id = wp_insert_attachment($attachment, $file_path);
+			error_log("Attach id : " . print_r($attach_id, true));
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+
+			wp_update_attachment_metadata(
+				$attach_id,
+				wp_generate_attachment_metadata($attach_id, $file_path)
+			);
+
+
+			$image_url = wp_get_attachment_url( $attach_id );
+			error_log("Image url : " . print_r($image_url, true));
 
 			if ( $image_url ) {
 				update_option( $image['option'], esc_url_raw( $image_url ) );
@@ -8730,7 +8752,7 @@ class Gdpr_Cookie_Consent_Admin {
 
 		// Add our own permissive CORS headers
 		add_filter( 'rest_pre_serve_request', function( $value ) {
-			header( 'Access-Control-Allow-Origin: *');
+			header( 'Access-Control-Allow-Origin: *' );
 			header( 'Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS' );
 			header( 'Access-Control-Allow-Credentials: true' );
 			header( 'Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Nonce, Origin, X-Requested-With, Accept' );
@@ -8999,7 +9021,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods'  => 'POST',
 				'callback' => array( $this, 'wplp_fetch_cookie_settings_data_for_react_app' ),
-				// 'permission_callback' => array($this, 'permission_callback_for_react_app'),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
 			)
 		);
 		
@@ -9009,7 +9031,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods'  => 'POST',
 				'callback' => array( $this, 'wplp_set_default_ab_banner_for_react_app' ),
-				// 'permission_callback' => array($this, 'permission_callback_for_react_app'),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
 			)
 		);
 
@@ -9019,7 +9041,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods'  => 'POST',
 				'callback' => array( $this, 'wplp_set_default_ab_banner_for_react_app' ),
-				// 'permission_callback' => array($this, 'permission_callback_for_react_app'),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
 			)
 		);
 
@@ -9029,7 +9051,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods'  => 'POST',
 				'callback' => array( $this, 'gdpr_renew_user_consent' ),
-				// 'permission_callback' => array($this, 'permission_callback_for_react_app'),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
 			)
 		);
 
@@ -9039,7 +9061,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods'  => 'POST',
 				'callback' => array( $this, 'gdpr_check_gcm_status' ),
-				// 'permission_callback' => array($this, 'permission_callback_for_react_app'),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
 			)
 		);
 		
@@ -9069,7 +9091,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods'  => 'POST',
 				'callback' => array( $this, 'gdpr_custom_cookie' ),
-				// 'permission_callback' => array($this, 'permission_callback_for_react_app'),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
 			)
 		);
 
@@ -9089,7 +9111,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods'  => 'POST',
 				'callback' => array( $this, 'gdpr_auto_generate_banner' ),
-				// 'permission_callback' => array($this, 'permission_callback_for_react_app'),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
 			)
 		);
 
@@ -9099,7 +9121,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods'  => 'POST',
 				'callback' => array( $this, 'gdpr_schedule_scan' ),
-				// 'permission_callback' => array($this, 'permission_callback_for_react_app'),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
 			)
 		);
 
@@ -9109,7 +9131,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods'  => 'POST',
 				'callback' => array( $this, 'gdpr_start_cookie_scan' ),
-				// 'permission_callback' => array($this, 'permission_callback_for_react_app'),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
 			)
 		);
 
@@ -9119,7 +9141,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods'  => 'POST',
 				'callback' => array( $this, 'gdpr_translate_text'),
-				// 'permission_callback' => array($this, 'permission_callback_for_react_app),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
 			)
 		);
 
@@ -9129,7 +9151,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods' => 'POST',
 				'callback' => array( $this, 'saas_upload_logo' ),
-				// 'permission_callback' => array($this, 'permission_callback_for_react_app'),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
 			)
 		);
 
@@ -9941,13 +9963,30 @@ public function gdpr_support_request_handler() {
 	public function gdpr_get_data_request_form_fields( WP_REST_Request $request ) {
 
 		$the_options = get_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD );
+		$plan                = $this->settings->get_plan();
+		$monthly_scan = 0;
+		$monthly_scan_limit = 1e7;
+		if( $plan == 'free' ) {
+			$monthly_scan = get_transient( 'gdpr_monthly_scan_limit_exhausted' );
+			$monthly_scan = (int) $monthly_scan;
+			$monthly_scan_limit = 5;
+		}
+
+		$gdpr_pages_scanned = get_option('gdpr_no_of_page_scan', 0);
+
+		$gdpr_monthly_page_views = get_option('wpl_monthly_page_views', 0);
 		
 		return rest_ensure_response(
 			array(
-				'subject' => $the_options['data_req_subject'],
-				'message' => $the_options['data_req_editor_message'] ?? '',
-				'email'   => $the_options['data_req_email_address'] ?? '',
-				'status'  => $the_options['data_reqs_on'],
+				'subject' 				 => $the_options['data_req_subject'],
+				'message' 				 => $the_options['data_req_editor_message'] ?? '',
+				'email'   				 => $the_options['data_req_email_address'] ?? '',
+				'status'  				 => $the_options['data_reqs_on'],
+				'monthly_scan'			 => $monthly_scan,
+				'monthly_scan_limit'	 => $monthly_scan_limit,
+				'plan' 					 => $plan,
+				'total_pages_scanned'	 => $gdpr_pages_scanned,
+				'monthly_page_views'	 => $gdpr_monthly_page_views,
 			)
 		);
 	}
@@ -9983,11 +10022,27 @@ public function gdpr_support_request_handler() {
 		$the_options         = get_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD );
 		$is_tracking_allowed = get_option( 'gdpr_usage_tracking_allowed' );
 		$plan                = $this->settings->get_plan();
+		$monthly_scan = 0;
+		$monthly_scan_limit = 1e7;
+		if( $plan == 'free' ) {
+			$monthly_scan = get_transient( 'gdpr_monthly_scan_limit_exhausted' );
+			$monthly_scan = (int) $monthly_scan;
+			$monthly_scan_limit = 5;
+		}
+
+		$gdpr_pages_scanned = get_option('gdpr_no_of_page_scan', 0);
+
+		$gdpr_monthly_page_views = get_option('wpl_monthly_page_views', 0);
+
 
 		return rest_ensure_response(
 			array(
 				'cookie_usage_for'       => $the_options['cookie_usage_for'],
 				'plan'                   => $plan,
+				'monthly_scan'			 => $monthly_scan,
+				'monthly_scan_limit'	 => $monthly_scan_limit,
+				'total_pages_scanned'	 => $gdpr_pages_scanned,
+				'monthly_page_views'	 => $gdpr_monthly_page_views,
 				'is_multisite'           => is_multisite(),
 				'consent_forward'        => $the_options['consent_forward'],
 				'logging_on'             => $the_options['logging_on'],
@@ -10190,6 +10245,18 @@ public function gdpr_support_request_handler() {
 			);
 			++$index;
 		}
+		$api_user_plan     = $this->settings->get_plan();
+		$monthly_scan = 0;
+		$monthly_scan_limit = 1e7;
+		if( $api_user_plan == 'free' ) {
+			$monthly_scan = get_transient( 'gdpr_monthly_scan_limit_exhausted' );
+			$monthly_scan = (int) $monthly_scan;
+			$monthly_scan_limit = 5;
+		}
+
+		$gdpr_pages_scanned = get_option('gdpr_no_of_page_scan', 0);
+
+		$gdpr_monthly_page_views = get_option('wpl_monthly_page_views', 0);
 
 		$advanced_scripts = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$advanced_scripts_table}" ), ARRAY_A );
 
@@ -10664,6 +10731,10 @@ public function gdpr_support_request_handler() {
 		return rest_ensure_response(
 			array(
 				'plan'									   => $plan,
+				'monthly_scan'					   		   => $monthly_scan,
+				'monthly_scan_limit'			   		   => $monthly_scan_limit,
+				'total_pages_scanned'		 	   		   => $gdpr_pages_scanned,
+				'monthly_page_views'			   		   => $gdpr_monthly_page_views,
 				'is_on'                                    => $this->convert_boolean( $the_options['is_on'] ),
 				'is_iabtcf_on'                             => $this->convert_boolean( $the_options['is_iabtcf_on'] ),
 				'is_gacm_on'                               => $this->convert_boolean( $the_options['is_gacm_on'] ),
@@ -11397,7 +11468,7 @@ public function gdpr_support_request_handler() {
 		update_option(GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options);
 
 		// check gcm status.
-		$wpl_api_url   = 'https://app.wplegalpages.com/wp-json/wplcookies/v2/';
+		$wpl_api_url   = 'https://appstaging.wplegalpages.com/wp-json/wplcookies/v2/';
 		$site_url      = site_url();
 		$response_url  = get_rest_url(null, 'gdpr/v2/update_gcm_status');
 		$response      = wp_remote_get( $wpl_api_url . 'get_gcm_status' . '?url=' . $site_url . '&response_url=' . $response_url );
