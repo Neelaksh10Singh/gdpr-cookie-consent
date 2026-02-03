@@ -603,7 +603,6 @@ class Gdpr_Cookie_Consent_Admin {
 	public function gdpr_ab_testing_complete() {
 		$ab_options = get_option( 'wpl_ab_options' );
 		if ( $ab_options && isset( $ab_options['ab_testing_enabled'] ) && ($ab_options['ab_testing_enabled'] === true || $ab_options['ab_testing_enabled'] === 'true') && false === get_transient( 'gdpr_ab_testing_transient' ) ) {
-			
 			$banner1_noChoice  = array_key_exists( 'noChoice1', $ab_options ) ? $ab_options['noChoice1'] : 0;
 			$banner2_noChoice  = array_key_exists( 'noChoice2', $ab_options ) ? $ab_options['noChoice2'] : 0;
 			$banner1_accept  = array_key_exists( 'accept1', $ab_options ) ? $ab_options['accept1'] : 0;
@@ -632,7 +631,6 @@ class Gdpr_Cookie_Consent_Admin {
 				}
 				update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
 			}
-			
 		}
 	}
 	/**
@@ -8607,18 +8605,59 @@ class Gdpr_Cookie_Consent_Admin {
 				}
 			}
 		}
-		if(!empty($ab_testing_data) && is_array($ab_testing_data)){
-			if($ab_testing_data['ab_testing_enabled'] === false && ($ab_option['ab_testing_enabled'] === 'true' || $ab_option['ab_testing_enabled'] === true)){
+		if (!empty($ab_testing_data) && is_array($ab_testing_data)) {
 
-				$the_options = $this->wpl_set_default_ab_testing_banner( $the_options, $the_options['default_cookie_bar'] === true || $the_options['default_cookie_bar'] === 'true' ? '1' : '2' );
+		    // Normalize booleans
+		    $new_enabled = filter_var($ab_testing_data['ab_testing_enabled'], FILTER_VALIDATE_BOOLEAN);
+		    $old_enabled = filter_var($ab_options['ab_testing_enabled'] ?? false, FILTER_VALIDATE_BOOLEAN);
+				
+		    // If AB testing is turned OFF
+		    if ($new_enabled === false && $old_enabled === true) {
+			
+		        $the_options = $this->wpl_set_default_ab_testing_banner(
+		            $the_options,
+		            ($the_options['default_cookie_bar'] === true || $the_options['default_cookie_bar'] === 'true') ? '1' : '2'
+		        );
+		    }
+		
+			if ( $new_enabled === true && $old_enabled === false ) {
+				$ab_options['noChoice1'] = 0;
+				$ab_options['noChoice2'] = 0;
+				$ab_options['accept1'] = 0;
+				$ab_options['accept2'] = 0;
+				$ab_options['acceptAll1'] = 0;
+				$ab_options['acceptAll2'] = 0;
+				$ab_options['reject1'] = 0;
+				$ab_options['reject2'] = 0;
+				$ab_options['bypass1'] = 0;
+				$ab_options['bypass2'] = 0;
+			}
+		    // Store old period before updating
+		    $current_ab_testing_value = (int) ($ab_options['ab_testing_period'] ?? 0);
+		
+		    // Update options
+		    $ab_options['ab_testing_enabled'] = $new_enabled ? 'true' : 'false';
+		    $ab_options['ab_testing_period']  = (int) $ab_testing_data['ab_testing_period'];
+		    $ab_options['ab_testing_auto']    = $ab_testing_data['ab_testing_auto'];
 
-			}
-			else{
-				$ab_option['ab_testing_enabled'] = $ab_testing_data['ab_testing_enabled'];
-				$ab_option['ab_testing_period'] = $ab_testing_data['ab_testing_period'];
-				$ab_option['ab_testing_auto'] = $ab_testing_data['ab_testing_auto'];
-				update_option('wpl_ab_options', $ab_option);
-			}
+		    update_option('wpl_ab_options', $ab_options);
+		
+		    // Handle transient if period changed
+		    $updated_ab_testing_value = (int) $ab_options['ab_testing_period'];
+		
+		    if ($current_ab_testing_value !== $updated_ab_testing_value && $updated_ab_testing_value > 0) {
+			
+		        $expiration_seconds = $updated_ab_testing_value * DAY_IN_SECONDS;
+			
+		        set_transient(
+		            'gdpr_ab_testing_transient',
+		            [
+		                'value'         => 'A/B Testing Period',
+		                'creation_time' => time(),
+		            ],
+		            $expiration_seconds
+		        );
+		    }
 		}
 
 
@@ -10180,7 +10219,7 @@ public function gdpr_support_request_handler() {
     		: [];
 
 		// AB testing data
-		$ab_options = get_option( 'wpl_ab_options' );			
+		$ab_options = get_option( 'wpl_ab_options' );	
 		$banner1_noChoice  = array_key_exists( 'noChoice1', $ab_options ) ? $ab_options['noChoice1'] : 0;
 		$banner2_noChoice  = array_key_exists( 'noChoice2', $ab_options ) ? $ab_options['noChoice2'] : 0;
 		$banner1_accept  = array_key_exists( 'accept1', $ab_options ) ? $ab_options['accept1'] : 0;
