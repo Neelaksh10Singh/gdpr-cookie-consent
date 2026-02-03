@@ -8470,6 +8470,9 @@ class Gdpr_Cookie_Consent_Admin {
 			if ( empty( $image['value'] ) ) {
 				continue;
 			}
+			if($image['value'] == 'empty'){
+				delete_option( $image['option']);
+			}
 			if(!isset($image['value']['image'])) continue;
 			$image_base64 = $image['value']['image'];
 			$file_name    = $image['value']['name'];
@@ -10173,7 +10176,7 @@ public function gdpr_support_request_handler() {
 	public function wplp_fetch_cookie_settings_data_for_react_app( WP_REST_Request $request ) {
 
 		$the_options = get_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD );
-		$language    = $the_options['lang_selected'] ?? 'en';
+		$language    = !empty($the_options['lang_selected']) ? $the_options['lang_selected'] : 'en';
 
 		if ( empty( $the_options['gcm_defaults'] ) ) {
 			$the_options['gcm_defaults'] = json_encode(
@@ -11172,7 +11175,7 @@ public function gdpr_support_request_handler() {
 				'whitelist_scripts'                        => get_option( 'wpl_options_custom-scripts' )['whitelist_script'],
 
 				'show_language_as_options'				   => $show_language_as_options,
-				'lang_selected'							   => $the_options['lang_selected'],
+				'lang_selected'							   => $language,
 
 				// AB Testing
 				'ab_testing_enabled'						=> array_key_exists( 'ab_testing_enabled', $ab_options ) ? $ab_options['ab_testing_enabled'] : false,
