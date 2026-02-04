@@ -90,7 +90,7 @@ if ( 'popup' === $the_options['cookie_bar_as'] ) {
 		$heading_style_attr .= esc_attr($key) . ':' . esc_attr($value) . ';';
 	}  
 	$readmore_style_attr = "";
-	$readmore_style_attr .= " color: {$the_options['button_readmore_link_color']};";
+	$readmore_style_attr .= " color: {$the_options['button_readmore_link_color' . $suffix]};";
 	if (
 		$template_object['name'] === 'blue_full' ||
 		$template_object['name'] === 'blue_center' ||
