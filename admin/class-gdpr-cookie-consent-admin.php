@@ -8490,7 +8490,6 @@ class Gdpr_Cookie_Consent_Admin {
 			];
 
 			$attach_id = wp_insert_attachment($attachment, $file_path);
-			error_log("Attach id : " . print_r($attach_id, true));
 			require_once ABSPATH . 'wp-admin/includes/image.php';
 
 			wp_update_attachment_metadata(
@@ -8500,7 +8499,6 @@ class Gdpr_Cookie_Consent_Admin {
 
 
 			$image_url = wp_get_attachment_url( $attach_id );
-			error_log("Image url : " . print_r($image_url, true));
 
 			if ( $image_url ) {
 				update_option( $image['option'], esc_url_raw( $image_url ) );
@@ -8794,7 +8792,7 @@ class Gdpr_Cookie_Consent_Admin {
 
 		// Add our own permissive CORS headers
 		add_filter( 'rest_pre_serve_request', function( $value ) {
-			header( 'Access-Control-Allow-Origin: *' );
+			header( 'Access-Control-Allow-Origin: ' . GDPR_APP_URL );
 			header( 'Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS' );
 			header( 'Access-Control-Allow-Credentials: true' );
 			header( 'Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Nonce, Origin, X-Requested-With, Accept' );
@@ -8810,7 +8808,6 @@ class Gdpr_Cookie_Consent_Admin {
 	}
 
 	public function permission_callback_for_react_app(WP_REST_Request $request) {
-		return true;
 		$this->settings = new GDPR_Cookie_Consent_Settings();
 
 		$master_key = $this->settings->get('api','token');		
@@ -9143,7 +9140,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods'  => 'POST',
 				'callback' => array( $this, 'gdpr_cookie_data' ),
-				// 'permission_callback' => array($this, 'permission_callback_for_react_app'),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
 			)
 		);
 
@@ -11500,7 +11497,7 @@ public function gdpr_support_request_handler() {
 		update_option(GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options);
 
 		// check gcm status.
-		$wpl_api_url   = 'https://appstaging.wplegalpages.com/wp-json/wplcookies/v2/';
+		$wpl_api_url   = 'https://app.wplegalpages.com/wp-json/wplcookies/v2/';
 		$site_url      = site_url();
 		$response_url  = get_rest_url(null, 'gdpr/v2/update_gcm_status');
 		$response      = wp_remote_get( $wpl_api_url . 'get_gcm_status' . '?url=' . $site_url . '&response_url=' . $response_url );
