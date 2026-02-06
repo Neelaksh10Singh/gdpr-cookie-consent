@@ -7063,9 +7063,13 @@ class Gdpr_Cookie_Consent_Admin {
 				return;
 			}
 			if ( isset( $_POST['settings'] ) ) {
-				$the_options = $_POST['settings'];//phpcs:ignore
-				update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
-				wp_send_json_success( array( 'imported_settings' => true ) );
+				$the_options = json_decode( wp_unslash( $_POST['settings'] ), true ); //phpcs:ignore
+				if ( is_array( $the_options ) ) {
+					update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
+					wp_send_json_success( array( 'imported_settings' => true ) );
+				} else {
+					wp_send_json_error("Invalid settings data.");
+				}
 			}
 		}
 	}
