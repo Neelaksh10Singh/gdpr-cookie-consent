@@ -176,9 +176,13 @@ class WPL_Data_Req_Table extends WP_List_Table {
 			admin_url( 'admin-post.php?action=gdpr_resolve&id=' . $item['ID'] ),
 			'wpl_resolve_request'
 		);
+		$delete_url = wp_nonce_url(
+			admin_url( 'admin-post.php?action=gdpr_delete&id=' . $item['ID'] ),
+			'wpl_delete_request'
+		);
 		$actions = array(
 			'resolve' => '<a href="' . $resolve_url . '">' . __( 'Resolve', 'gdpr-cookie-consent' ) . '</a>',
-			'delete'  => '<a href="' . admin_url( 'admin.php?page=gdpr-cookie-consent&action=delete&id=' . $item['ID'] ) . '">' . __( 'Delete', 'gdpr-cookie-consent' ) . '</a>',
+			'delete'  => '<a href="' . $delete_url . '">' . __( 'Delete', 'gdpr-cookie-consent' ) . '</a>',
 		);
 
 		return $this->row_actions( $actions );

@@ -112,6 +112,7 @@ class Gdpr_Cookie_Consent_Admin {
 			}
 
 			add_action( 'admin_post_gdpr_resolve', [ $this, 'wpl_data_req_process_resolve' ] );
+			add_action( 'admin_post_gdpr_delete', [ $this, 'wpl_data_req_process_delete' ] );
 			add_action( 'admin_init', array( $this, 'gdpr_migrate_old_template_names_once') );
 			add_action('admin_init', function() {
 				if (!defined('DOING_AJAX') && !defined('REST_REQUEST')) {
@@ -120,7 +121,6 @@ class Gdpr_Cookie_Consent_Admin {
 			});
 			add_action( 'wp_ajax_set_default_test_banner_1', array( $this, 'set_default_banner_1' ) );
 			add_action( 'wp_ajax_set_default_test_banner_2', array( $this, 'set_default_banner_2' ) );
-			add_action( 'add_data_request_content', array( $this, 'wpl_data_req_process_delete' ) );
 			add_action( 'add_data_request_content', array( $this, 'wpl_data_requests_overview' ) );
 			add_action('gdpr_cookie_consent_admin_screen', array($this, 'gdpr_cookie_consent_new_admin_screen'));
 			add_action('gdpr_cookie_consent_new_admin_dashboard_screen', array($this, 'gdpr_cookie_consent_new_admin_dashboard_screen'));
@@ -1663,16 +1663,16 @@ class Gdpr_Cookie_Consent_Admin {
 		    wp_die( 'Unauthorized request.' );
 		}
 
-		if ( isset( $_GET['page'] ) && ( $_GET['page'] == 'gdpr-cookie-consent' )
-			&& isset( $_GET['action'] )
-			&& $_GET['action'] == 'delete'
-			&& isset( $_GET['id'] )
-		) {
-			global $wpdb;
-			$wpdb->delete( $wpdb->prefix . 'wpl_data_req', array( 'ID' => intval( $_GET['id'] ) ) );
-			$paged = isset( $_GET['paged'] ) ? 'paged=' . intval( $_GET['paged'] ) : '';
-			wp_redirect( admin_url( 'admin.php?page=gdpr-cookie-consent#data_request' . $paged ) );
+		check_admin_referer( 'wpl_delete_request' );
+		$id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
+		if ( ! $id ) {
+			wp_die( 'Invalid request.' );
 		}
+		global $wpdb;
+		$wpdb->delete( $wpdb->prefix . 'wpl_data_req', array( 'ID' => intval( $_GET['id'] ) ) );
+		$paged = isset( $_GET['paged'] ) ? 'paged=' . intval( $_GET['paged'] ) : '';
+		wp_redirect( admin_url( 'admin.php?page=gdpr-cookie-consent#data_request' . $paged ) );
+		exit;
 	}
 
 
@@ -8329,7 +8329,7 @@ class Gdpr_Cookie_Consent_Admin {
 	}
 
 	public function gdpr_delete_data_request_entries( WP_REST_Request $request ) {
-
+		error_log('Delete data request entries called');
 		$ids = $request->get_param('ids');
 
 		if ( empty($ids) || !is_array($ids) ) {
