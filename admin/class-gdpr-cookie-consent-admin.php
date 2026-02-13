@@ -5404,12 +5404,6 @@ class Gdpr_Cookie_Consent_Admin {
 			if ( ! get_option( 'wpl_pro_active' ) ) {
 				// script blocker.
 				// enable safe mode.
-				$the_options['enable_safe'] = isset( $_POST['gcc-enable-safe'] ) && ( true === $_POST['gcc-enable-safe'] || 'true' === $_POST['gcc-enable-safe'] ) ? 'true' : 'false';
-				$is_usage_tracking_allowed = 'false';
-				if ( isset( $_POST['gcc-usage-data'] ) && ( true === $_POST['gcc-usage-data'] || 'true' === $_POST['gcc-usage-data'] ) ) {
-					$is_usage_tracking_allowed = 'true';
-				}
-				update_option( 'gdpr_usage_tracking_allowed', $is_usage_tracking_allowed );
 
 				// consent forwarding.
 				$selected_sites                 = array();
