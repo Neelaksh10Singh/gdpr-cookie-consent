@@ -7063,9 +7063,111 @@ class Gdpr_Cookie_Consent_Admin {
 				return;
 			}
 			if ( isset( $_POST['settings'] ) ) {
-				$the_options = $_POST['settings'];//phpcs:ignore
-				update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
-				wp_send_json_success( array( 'imported_settings' => true ) );
+				$the_options = json_decode( wp_unslash( $_POST['settings'] ), true ); //phpcs:ignore
+				if ( is_array( $the_options ) ) {
+					// Process logo images if they exist in the import (base64)
+					$this->process_imported_logo_images();
+					
+					// Remove the logo_images field if it exists
+					if (isset($the_options['logo_images'])) {
+						unset($the_options['logo_images']);
+					}
+					
+					// Update the main settings
+					update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
+					wp_send_json_success( array( 'imported_settings' => true ) );
+				} else {
+					wp_send_json_error("Invalid settings data.");
+				}
+			}
+		}
+	}
+	/**
+	 * Process imported logo images (base64)
+	 */
+	private function process_imported_logo_images() {
+		$banner_image    = isset( $_POST['banner_image'] ) ? json_decode( wp_unslash( $_POST['banner_image'] ), true ) : '';
+		$banner_image1   = isset( $_POST['banner_image1'] ) ? json_decode( wp_unslash( $_POST['banner_image1'] ), true ) : '';
+		$banner_image2   = isset( $_POST['banner_image2'] ) ? json_decode( wp_unslash( $_POST['banner_image2'] ), true ) : '';
+		$banner_image_ml = isset( $_POST['banner_image_ml'] ) ? json_decode( wp_unslash( $_POST['banner_image_ml'] ), true ) : '';
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		$images = array(
+			array(
+				'value'  => $banner_image,
+				'option' => GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD,
+			),
+			array(
+				'value'  => $banner_image1,
+				'option' => GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD1,
+			),
+			array(
+				'value'  => $banner_image2,
+				'option' => GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD2,
+			),
+			array(
+				'value'  => $banner_image_ml,
+				'option' => GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELDML1,
+			),
+		);
+
+		foreach ( $images as $image ) {
+			if ( empty( $image['value'] ) ) {
+				continue;
+			}
+			
+			// Check if value is a string "empty" (for deleting logos)
+			if ( is_string( $image['value'] ) && $image['value'] == 'empty' ) {
+				delete_option( $image['option'] );
+				continue;
+			}
+			
+			// Check if we have valid image data
+			if ( ! isset( $image['value']['image'] ) || ! isset( $image['value']['name'] ) ) {
+				continue;
+			}
+			
+			$image_base64 = $image['value']['image'];
+			$file_name    = $image['value']['name'];
+
+			// Check if the base64 string has the data:image prefix and remove it
+			if ( strpos( $image_base64, 'data:image' ) === 0 ) {
+				// Remove the data:image/*;base64, prefix
+				$image_base64 = substr( $image_base64, strpos( $image_base64, ',' ) + 1 );
+			}
+			
+			$image_data = base64_decode( $image_base64 );
+			
+			if ( ! $image_data ) {
+				continue;
+			}
+
+			$upload_dir = wp_upload_dir();
+			$file_path = $upload_dir['path'] . '/' . $file_name;
+
+			file_put_contents( $file_path, $image_data );
+
+			$filetype = wp_check_filetype( $file_name, null );
+
+			$attachment = [
+				'post_mime_type' => $filetype['type'],
+				'post_title'     => pathinfo( $file_name, PATHINFO_FILENAME ),
+				'post_status'    => 'inherit'
+			];
+
+			$attach_id = wp_insert_attachment( $attachment, $file_path );
+			
+			// Regenerate attachment metadata
+			$attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
+			wp_update_attachment_metadata( $attach_id, $attach_data );
+
+			$image_url = wp_get_attachment_url( $attach_id );
+
+			if ( $image_url ) {
+				update_option( $image['option'], esc_url_raw( $image_url ) );
 			}
 		}
 	}
