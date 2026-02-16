@@ -5759,8 +5759,6 @@ class Gdpr_Cookie_Consent_Admin {
 				$the_options['is_script_dependency_on'] = isset( $_POST['gcc-script-dependency-on'] ) && ( true === $_POST['gcc-script-dependency-on'] || 'true' === $_POST['gcc-script-dependency-on'] ) ? 'true' : 'false';
 				$the_options['header_dependency'] = isset( $_POST['gcc-header-dependency'] )? sanitize_text_field( wp_unslash( $_POST['gcc-header-dependency'] ) ): '';
 				$the_options['footer_dependency'] = isset( $_POST['gcc-footer-dependency'] )? sanitize_text_field( wp_unslash( $_POST['gcc-footer-dependency'] ) ): '';
-				// enable safe mode.
-				$the_options['enable_safe'] = isset( $_POST['gcc-enable-safe'] ) && ( true === $_POST['gcc-enable-safe'] || 'true' === $_POST['gcc-enable-safe'] ) ? 'true' : 'false';
 				
 				if ( isset( $the_options['cookie_usage_for'] ) ) {
 					switch ( $the_options['cookie_usage_for'] ) {
@@ -7110,6 +7108,7 @@ class Gdpr_Cookie_Consent_Admin {
 
 		foreach ( $images as $image ) {
 			if ( empty( $image['value'] ) ) {
+				delete_option( $image['option'] );
 				continue;
 			}
 			
@@ -10350,9 +10349,9 @@ public function gdpr_support_request_handler() {
 		$cookie_scan            = $wpdb->prefix . 'wpl_cookie_scan';
 		$advanced_scripts_table = $wpdb->prefix . 'wpl_cookie_scripts';
 
-		$scanned_cookies = $wpdb->get_results( $wpdb->prepare( 'SELECT id_wpl_cookie_scan_cookies, name, domain, duration, type, category, category_id, description FROM ' . $cookies_table . ' ORDER BY id_wpl_cookie_scan_cookies DESC' ), ARRAY_A );
+		$scanned_cookies = $wpdb->get_results("SELECT id_wpl_cookie_scan_cookies, name, domain, duration, type, category, category_id, description FROM {$cookies_table} ORDER BY id_wpl_cookie_scan_cookies DESC", ARRAY_A);
 
-		$cookie_scan_list = $wpdb->get_results( $wpdb->prepare( 'SELECT id_wpl_cookie_scan, created_at, status, total_url, total_category, total_cookies FROM ' . $cookie_scan . ' ORDER BY id_wpl_cookie_scan DESC' ), ARRAY_A );
+		$cookie_scan_list = $wpdb->get_results("SELECT id_wpl_cookie_scan, created_at, status, total_url, total_category, total_cookies FROM {$cookie_scan} ORDER BY id_wpl_cookie_scan DESC", ARRAY_A );
 
 		$posts = $wpdb->get_results( $wpdb->prepare( "SELECT ID, post_title FROM {$wpdb->posts} WHERE post_type IN ('post', 'page') AND post_status = 'publish'" ), ARRAY_A );
 
