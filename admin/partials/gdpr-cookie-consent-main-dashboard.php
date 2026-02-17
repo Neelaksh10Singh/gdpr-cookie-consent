@@ -73,7 +73,7 @@ if( $gdpr_monthly_page_views_percent === 100 || $remaining_percentage_scan_limit
 	$gdpr_plan_warning = true;
 }
 $site_url = get_site_url();
-$site_domain = parse_url($site_url, PHP_URL_HOST);
+$site_domain = wp_parse_url($site_url, PHP_URL_HOST);
 ?>
 
 <div id="gdpr-cookie-consent-main-admin-structure" class="gdpr-cookie-consent-main-admin-structure">

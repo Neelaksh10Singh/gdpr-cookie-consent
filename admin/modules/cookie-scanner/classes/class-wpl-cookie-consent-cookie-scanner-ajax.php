@@ -218,7 +218,7 @@ class Gdpr_Cookie_Consent_Cookie_Scanner_Ajax extends Gdpr_Cookie_Consent_Cookie
 		$account_details = $this->settings->get();
 
 		$instance_id = get_option( 'wc_am_client_gdpr_cookie_consent_instance' );
-		$hash        = isset( $_POST['hash'] ) ? sanitize_text_field( wp_unslash( $_POST['hash'] ) ) : substr( strtolower( base_convert( mt_rand(), 10, 36 ) ), 0, 10 );
+		$hash        = isset( $_POST['hash'] ) ? sanitize_text_field( wp_unslash( $_POST['hash'] ) ) : substr( strtolower( base_convert( wp_rand(), 10, 36 ) ), 0, 10 );
 
 		$body = array(
 			'site_url'            => rawurlencode( get_site_url() ),
