@@ -196,11 +196,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 									<c-col class="col-sm-4"><label><?php esc_attr_e( 'Show Credits', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'If you are happy with the product and want to share credit with the developer, you can display credits under the Cookie Settings.', 'gdpr-cookie-consent' ); ?>"></tooltip>  <span class="probadge bg-badge"><?php esc_attr_e( 'Pro', 'gdpr-cookie-consent' ); ?></span></label></c-col>
 									<c-col class="col-sm-8">
 										<div class="gdpr-disabled-show-credits">
-										<c-switch v-bind="labelIcon" v-model="show_credits" id="gdpr-cookie-consent-show-credits" variant="3d"  color="success" :checked="show_credits" v-on:update:checked="onSwitchShowCredits"  <?php echo !$is_user_connected ? 'disabled' : ''; ?>></c-switch>
+										<?php 
+											$is_disabled = (!$is_user_connected || $api_user_plan === 'free');
+										?>
+										<c-switch v-bind="labelIcon" v-model="show_credits" id="gdpr-cookie-consent-show-credits" variant="3d"  color="success" :checked="<?php echo $is_disabled ? 'true' : 'show_credits'; ?>" v-on:update:checked="onSwitchShowCredits"  <?php echo $is_disabled ? 'disabled' : ''; ?>></c-switch>
 										<input type="hidden" name="gcc-show-credits" v-model="show_credits">
-										<?php if (!$is_user_connected): ?>
+										<?php if ($is_disabled): ?>
 											<p class="gdpr-show_credits_message">
-												<?php esc_attr_e( 'To enable this feature, connect to your free account', 'gdpr-cookie-consent' ); ?>
+												<?php esc_attr_e( 'To enable this feature, connect to your pro account', 'gdpr-cookie-consent' ); ?>
 											</p>
 										<?php endif; ?>
 									</div>
@@ -276,10 +279,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 							    	</c-col>
 							    	<c-col class="col-sm-8">
 										<div class="gdpr-disabled-export-settings">
-							    		<c-button id="export-settings-configuration" color="info" variant="outline" @click="exportsettings" <?php echo !$is_user_connected ? 'disabled' : ''; ?> style="<?php echo !$is_user_connected ? 'cursor:not-allowed' : ''; ?>"><?php esc_html_e( 'Export', 'gdpr-cookie-consent' ); ?></c-button>
-										<?php if ( ! $is_user_connected ) : ?>
+							    		<c-button id="export-settings-configuration" color="info" variant="outline" @click="exportsettings" <?php echo (!$is_user_connected || $api_user_plan === 'free') ? 'disabled' : ''; ?> style="<?php echo (!$is_user_connected || $api_user_plan === 'free') ? 'cursor:not-allowed' : ''; ?>"><?php esc_html_e( 'Export', 'gdpr-cookie-consent' ); ?></c-button>
+										<?php if ( ! $is_user_connected || $api_user_plan === 'free' ) : ?>
 											<p class="gdpr-export-message">
-												<?php esc_attr_e( 'To use this feature, connect to your free account', 'gdpr-cookie-consent' ); ?>
+												<?php esc_attr_e( 'To use this feature, connect to your pro account', 'gdpr-cookie-consent' ); ?>
 											</p>
 										<?php endif; ?>
 										</div>
@@ -306,16 +309,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 							    	<c-col class="col-sm-6" id="import-btn-container">
 										<div class="gdpr-disabled-import-settings">
                                         <label style="margin-bottom:0; font-size:0.875rem;<?php
-                                        echo version_compare( $plugin_version, '2.5.2', '<=' ) ? ( ! $is_pro_active ? 'color:#D8DBE0;' : 'color:#3399ff;' ) : 'color:#3399ff;';  if (!$is_user_connected) {
+                                        echo version_compare( $plugin_version, '2.5.2', '<=' ) ? ( ! $is_pro_active ? 'color:#D8DBE0;' : 'color:#3399ff;' ) : 'color:#3399ff;';  if (!$is_user_connected  || $api_user_plan === 'free') {
 											echo 'text-decoration:none;color:#D8DBE0;font-weight:normal;cursor:not-allowed;';
 										} else {
 											echo 'cursor:pointer;';
 										}
 										
-                                        ?> text-decoration:underline;margin: right 10px ;padding-left:42px;margin-top:6px;" for="fileInput"  <?php echo !$is_user_connected ? 'onclick="return false;"' : ''; ?>>Choose file</label>
-										 <?php if ( ! $is_user_connected ) : ?>
+                                        ?> text-decoration:underline;margin: right 10px ;padding-left:42px;margin-top:6px;" for="fileInput"  <?php echo (!$is_user_connected || !$api_user_plan === 'free')? 'onclick="return false;"' : ''; ?>>Choose file</label>
+										 <?php if ( ! $is_user_connected || $api_user_plan === 'free') : ?>
 											<p class="gdpr-import-message">
-												<?php esc_attr_e( 'To use this feature, connect to your free account', 'gdpr-cookie-consent' ); ?>
+												<?php esc_attr_e( 'To use this feature, connect to your pro account', 'gdpr-cookie-consent' ); ?>
 											</p>
 										<?php endif; ?>
 									</div>
