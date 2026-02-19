@@ -5729,11 +5729,65 @@ class Gdpr_Cookie_Consent_Admin {
 			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['gcc_settings_form_nonce_abtesting'] ) ), 'gcc-settings-form-nonce-abtesting' ) ) {
 				return;
 			}
-
-			$this->gdpr_ab_testing_complete();
-
-			wp_send_json_success( array( 'form_options_saved' => true ) );
 		}
+
+		$ab_options = get_option( 'wpl_ab_options' );
+		if ( ! $ab_options ) {
+			$ab_options = array();
+		}
+
+		$current_ab_testing_value = isset( $ab_options['ab_testing_period'] ) ? $ab_options['ab_testing_period'] : '';
+
+		$ab_options['ab_testing_period'] = isset( $_POST['ab_testing_period'] ) ? absint( $_POST['ab_testing_period'] ) : '';
+		$ab_options['ab_testing_auto'] = isset( $_POST['gcc-ab-testing-auto'] ) && in_array( wp_unslash( $_POST['gcc-ab-testing-auto'] ), array( 'true', '1', 1, true ), true) ? 'true' : 'false';
+
+		$updated_ab_testing_value = isset( $ab_options['ab_testing_period'] ) ? $ab_options['ab_testing_period'] : '';
+
+		if ( $current_ab_testing_value !== $updated_ab_testing_value ) {
+
+			$transient_name   = '_transient_timeout_gdpr_ab_testing_transient';
+			$expiration_time  = get_option( $transient_name );
+
+			if ( $expiration_time ) {
+
+				$expiration_time          = gmdate( 'Y-m-d H:i:s', $expiration_time );
+				$current_date_time        = gmdate( 'Y-m-d H:i:s' );
+				$current_time_unix        = strtotime( $current_date_time );
+				$expiration_time_unix     = strtotime( $expiration_time );
+				$remaining_time_seconds   = $expiration_time_unix - $current_time_unix;
+				$remaining_days           = ceil( $remaining_time_seconds / ( 60 * 60 * 24 ) );
+				$new_expiration_time_seconds = ( (int) $updated_ab_testing_value * 24 * 60 * 60 );
+
+				if ( $remaining_days != $updated_ab_testing_value ) {
+
+					set_transient(
+						'gdpr_ab_testing_transient',
+						array(
+							'value'         => 'A/B Testing Period',
+							'creation_time' => time(),
+						),
+						$new_expiration_time_seconds
+					);
+				}
+
+			} else {
+
+				$new_expiration_time_seconds = ( (int) $updated_ab_testing_value * 24 * 60 * 60 );
+
+				set_transient(
+					'gdpr_ab_testing_transient',
+					array(
+						'value'         => 'A/B Testing Period',
+						'creation_time' => time(),
+					),
+					$new_expiration_time_seconds
+				);
+			}
+		}
+
+		update_option( 'wpl_ab_options', $ab_options );
+		wp_send_json_success( array( 'form_options_saved' => true ) );
+
 	}
 
 	/**
