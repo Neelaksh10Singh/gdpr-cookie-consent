@@ -3163,6 +3163,31 @@ class Gdpr_Cookie_Consent_Admin {
 		$this->settings = new GDPR_Cookie_Consent_Settings();
 		// Call the is_connected() method from the instantiated object to check if the user is connected.
 		$is_user_connected = $this->settings->is_connected();
+		$is_disabled = (!$is_user_connected || $api_user_plan === 'free');
+		$needs_update = false;
+		if ($is_disabled) {
+			$needs_update = false;
+			
+			if ($settings['show_credits'] !== true) {
+				$settings['show_credits'] = true;
+				$needs_update = true;
+			}
+			
+			if ($settings['is_iabtcf_on'] !== "false" && $settings['is_iabtcf_on'] !== false) {
+				$settings['is_iabtcf_on'] = false;
+				$needs_update = true;
+			}
+
+			$non_iab_message = "This website uses cookies to improve your experience. We'll assume you're ok with this, but you can opt-out if you wish.";
+			if ($settings['notify_message'] !== $non_iab_message) {
+				$settings['notify_message'] = $non_iab_message;
+				$needs_update = true;
+			}
+
+			if ($needs_update) {
+				update_option(GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $settings);
+			}
+		}
 		wp_localize_script(
 			$this->plugin_name . '-main',
 			'settings_obj',
@@ -3217,6 +3242,7 @@ class Gdpr_Cookie_Consent_Admin {
 				// for countries.
 				'list_of_countries'                => $list_of_countries,
 				'is_usage_tracking_allowed'        => get_option( 'gdpr_usage_tracking_allowed' ),
+				'api_user_plan'                    => $api_user_plan,
 			)
 		);
 		wp_enqueue_script( $this->plugin_name . '-main' );
