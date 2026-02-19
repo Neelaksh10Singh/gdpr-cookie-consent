@@ -8329,7 +8329,6 @@ class Gdpr_Cookie_Consent_Admin {
 	}
 
 	public function gdpr_delete_data_request_entries( WP_REST_Request $request ) {
-		error_log('Delete data request entries called');
 		$ids = $request->get_param('ids');
 
 		if ( empty($ids) || !is_array($ids) ) {
