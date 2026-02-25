@@ -197,7 +197,10 @@ Yes, the plugin supports multiple languages, ensuring that your cookie consent b
 == Change Log ==
 
 = 4.2.2 =
-* Bug fixes and improvements
+* Fixed issues in the Revoke Consent flow.
+* Improved Google Analytics cookie categorization.
+* Fixed issues related to A/B testing.
+* Resolved minor bugs.
 
 = 4.2.1 =
 * Bug Fixes
@@ -767,7 +770,10 @@ Yes, the plugin supports multiple languages, ensuring that your cookie consent b
 == Upgrade Notice ==
 
 = 4.2.2 =
-* Bug fixes and improvements
+* Fixed issues in the Revoke Consent flow.
+* Improved Google Analytics cookie categorization.
+* Fixed issues related to A/B testing.
+* Resolved minor bugs.
 
 = 4.2.1 =
 * Bug Fixes
