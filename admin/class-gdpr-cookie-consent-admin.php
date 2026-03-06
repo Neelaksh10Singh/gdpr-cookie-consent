@@ -4261,6 +4261,7 @@ class Gdpr_Cookie_Consent_Admin {
 				update_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD, esc_url_raw( wp_unslash( $_POST['gdpr-cookie-bar-logo-url-holder'] ) ) );
 			}
 			update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
+			update_option( 'wplp_cookie_banner_created_once', 'true' );
 			wp_send_json_success( array( 'form_options_saved' => true ) );
 		}
 	}
