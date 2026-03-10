@@ -10277,11 +10277,61 @@ public function gdpr_support_request_handler() {
 	}
 
 	public function gdpr_export_plugin_settings( WP_REST_Request $request ) {
+		$settings = get_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, array() );
+		
+		$logo_urls = array(
+			'gdpr_cookie_bar_logo' => get_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD, '' ),
+			'gdpr_cookie_bar_logo1' => get_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD1, '' ),
+			'gdpr_cookie_bar_logo2' => get_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD2, '' ),
+			'gdpr_cookie_bar_logo_ml' => get_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELDML1, '' )
+		);
+		
+		// Merge logo URLs into settings
+		$settings = array_merge( $settings, $logo_urls );
+		
+		// fetch and convert images to base64
+		$logo_images = array();
+		
+		foreach ( $logo_urls as $key => $url ) {
+			if ( ! empty( $url ) ) {
+				// Get image from URL and convert to base64
+				$image_data = $this->get_image_as_base64( $url );
+				if ( $image_data ) {
+					$logo_images[ $key ] = array(
+						'image' => $image_data['base64'],
+						'name' => $image_data['filename']
+					);
+				}
+			}
+		}
+		
+		$export_data = array(
+			'settings' => $settings,
+			'logo_images' => $logo_images
+		);
+		
 		return rest_ensure_response(
 			array(
 				'success' => true,
-				'data' => get_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD )
+				'data' => $export_data
 			)
+		);
+	}
+
+	private function get_image_as_base64( $url ) {
+		$response = wp_remote_get( $url );
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			return false;
+		}
+		
+		$image_data = wp_remote_retrieve_body( $response );
+		$filename = basename( $url );
+		$base64 = base64_encode( $image_data );
+		$mime_type = wp_check_filetype( $filename )['type'];
+		
+		return array(
+			'base64' => 'data:' . $mime_type . ';base64,' . $base64,
+			'filename' => $filename
 		);
 	}
 
@@ -10336,11 +10386,30 @@ public function gdpr_support_request_handler() {
 
 	public function gdpr_import_plugin_settings( WP_REST_Request $request ) {
 
-		$settings = $request->get_param( 'settings' );
-
-		$settings = json_decode( $settings, true );
-
+		$data = $request->get_param( 'settings' );
+		$data = json_decode( $data, true );
+		
+		// Extract settings and logo images
+		$settings = isset( $data['settings'] ) ? $data['settings'] : $data;
+		$logo_images = isset( $data['logo_images'] ) ? $data['logo_images'] : array();
+		
 		update_option(GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $settings);
+		
+		$_POST['banner_image'] = isset( $logo_images['gdpr_cookie_bar_logo'] ) ? 
+			json_encode( $logo_images['gdpr_cookie_bar_logo'] ) : '';
+		$_POST['banner_image1'] = isset( $logo_images['gdpr_cookie_bar_logo1'] ) ? 
+			json_encode( $logo_images['gdpr_cookie_bar_logo1'] ) : '';
+		$_POST['banner_image2'] = isset( $logo_images['gdpr_cookie_bar_logo2'] ) ? 
+			json_encode( $logo_images['gdpr_cookie_bar_logo2'] ) : '';
+		$_POST['banner_image_ml'] = isset( $logo_images['gdpr_cookie_bar_logo_ml'] ) ? 
+			json_encode( $logo_images['gdpr_cookie_bar_logo_ml'] ) : '';
+		
+		// Process logo images
+		$this->process_imported_logo_images();
+		// Remove logo_images field if it exists
+		if ( isset( $settings['logo_images'] ) ) {
+			unset( $settings['logo_images'] );
+		}
 
 		return rest_ensure_response(
 			array(
