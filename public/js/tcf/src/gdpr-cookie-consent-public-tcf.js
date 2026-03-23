@@ -20,6 +20,16 @@ if (!(iabtcf.is_iabtcf_on === true || iabtcf.is_iabtcf_on === "true" || iabtcf.i
   const cmpVersion = 1;
   cmpstub();
 
+  function initDisclosedVendors() {
+    const vendorIds = iabtcf.data.vendors.map(v => Number(v.id));
+
+    // Fallback to GVL if empty
+    const ids = vendorIds.length > 0
+      ? vendorIds
+      : Object.keys(gvl.vendors).map(Number);
+
+    tcModel.vendorsDisclosed.set(ids);
+  }
   //functions to handle tc string cookie
   var GDPR_Cookie = {
     set: function (name, value, days) {
@@ -125,7 +135,7 @@ if (!(iabtcf.is_iabtcf_on === true || iabtcf.is_iabtcf_on === "true" || iabtcf.i
       const value = jQuery(this).val();
 
       // Check if the value is in the user_iab_consent.consent array
-      if (user_iab_consent.consent.includes(Number(value))) {
+      if (user_iab_consent.consent.includes(Number(value))) { 
         jQuery(this).prop("checked", true); // Mark as checked
       } else {
         jQuery(this).prop("checked", false); // Ensure it is unchecked
@@ -281,6 +291,9 @@ if (!(iabtcf.is_iabtcf_on === true || iabtcf.is_iabtcf_on === "true" || iabtcf.i
       tcModel.cmpVersion = cmpVersion;
       tcModel.gdprApplies = true;
       tcModel.isServiceSpecific = false;
+
+      initDisclosedVendors();
+
       //initializing the cmp api
       if (tcModel && tcModel.gvl) {
         cmpApi = new CmpApi(cmpId, cmpVersion, false, {
