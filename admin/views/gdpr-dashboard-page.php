@@ -196,7 +196,6 @@ if ( 200 === $response_status ) {
 
 
 ?>
-<div id="gdpr-dashboard-loader"></div>
 <div id="gdpr-cookie-consent-dashboard-page">
 	<c-container class="gdpr-cookie-consent-dashboard-container">
 		<div class="gdpr-welcome-section">

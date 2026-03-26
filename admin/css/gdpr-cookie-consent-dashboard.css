@@ -7,17 +7,19 @@
 	float: none !important;
 } */
 
-#gdpr-dashboard-loader {
+/* #gdpr-dashboard-loader {
   top: 0;
   right: 0;
-  left: 0;
-  bottom: 0;
   height: 100%;
   width: 100%;
-  position: fixed;
-  background-color: var(--white-100);
-  z-index: 999;
-}
+  max-height: 100vh;
+  position: absolute;
+  background-color: #fff;
+  z-index: 9999;
+  display:flex;
+	align-items:center;
+	justify-content:center;
+} */
 
 #gdpr-cookie-consent-dashboard-page {
   /* margin-left: -20px; */
