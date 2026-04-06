@@ -21,14 +21,18 @@ if (!(iabtcf.is_iabtcf_on === true || iabtcf.is_iabtcf_on === "true" || iabtcf.i
   cmpstub();
 
   function initDisclosedVendors() {
-    const vendorIds = iabtcf.data.vendors.map(v => Number(v.id));
+    const vendors = iabtcf?.data?.vendors || [];
+    const vendorIds = Array.isArray(vendors) ? vendors.map(v => Number(v.id)).filter(Boolean) : [];
+    var ids = vendorIds;
 
-    // Fallback to GVL if empty
-    const ids = vendorIds.length > 0
-      ? vendorIds
-      : Object.keys(gvl.vendors).map(Number);
-
-    tcModel.vendorsDisclosed.set(ids);
+    if (ids.length === 0) {
+        if (typeof gvl !== 'undefined' && gvl?.vendors) {
+            ids = Object.keys(gvl.vendors).map(Number);
+        } else {
+            ids = [];
+        }
+    }
+    ids.forEach(id => tcModel.vendorsDisclosed.set(id));
   }
   //functions to handle tc string cookie
   var GDPR_Cookie = {
@@ -318,6 +322,8 @@ if (!(iabtcf.is_iabtcf_on === true || iabtcf.is_iabtcf_on === "true" || iabtcf.i
     } catch (error) {
       console.error("Error during CMP initialization:", error);
     }
+  }).catch(err => {
+    console.error("GVL readyPromise failed:", err);
   });
 
   function updateTCModel() {

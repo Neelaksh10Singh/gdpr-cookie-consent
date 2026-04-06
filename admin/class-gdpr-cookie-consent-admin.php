@@ -12472,7 +12472,7 @@ public function gdpr_support_request_handler() {
 	    }
 	}
 
-	private function gdpr_parse_scan_datetime( $date_string, $time_string ) {
+	private function gdpr_parse_scan_datetime( $date_string ) {
     	$clean = preg_replace( '/\(.*?\)/', '', trim( $date_string ) );
 
     	try {
