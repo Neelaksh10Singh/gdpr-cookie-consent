@@ -59,7 +59,6 @@ $gdpr_no_of_page_scan_left       = $total_pages_scan_limit - get_option( 'gdpr_n
 $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $total_pages_scan_limit ) * 100;
 
 ?>
-<div id="gdpr-before-mount" style="top:0;left:0;right:0;left:0;height:100%;width:100%;position:fixed;background-color:white;z-index:999"></div>
 <div class="gdpr-cookie-consent-app-container" id="gdpr-cookie-consent-settings-app">
 	<!-- main preview container -->
 	<div v-if="banner_preview_is_on">

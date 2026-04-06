@@ -9986,6 +9986,8 @@ div#gdpr-scan-history {
 
 /* Plugin Dashboard Revamp - Sep25 */
 .wplp-compliance-main-wrapper {
+  position: relative;
+  min-height: 400px;
   padding-right: 20px;
 }
 
