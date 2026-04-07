@@ -83,7 +83,7 @@ $site_domain = wp_parse_url($site_url, PHP_URL_HOST);
 				position:absolute;
 				top:0;
 				left:0;
-				width:100vw;
+				width:100%;
 				height:100vh;
 				background:#fff;
 				z-index:9999;
