@@ -79,42 +79,16 @@ $site_domain = wp_parse_url($site_url, PHP_URL_HOST);
 	<div id="gdpr-cookie-consent-main-admin-header" class="gdpr-cookie-consent-main-admin-header">
 		<div class="wplp-compliance-main-wrapper">
 
-			<div id="gdpr-before-mount" style="
-				position:absolute;
-				top:0;
-				left:0;
-				width:100%;
-				height:100vh;
-				background:#fff;
-				z-index:9999;
-				display:flex;
-				align-items:center;
-				justify-content:center;"
-			>
+			<div id="gdpr-before-mount">
   				<div style="text-align:center;">
-
-  				  	<div style="
-  				  	  	width:40px;
-  				  	  	height:40px;
-  				  	  	border:4px solid #e5e5e5;
-  				  	  	border-top:4px solid #2271b1;
-  				  	  	border-radius:50%;
-  				  	  	animation: gdpr-spin 0.8s linear infinite;
-  				  	"></div>
-
-  				  	<p style="margin-top:10px;font-size:13px;color:#50575e;">
+  				  	<div class="gdpr-before-mount-loader-content"></div>
+  				  	<p class="gdpr-before-mount-loader-text">
   				  	  	Loading...
   				  	</p>
-
   				</div>
 
 			</div>
 
-			<style>
-			@keyframes gdpr-spin {
-			  to { transform: rotate(360deg); }
-			}
-			</style>
 			<!-- Main top banner  -->
 			<div class="gdpr-cookie-consent-admin-fixed-banner">
 					<div class="gdpr-cookie-consent-admin-logo-and-label">

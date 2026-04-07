@@ -198,23 +198,11 @@ if ( 200 === $response_status ) {
 ?>
 <div id="gdpr-dashboard-loader">
 	<div style="text-align:center;">
-  	  	<div style="
-  	  	  	width:40px;
-  	  	  	height:40px;
-  	  	  	border:4px solid #e5e5e5;
-  	  	  	border-top:4px solid #2271b1;
-  	  	  	border-radius:50%;
-  	  	  	animation: gdpr-spin 0.8s linear infinite;
-  	  	"></div>
-  	  	<p style="margin-top:10px;font-size:13px;color:#50575e;">
+  	  	<div class="gdpr-dashboard-loader-content"></div>
+  	  	<p class="gdpr-dashboard-loader-text">
   	  	  	Loading...
   	  	</p>
   	</div>
-	<style>
-		@keyframes gdpr-spin {
-		  to { transform: rotate(360deg); }
-		}
-	</style>
 </div>
 <div id="gdpr-cookie-consent-dashboard-page">
 	<c-container class="gdpr-cookie-consent-dashboard-container">
