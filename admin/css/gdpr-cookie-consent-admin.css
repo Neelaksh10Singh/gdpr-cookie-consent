@@ -6122,7 +6122,7 @@ fieldset:disabled #gdpr-cookie-consent-bar a.btn {
 .gdpr_messagebar_detail.layout-classic .category-group {
   padding: 0 10px;
 }
-.gdpr_messagebar_detail .gdpr-about-cookies {
+.gdpr_messagebar_detail .gdpr-about-cookies, .gdpr_messagebar_detail .gdpr-about-cookies-gcm {
   padding: 10px 20px;
 }
 
