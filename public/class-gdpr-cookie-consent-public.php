@@ -1244,6 +1244,19 @@ $selected_script_category = $wpdb->get_var(
 			if ( $the_options['consent_forward'] !== true ) {
 				$the_options['select_sites'] = null;
 			}
+
+			$gdpr_monthly_page_views = get_option('wpl_monthly_page_views', 0);
+			$settings = new GDPR_Cookie_Consent_Settings();
+			$api_user_plan     = $settings->get_plan();
+			error_log($api_user_plan);
+			$gdpr_monthly_page_views_percent = 0;
+			if ( 'free' === $api_user_plan ) { 
+				$gdpr_monthly_page_views_percent = ( ( $gdpr_monthly_page_views ) / 20000 ) * 100;
+				error_log($gdpr_monthly_page_views);
+			} else if ( '3sites' === $api_user_plan ) {
+				$gdpr_monthly_page_views_percent = ( ( $gdpr_monthly_page_views ) / 100000 ) * 100;
+			}
+
 			$cookies_list_data = array(
 				'gdpr_cookies_list'                 		=> wp_json_encode( $categories_json_data),
 				'gdpr_cookiebar_settings'          		 	=> wp_json_encode( Gdpr_Cookie_Consent::gdpr_get_json_settings() ),
@@ -1267,7 +1280,8 @@ $selected_script_category = $wpdb->get_var(
 				'is_gcm_debug_on'							=> isset($the_options['is_gcm_debug_mode']) ? $this->convert_boolean($the_options['is_gcm_debug_mode']) : false,
 				'vendor_data'	                            => Gdpr_Cookie_Consent::gdpr_get_all_vendors(),
 				'cookieSettingsPopupAccentColor'	        => strtoupper(substr($finalColor, 0, -2)) === strtoupper($acceptAllBGColor) ? $the_options['button_accept_all_link_color'] : $acceptAllBGColor,
-				'template_parts' 	                        => $the_options['template_parts']
+				'template_parts' 	                        => $the_options['template_parts'],
+				'gdpr_monthly_page_views_percent'			=> $gdpr_monthly_page_views_percent
         
 			);
 
