@@ -345,7 +345,7 @@ class GDPR_Cookie_Consent_App_Auth {
 		$no_of_scans = $_POST['no_of_scans'];
 
 		if ( get_option('app_wplp_subscription_status_pending_cancel') === 1 || get_option('app_wplp_subscription_status_pending_cancel') === '1' || get_option('app_wplp_subscription_status_pending_cancel') === true ) {
-			if (strtolower($data['account']['plan']) !== 'free' ) {
+			if (!empty($data['account']['plan']) && strtolower($data['account']['plan']) !== 'free' ) {
 				delete_option('app_wplp_subscription_status_pending_cancel');
 			}
 		}
