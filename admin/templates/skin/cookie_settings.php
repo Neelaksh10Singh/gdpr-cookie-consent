@@ -184,7 +184,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<div class="gdpr-groups-container">
                      <div class="gdpr-about-cookies"><?php echo esc_html( $the_options['about_message'] ); ?></div>
                      <div class="gdpr-about-cookies iabtcf"><?php echo esc_html( $the_options['about_message'] ); ?></div>
-                     <div v-if="gcm_is_on" class="gdpr-about-cookies">
+                     <div v-if="gcm_is_on" class="gdpr-about-cookies-gcm">
                         <?php echo esc_html("For more information on how Google's third party cookies operate and handle your data, see: "); ?><a :style="{'color': cookieSettingsPopupAccentColor}" href="https://business.safety.google/privacy" target="blank"><?php echo esc_html("Google's Privacy Policy"); ?></a>
                      </div>
                      <ul class="gdpr-iab-navbar">
