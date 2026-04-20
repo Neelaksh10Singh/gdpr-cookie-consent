@@ -4599,10 +4599,10 @@ class Gdpr_Cookie_Consent_Admin {
 						<!-- API Connection Screen  -->
 						<?php if ( ! $is_user_connected && ! $pro_installed ) : ?>
 							<div class="gdpr-overlay">
-								<img :src="account_connection.default" class="gdpr-cookie-account_connection">
-								<p class="enable-text"><?php esc_html_e( 'To access more templates, create your FREE WPLP Cookie Consent account.', 'gdpr-cookie-consent' ); ?></p>
-								<button class="gdpr-start-auth"><?php esc_html_e( 'New? Create an account', 'gdpr-cookie-consent' ); ?></button>
-								<p><span class="already-have-acc"><?php esc_html_e( 'Already have an account? ', 'gdpr-cookie-consent' ); ?></span><span class="api-connect-to-account-btn" ><?php esc_html_e( 'Connect your existing account', 'gdpr-cookie-consent' ); ?></span></p>
+								<img :src="account_connection_new.default" class="gdpr-cookie-account_connection">
+								<p class="enable-text"><?php esc_html_e( 'Create a free account to view detailed reports and track compliance', 'gdpr-cookie-consent' ); ?></p>
+								<button class="gdpr-start-auth"><?php esc_html_e( 'Unlock Full Insights', 'gdpr-cookie-consent' ); ?></button>
+								<p class="free-text"><?php esc_html_e('Free · No credit card required', 'gdpr-cookie-consent')?></p>
 							</div>
 						<?php endif; ?>
 					</div>
