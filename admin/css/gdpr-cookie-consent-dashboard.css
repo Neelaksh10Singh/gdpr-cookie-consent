@@ -446,8 +446,6 @@
   padding: 0px;
   margin-left: 28px;
   margin-right: 37px;
-  margin-bottom: 20px;
-  border: 1px solid #f3f4f3
 }
 .gdpr-cookie-summary-icon {
   height: 88px;
@@ -555,7 +553,6 @@ circle.ep-circle--empty {
   grid-template-columns: repeat(4, 1fr);
   margin-top: 28px;
   column-gap: 20px;
-  margin-bottom: 60px;
 }
 
 .gdpr-cookie-summary-schedule:hover {
