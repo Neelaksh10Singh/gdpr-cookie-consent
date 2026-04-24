@@ -3221,7 +3221,10 @@ banner.style.display = "none";
                       node.tagName === 'IFRAME' &&
                       node.src &&
                       node.src.indexOf( 'youtube.com/embed' ) !== -1 &&
-                      node.closest( '[data-e-type="e-youtube"]' )
+                      (
+                        node.closest( '[data-e-type="e-youtube"]' ) ||      // YouTube Embed widget
+                        node.closest( '.elementor-widget-video' )            // Video widget
+                      )
                   ) {
                       var gdpr_user_preference_arr = {};
                       if ( GDPR_Cookie.read( 'wpl_user_preference' ) ) {
