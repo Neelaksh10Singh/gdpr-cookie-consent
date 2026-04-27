@@ -6847,7 +6847,9 @@ fieldset:disabled #gdpr-cookie-consent-bar a.btn {
     font-size: var(--text-xs-font-size);
   }
   #gdpr-cookie-consent-bar,
-  #gdpr-cookie-consent-show-again {
+  #gdpr-cookie-consent-show-again,
+  #ccpa-cookie-consent-show-again
+   {
     font-size: var(--text-xs-font-size);
   }
   #gdpr-cookie-consent-bar .gdpr_messagebar_content h3 {

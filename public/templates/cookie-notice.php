@@ -624,4 +624,14 @@ if ( ! empty( $the_options['ccpa_notify'] ) ) {
 		<?php include plugin_dir_path( __FILE__ ) . 'modals/cookie_settings.php'; ?>
 	</div>
 	<?php
+		if ( ! empty( $the_options['ccpa_show_again' . $suffix] ) ) {
+		?>
+		
+		<div id="<?php echo esc_html( $the_options['ccpa_show_again_container_id'] ); ?>" style="position: fixed; display:none; bottom: 10px; color: <?php echo esc_html($the_options['ccpa_button_revoke_consent_text_color' . $suffix]); ?>; background-color: <?php echo esc_html($the_options['ccpa_button_revoke_consent_background_color' . $suffix]); ?>; <?php if($the_options['ccpa_show_again_position' . $suffix] === 'right') echo "right: ". esc_html($the_options['ccpa_show_again_margin' . $suffix]) . "%;"; else echo "left: ". esc_html($the_options['ccpa_show_again_margin' . $suffix]) . "%;"; ?> border-radius: 5px; box-shadow: 0px 6px 11px gray;">
+			<?php
+		?>
+			<span><?php echo esc_html__( $cookie_data['ccpa_dash_show_again_text'], 'gdpr-cookie-consent' );//phpcs:ignore ?></span>
+		</div>
+		<?php
+	}
 }
