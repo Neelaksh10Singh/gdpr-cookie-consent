@@ -8655,6 +8655,10 @@ class Gdpr_Cookie_Consent_Admin {
 			if (isset($save_object['selected_template_json']) && is_array($save_object['selected_template_json'])) {
 			    $save_object['selected_template_json'] = json_encode($save_object['selected_template_json']);
 			}
+
+			if (isset($save_object['do_not_track_on'])) {
+			    $save_object['do_not_track_on'] = filter_var($save_object['do_not_track_on'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+			}
 			
 			$the_options = array_merge($the_options, $save_object);
 
