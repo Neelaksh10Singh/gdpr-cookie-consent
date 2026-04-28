@@ -3547,6 +3547,56 @@ class Gdpr_Cookie_Consent_Admin {
 				'render_callback' => array( $this, 'gdpr_block_render_callback' ),
 			)
 		);
+
+		register_block_type(
+		    'gdpr/cookie-table',
+		    array(
+		        'editor_script'   => $this->plugin_name . '-block',
+		        'render_callback' => array( $this, 'render_gdpr_cookie_table' ),
+		    )
+		);
+	}
+
+	/**
+	 * Render callback for autoupdate cookies table block
+	 */
+
+	public function render_gdpr_cookie_table() {
+	    global $wpdb;
+
+	    $cookies_table = $wpdb->prefix . 'wpl_cookie_scan_cookies';
+	    $cookies = $wpdb->get_results(
+	        "SELECT name, domain, duration, category FROM {$cookies_table} ORDER BY id_wpl_cookie_scan_cookies DESC",
+	        ARRAY_A
+	    );
+
+	    $styles  = 'border: 1px solid #767676; padding: 2px 4px;';
+	    $content = '';
+
+	    if ( empty( $cookies ) ) {
+	        $content .= '<p>No cookies detected yet. Run a cookie scan to populate this table.</p>';
+	    } else {
+	        $content .= "<div class='wp_legalpolicy' style='overflow-x:scroll;overflow:auto;'>";
+	        $content .= '<table style="width:100%;margin:0 auto;border-collapse:collapse;">';
+	        $content .= '<thead>';
+	        $content .= "<th style='{$styles}'>Cookie Name</th>";
+	        $content .= "<th style='{$styles}'>Duration</th>";
+	        $content .= "<th style='{$styles}'>Category</th>";
+	        $content .= "<th style='{$styles}'>Domain</th>";
+	        $content .= '</thead>';
+	        $content .= '<tbody>';
+	        foreach ( $cookies as $cookie ) {
+	            $content .= '<tr>';
+	            $content .= "<td style='{$styles}'>" . esc_html( $cookie['name'] )     . '</td>';
+	            $content .= "<td style='{$styles}'>" . esc_html( $cookie['duration'] ) . '</td>';
+	            $content .= "<td style='{$styles}'>" . esc_html( $cookie['category'] ) . '</td>';
+	            $content .= "<td style='{$styles}'>" . esc_html( $cookie['domain'] )   . '</td>';
+	            $content .= '</tr>';
+	        }
+	        $content .= '</tbody></table></div>';
+	    }
+
+	    return $content;
 	}
 
 	/**
