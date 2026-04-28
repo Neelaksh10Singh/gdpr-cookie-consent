@@ -1248,13 +1248,36 @@ $selected_script_category = $wpdb->get_var(
 			$gdpr_monthly_page_views = get_option('wpl_monthly_page_views', 0);
 			$settings = new GDPR_Cookie_Consent_Settings();
 			$api_user_plan     = $settings->get_plan();
-			error_log($api_user_plan);
 			$gdpr_monthly_page_views_percent = 0;
 			if ( 'free' === $api_user_plan ) { 
 				$gdpr_monthly_page_views_percent = ( ( $gdpr_monthly_page_views ) / 20000 ) * 100;
-				error_log($gdpr_monthly_page_views);
 			} else if ( '3sites' === $api_user_plan ) {
 				$gdpr_monthly_page_views_percent = ( ( $gdpr_monthly_page_views ) / 100000 ) * 100;
+			}
+
+
+			global $wpdb;
+			$youtube_category = array( 'slug' => 'preferences', 'name' => 'Preferences' );
+					
+			$youtube_script = $wpdb->get_row(
+			    "SELECT script_category FROM {$wpdb->prefix}wpl_cookie_scripts 
+			     WHERE script_key = 'youtube_embed' AND script_status = 1 
+			     LIMIT 1"
+			);
+			
+			if ( $youtube_script ) {
+			    $category = $wpdb->get_row( $wpdb->prepare(
+			        "SELECT gdpr_cookie_category_slug, gdpr_cookie_category_name 
+			         FROM {$wpdb->prefix}gdpr_cookie_scan_categories 
+			         WHERE id_gdpr_cookie_category = %d",
+			        $youtube_script->script_category
+			    ));
+			    if ( $category ) {
+			        $youtube_category = array(
+			            'slug' => $category->gdpr_cookie_category_slug,
+			            'name' => $category->gdpr_cookie_category_name,
+			        );
+			    }
 			}
 
 			$cookies_list_data = array(
@@ -1281,8 +1304,8 @@ $selected_script_category = $wpdb->get_var(
 				'vendor_data'	                            => Gdpr_Cookie_Consent::gdpr_get_all_vendors(),
 				'cookieSettingsPopupAccentColor'	        => strtoupper(substr($finalColor, 0, -2)) === strtoupper($acceptAllBGColor) ? $the_options['button_accept_all_link_color'] : $acceptAllBGColor,
 				'template_parts' 	                        => $the_options['template_parts'],
-				'gdpr_monthly_page_views_percent'			=> $gdpr_monthly_page_views_percent
-        
+				'gdpr_monthly_page_views_percent'			=> $gdpr_monthly_page_views_percent,
+				'youtube_embed_category'					=> $youtube_category
 			);
 
 
