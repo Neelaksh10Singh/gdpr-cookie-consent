@@ -672,6 +672,8 @@ class Gdpr_Cookie_Consent_Admin {
 		$the_options['button_revoke_consent_background_color']   = $the_options['button_revoke_consent_background_color' . $banner_choice];
 		$the_options['show_again_position']                      = $the_options['show_again_position' . $banner_choice];
 		$the_options['show_again_margin']                        = $the_options['show_again_margin' . $banner_choice];
+		$the_options['show_again_as']							 = $the_options['show_again_as' . $banner_choice];
+		$the_options['show_again_icon']							 = $the_options['show_again_icon' . $banner_choice];
 
 		$the_options['button_accept_is_on']                  = $the_options[ 'button_accept_is_on' . $banner_choice ];
 		$the_options['button_accept_text']                   = $the_options[ 'button_accept_text' . $banner_choice ];
@@ -768,9 +770,15 @@ class Gdpr_Cookie_Consent_Admin {
 		if($banner_choice == '1'){
 			$get_banner_img = get_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD1 );
 			update_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD, $get_banner_img );
+
+			$revoke_icon = get_option( GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON1 );
+			update_option( GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON, $revoke_icon );
 		}else{
 			$get_banner_img = get_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD2 );
 			update_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD, $get_banner_img );
+
+			$revoke_icon = get_option( GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON2 );
+			update_option( GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON, $revoke_icon );
 		}
 		update_option( 'wpl_ab_options', $ab_options );
 		return $the_options;
@@ -8628,6 +8636,10 @@ class Gdpr_Cookie_Consent_Admin {
 		$banner_image2   = $request->get_param( 'banner_image2' );
 		$banner_image_ml = $request->get_param( 'banner_image_ml' );
 
+		$revoke_custom_icon 	= $save_object['show_again_custom_icon'];
+		$revoke_custom_icon1 	= $save_object['show_again_custom_icon1'];
+		$revoke_custom_icon2 	= $save_object['show_again_custom_icon2'];
+
 		$custom_css = $request->get_param( 'gdpr_css_text' );
 
 		$advanced_scripts = $request->get_param( 'advanced_scripts' );
@@ -8700,6 +8712,21 @@ class Gdpr_Cookie_Consent_Admin {
 			),
 		);
 
+		$revoke_icons = array(
+			array(
+				'value'		=> $revoke_custom_icon,
+				'option'	=> GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON,
+			),
+			array(
+				'value'		=> $revoke_custom_icon1,
+				'option'	=> GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON1,
+			),
+			array(
+				'value'		=> $revoke_custom_icon2,
+				'option'	=> GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON2,
+			),
+		);
+
 		foreach ( $images as $image ) {
 			if ( empty( $image['value'] ) ) {
 				continue;
@@ -8738,6 +8765,59 @@ class Gdpr_Cookie_Consent_Admin {
 
 			if ( $image_url ) {
 				update_option( $image['option'], esc_url_raw( $image_url ) );
+			}
+		}
+
+		foreach ( $revoke_icons as $icon ) {
+			$value = $icon['value'];
+
+    		if ( empty( $value ) ) {
+    		    delete_option( $icon['option'] );
+    		    continue;
+    		}
+		
+    		if ( is_array($value) && empty($value['url']) ) {
+    		    delete_option( $icon['option'] );
+    		    continue;
+    		}
+		
+    		if ( !isset( $value['image'] ) ) continue;
+
+			$icon_base64 = $value['image'];
+			$file_name = $value['name'];
+
+			$upload_dir = wp_upload_dir();
+
+			$revoke_dir = $upload_dir['path'] . '/revoke/';
+			$file_path  = $revoke_dir . $file_name;
+
+			if ( ! file_exists( $revoke_dir ) ) {
+			    wp_mkdir_p( $revoke_dir );
+			}
+
+			$icon_data = base64_decode( $icon_base64 );
+			file_put_contents( $file_path, $icon_data );
+
+			$filetype = wp_check_filetype($file_name);
+
+			$attachment = [
+				'post_mime_type' => $filetype['type'],
+				'post_title'     => pathinfo($file_name, PATHINFO_FILENAME),
+				'post_status'    => 'inherit'
+			];
+
+			$attach_id = wp_insert_attachment($attachment, $file_path);
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+
+			wp_update_attachment_metadata(
+				$attach_id,
+				wp_generate_attachment_metadata($attach_id, $file_path)
+			);
+
+			$icon_url = wp_get_attachment_url( $attach_id );
+
+			if ( $icon_url ) {
+				update_option( $icon['option'], esc_url_raw( $icon_url ) );
 			}
 		}
 
@@ -11211,6 +11291,9 @@ public function gdpr_support_request_handler() {
 				'button_revoke_consent_background_color1'  => $the_options['button_revoke_consent_background_color1'] ?? '',
 				'show_again_position1'                     => $the_options['show_again_position1'] ?? 'right',
 				'show_again_margin1'                       => $the_options['show_again_margin1'] ?? '5',
+				'show_again_as1'						   => $the_options['show_again_as1'] ?? 'text',
+				'show_again_icon1'						   => $the_options['show_again_icon1'] ?? 'cookie',
+				'show_again_custom_icon1'				   => get_option( GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON1 ),
 
 				'button_accept_is_on1'                     => $the_options['button_accept_is_on1'],
 				'button_accept_text1'                      => $the_options['button_accept_text1'] ?? 'Accept',
@@ -11300,6 +11383,9 @@ public function gdpr_support_request_handler() {
 				'button_revoke_consent_background_color2'  => $the_options['button_revoke_consent_background_color2'] ?? '',
 				'show_again_position2'                     => $the_options['show_again_position2'] ?? 'right',
 				'show_again_margin2'                       => $the_options['show_again_margin2'] ?? '5',
+				'show_again_as2'						   => $the_options['show_again_as2'] ?? 'text',
+				'show_again_icon2'						   => $the_options['show_again_icon2'] ?? 'cookie',
+				'show_again_custom_icon2'				   => get_option( GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON2 ),
 
 				'button_accept_is_on2'                     => $the_options['button_accept_is_on2'],
 				'button_accept_text2'                      => $the_options['button_accept_text2'] ?? 'Accept',
@@ -11388,6 +11474,9 @@ public function gdpr_support_request_handler() {
 				'button_revoke_consent_background_color'   => $the_options['button_revoke_consent_background_color'] ?? '',
 				'show_again_position'                      => $the_options['show_again_position'] ?? 'right',
 				'show_again_margin'                        => $the_options['show_again_margin'] ?? '5',
+				'show_again_as'							   => $the_options['show_again_as'] ?? 'text',
+				'show_again_icon'						   => $the_options['show_again_icon'] ?? 'cookie',
+				'show_again_custom_icon'				   => get_option( GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON ),
 
 				'button_accept_is_on'                      => $the_options['button_accept_is_on'],
 				'button_accept_text'                       => $the_options['button_accept_text'] ?? 'Accept',
@@ -11633,6 +11722,8 @@ public function gdpr_support_request_handler() {
 				'button_revoke_consent_background_color'   => $the_options['button_revoke_consent_background_color'] ?? '',
 				'show_again_position'                      => $the_options['show_again_position'] ?? 'right',
 				'show_again_margin'                        => $the_options['show_again_margin'] ?? '5',
+				'show_again_as'							   => $the_options['show_again_as'] ?? 'text',
+				'show_again_icon'						   => $the_options['show_again_icon'] ?? 'cookie',
 
 				// Accept
 				'button_accept_is_on'                      => $the_options['button_accept_is_on'],
