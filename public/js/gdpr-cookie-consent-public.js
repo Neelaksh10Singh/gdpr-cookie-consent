@@ -1736,9 +1736,6 @@ banner.style.display = "none";
 
                 } else {
                     GDPR.displayHeader();
-                    if (GDPR.settings.ccpa_show_again === true || GDPR.settings.ccpa_show_again === "true") {
-                        $("#ccpa-cookie-consent-show-again").show();
-                    }
                 }
 
             }
@@ -2404,6 +2401,7 @@ banner.style.display = "none";
       if (GDPR.settings.cookie_usage_for === "ccpa" && 
           (GDPR.settings.ccpa_show_again === true || GDPR.settings.ccpa_show_again === "true")) {
           $("#ccpa-cookie-consent-show-again").show();
+          
       }
       if (this.settings.accept_reload == true) {
         window.location.reload(true);
