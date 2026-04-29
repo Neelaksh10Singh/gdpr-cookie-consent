@@ -4130,6 +4130,10 @@ class Gdpr_Cookie_Consent_Admin {
 				$the_options['logging_on']           = isset( $_POST['gcc-logging-on'] ) && ( true === $_POST['gcc-logging-on'] || 'true' === $_POST['gcc-logging-on'] ) ? 'true' : 'false';
 				// DO NOT TRACK.
 				$the_options['do_not_track_on'] = isset( $_POST['gcc-do-not-track'] ) && ( true === $_POST['gcc-do-not-track'] || 'true' === $_POST['gcc-do-not-track'] ) ? 'true' : 'false';
+				// Anonymize IP address
+				$the_options['ip_anonymization_on'] = isset( $_POST['gcc-ip-anonymization-enabled'] ) && ( true === $_POST['gcc-ip-anonymization-enabled'] || 'true' === $_POST['gcc-ip-anonymization-enabled'] ) ? 'true' : 'false';
+				$the_options['ip_masking_level'] = isset( $_POST['gcc-ip-masking-level'] )? sanitize_text_field( wp_unslash($_POST['gcc-ip-masking-level'] ) ): '2'; //recommended is 2 level
+
 				// For EU.
 				if ( isset( $_POST['gcc-eu-enable'] ) ) {
 					if ( 'no' === $_POST['gcc-eu-enable'] ) {
@@ -4288,6 +4292,10 @@ class Gdpr_Cookie_Consent_Admin {
 
 				// DO NOT TRACK.
 				$the_options['do_not_track_on'] = isset( $_POST['gcc-do-not-track'] ) && ( true === $_POST['gcc-do-not-track'] || 'true' === $_POST['gcc-do-not-track'] ) ? 'true' : 'false';
+				// Anonymize IP address
+				$the_options['ip_anonymization_on'] = isset( $_POST['gcc-ip-anonymization-enabled'] ) && ( true === $_POST['gcc-ip-anonymization-enabled'] || 'true' === $_POST['gcc-ip-anonymization-enabled'] ) ? 'true' : 'false';
+				$the_options['ip_masking_level'] = isset( $_POST['gcc-ip-masking-level'] )? sanitize_text_field( wp_unslash($_POST['gcc-ip-masking-level'] ) ): '2'; //recommended is 2 level
+
 
 				$the_options['header_dependency'] = isset( $_POST['gcc-header-dependency'] )? sanitize_text_field( wp_unslash( $_POST['gcc-header-dependency'] ) ): '';
 				
@@ -5752,6 +5760,10 @@ class Gdpr_Cookie_Consent_Admin {
 
 			// DO NOT TRACK.
 			$the_options['do_not_track_on'] = isset( $_POST['gcc-do-not-track'] ) && ( true === $_POST['gcc-do-not-track'] || 'true' === $_POST['gcc-do-not-track'] ) ? 'true' : 'false';
+			// Anonymize IP address
+			$the_options['ip_anonymization_on'] = isset( $_POST['gcc-ip-anonymization-enabled'] ) && ( true === $_POST['gcc-ip-anonymization-enabled'] || 'true' === $_POST['gcc-ip-anonymization-enabled'] ) ? 'true' : 'false';
+			$the_options['ip_masking_level'] = isset( $_POST['gcc-ip-masking-level'] )? sanitize_text_field( wp_unslash($_POST['gcc-ip-masking-level'] ) ): '2'; //recommended is 2 level
+
 			// Consent log
 			$the_options['logging_on'] = isset( $_POST['gcc-logging-on'] ) && ( true === $_POST['gcc-logging-on'] || 'true' === $_POST['gcc-logging-on'] ) ? 'true' : 'false';
 
@@ -8254,6 +8266,9 @@ class Gdpr_Cookie_Consent_Admin {
 				'logging_on'						=> $the_options['logging_on'],
 				'is_script_blocker_on'				=> $the_options["is_script_blocker_on"],
 				'do_not_track_on'					=> $the_options["do_not_track_on"],
+				//  Anonymize IP address
+				'ip_anonymization_on'               => $the_options["ip_anonymization_on"],
+				'ip_masking_level'                  => $the_options["ip_masking_level"],
 				'data_reqs_on'						=> $the_options['data_reqs_on'],
 				'data_req_email_address'			=> $the_options['data_req_email_address'],
 				'data_req_subject'					=> $the_options['data_req_subject'],
@@ -10433,6 +10448,9 @@ public function gdpr_support_request_handler() {
 				'accept_reload'          => $the_options['accept_reload'],
 				'decline_reload'         => $the_options['decline_reload'],
 				'do_not_track_on'        => $the_options['do_not_track_on'],
+				//  Anonymize IP address
+				'ip_anonymization_on'               => $the_options["ip_anonymization_on"],
+				'ip_masking_level'                  => $the_options["ip_masking_level"],
 				'delete_on_deactivation' => $the_options['delete_on_deactivation'],
 				'show_credits'           => $plan === 'free' ? true : $the_options['show_credits'],
 				'cookie_expiry'          => $the_options['cookie_expiry'],
