@@ -246,9 +246,9 @@ class Gdpr_Cookie_Consent_Admin {
 					'script_status'      => 1,
 					'script_description' => 'Chat widget',
 				);
-				$data_exists     = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM ' . $wpdb->prefix . 'wpl_cookie_scripts WHERE `script_key`=%s', array( $tawk_table_data['script_key'] ) ), ARRAY_A ); // db call ok; no-cache ok.
+				$data_exists     = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM `' . $wpdb->prefix . 'wpl_cookie_scripts` WHERE `script_key`=%s', array( $tawk_table_data['script_key'] ) ), ARRAY_A ); // db call ok; no-cache ok.
 				if ( ! $data_exists ) {
-					$wpdb->insert( $table_name, $tawk_table_data ); // db call ok; no-cache ok.
+					$wpdb->insert( '`' . $table_name . '`', $tawk_table_data ); // db call ok; no-cache ok.
 				}
 				add_option( 'wpl_pro_tawk_script_added', '1' );
 			}
@@ -269,9 +269,9 @@ class Gdpr_Cookie_Consent_Admin {
 					'script_status'      => 1,
 					'script_description' => 'Hubspot Analytics',
 				);
-				$data_exists        = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM ' . $wpdb->prefix . 'wpl_cookie_scripts WHERE `script_key`=%s', array( $hubspot_table_data['script_key'] ) ), ARRAY_A ); // db call ok; no-cache ok.
+				$data_exists        = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM `' . $wpdb->prefix . 'wpl_cookie_scripts` WHERE `script_key`=%s', array( $hubspot_table_data['script_key'] ) ), ARRAY_A ); // db call ok; no-cache ok.
 				if ( ! $data_exists ) {
-					$wpdb->insert( $table_name, $hubspot_table_data ); // db call ok; no-cache ok.
+					$wpdb->insert( '`' . $table_name . '`', $hubspot_table_data ); // db call ok; no-cache ok.
 				}
 				add_option( 'wpl_pro_hubspot_script_added', '1' );
 			}
@@ -291,9 +291,9 @@ class Gdpr_Cookie_Consent_Admin {
 					'script_status'      => 1,
 					'script_description' => 'Google Recaptcha',
 				);
-				$data_exists          = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM ' . $wpdb->prefix . 'wpl_cookie_scripts WHERE `script_key`=%s', array( $recaptcha_table_data['script_key'] ) ), ARRAY_A ); // db call ok; no-cache ok.
+				$data_exists          = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM `' . $wpdb->prefix . 'wpl_cookie_scripts` WHERE `script_key`=%s', array( $recaptcha_table_data['script_key'] ) ), ARRAY_A ); // db call ok; no-cache ok.
 				if ( ! $data_exists ) {
-					$wpdb->insert( $table_name, $recaptcha_table_data ); // db call ok; no-cache ok.
+					$wpdb->insert( '`' . $table_name . '`', $recaptcha_table_data ); // db call ok; no-cache ok.
 				}
 				add_option( 'wpl_pro_recaptcha_script_added', '1' );
 			}
@@ -313,9 +313,9 @@ class Gdpr_Cookie_Consent_Admin {
 					'script_status'      => 1,
 					'script_description' => 'Google Adsense',
 				);
-				$data_exists        = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM ' . $wpdb->prefix . 'wpl_cookie_scripts WHERE `script_key`=%s', array( $adsense_table_data['script_key'] ) ), ARRAY_A ); // db call ok; no-cache ok.
+				$data_exists        = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM `' . $wpdb->prefix . 'wpl_cookie_scripts` WHERE `script_key`=%s', array( $adsense_table_data['script_key'] ) ), ARRAY_A ); // db call ok; no-cache ok.
 				if ( ! $data_exists ) {
-					$wpdb->insert( $table_name, $adsense_table_data ); // db call ok; no-cache ok.
+					$wpdb->insert( '`' . $table_name . '`', $adsense_table_data ); // db call ok; no-cache ok.
 				}
 				add_option( 'wpl_pro_adsense_script_added', '1' );
 			}
@@ -335,9 +335,9 @@ class Gdpr_Cookie_Consent_Admin {
 					'script_status'      => 1,
 					'script_description' => 'Matomo Analytics',
 				);
-				$data_exists       = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM ' . $wpdb->prefix . 'wpl_cookie_scripts WHERE `script_key`=%s', array( $matomo_table_data['script_key'] ) ), ARRAY_A ); // db call ok; no-cache ok.
+				$data_exists       = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM `' . $wpdb->prefix . 'wpl_cookie_scripts` WHERE `script_key`=%s', array( $matomo_table_data['script_key'] ) ), ARRAY_A ); // db call ok; no-cache ok.
 				if ( ! $data_exists ) {
-					$wpdb->insert( $table_name, $matomo_table_data ); // db call ok; no-cache ok.
+					$wpdb->insert( '`' . $table_name . '`', $matomo_table_data ); // db call ok; no-cache ok.
 				}
 
 				add_option( 'wpl_pro_matomo_script_added', '1' );
@@ -579,7 +579,7 @@ class Gdpr_Cookie_Consent_Admin {
 
 				foreach ( $tables_arr as $table ) {
 					$tablename = $wpdb->prefix . $table;
-					$wpdb->query( "DROP TABLE IF EXISTS $tablename" ); // SQL query included to drop tables
+					$wpdb->query( "DROP TABLE IF EXISTS `$tablename`" ); // SQL query included to drop tables
 				}
 
 				$option_name = 'GDPRCookieConsent-9.0';
@@ -10673,15 +10673,15 @@ public function gdpr_support_request_handler() {
 		);
 
 		global $wpdb;
-		$custom_cookies_list = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . $wpdb->prefix . 'gdpr_cookie_post_cookies ORDER BY id_gdpr_cookie_post_cookies DESC'), ARRAY_A );
+		$custom_cookies_list = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM `' . $wpdb->prefix . 'gdpr_cookie_post_cookies` ORDER BY id_gdpr_cookie_post_cookies DESC'), ARRAY_A );
 
 		$cookies_table          = $wpdb->prefix . 'wpl_cookie_scan_cookies';
 		$cookie_scan            = $wpdb->prefix . 'wpl_cookie_scan';
 		$advanced_scripts_table = $wpdb->prefix . 'wpl_cookie_scripts';
 
-		$scanned_cookies = $wpdb->get_results("SELECT id_wpl_cookie_scan_cookies, name, domain, duration, type, category, category_id, description FROM {$cookies_table} ORDER BY id_wpl_cookie_scan_cookies DESC", ARRAY_A);
+		$scanned_cookies = $wpdb->get_results("SELECT id_wpl_cookie_scan_cookies, name, domain, duration, type, category, category_id, description FROM `{$cookies_table}` ORDER BY id_wpl_cookie_scan_cookies DESC", ARRAY_A);
 
-		$cookie_scan_list = $wpdb->get_results("SELECT id_wpl_cookie_scan, created_at, status, total_url, total_category, total_cookies FROM {$cookie_scan} ORDER BY id_wpl_cookie_scan DESC", ARRAY_A );
+		$cookie_scan_list = $wpdb->get_results("SELECT id_wpl_cookie_scan, created_at, status, total_url, total_category, total_cookies FROM `{$cookie_scan}` ORDER BY id_wpl_cookie_scan DESC", ARRAY_A );
 
 		$posts = $wpdb->get_results( $wpdb->prepare( "SELECT ID, post_title FROM {$wpdb->posts} WHERE post_type IN ('post', 'page') AND post_status = 'publish'" ), ARRAY_A );
 
@@ -10712,7 +10712,7 @@ public function gdpr_support_request_handler() {
 
 		$gdpr_monthly_page_views = get_option('wpl_monthly_page_views', 0);
 
-		$advanced_scripts = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$advanced_scripts_table}" ), ARRAY_A );
+		$advanced_scripts = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `{$advanced_scripts_table}`" ), ARRAY_A );
 
 		$select_pages = is_array( $the_options['select_pages'] ?? null )
     		? $the_options['select_pages']
@@ -12236,8 +12236,8 @@ public function gdpr_support_request_handler() {
 		$post_cookies_table = $wpdb->prefix . 'wpl_cookie_scan_cookies';
 		$post_custom_cookies_table = $wpdb->prefix . 'gdpr_cookie_post_cookies';
 
-		$cleared = $wpdb->query( "TRUNCATE TABLE {$post_cookies_table}" );
-		$cleared_custom = $wpdb->query( "TRUNCATE TABLE {$post_custom_cookies_table}" );
+		$cleared = $wpdb->query( "TRUNCATE TABLE `{$post_cookies_table}`" );
+		$cleared_custom = $wpdb->query( "TRUNCATE TABLE `{$post_custom_cookies_table}`" );
 
 		if ( ! $cleared || !$cleared_custom) {
 			return array(
