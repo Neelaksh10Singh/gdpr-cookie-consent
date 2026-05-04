@@ -6739,6 +6739,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 													showPrintMargin: false,
 													showGutter: true,
 												}"
+												@keydown.native.stop
 											/>
 										</c-col>
 							<?php
@@ -6769,6 +6770,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 									showPrintMargin: false,
 									showGutter: true,
 								}"
+								@keydown.native.stop
 							/>
 						</c-col>
 						<?php
