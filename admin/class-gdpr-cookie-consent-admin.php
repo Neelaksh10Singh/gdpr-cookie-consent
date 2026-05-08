@@ -5776,6 +5776,7 @@ class Gdpr_Cookie_Consent_Admin {
 					$the_options['is_selectedCountry_on'] = 'false';
 					$the_options['is_eu_on'] = 'false';
 					$the_options['is_ccpa_on'] = 'false';
+					$the_options['is_script_blocker_on'] = false;
 
 					$the_options['is_worldwide_on_ccpa'] = 'true';
 					$the_options['is_selectedCountry_on_ccpa'] = 'false';
