@@ -749,7 +749,6 @@ class Gdpr_Cookie_Consent_Consent_Logs {
 	 * @return string The anonymized IP address.
 	 */
 	public function wpl_anonymize_ip( $ip, $level ) {
-		error_log("wpl_anonymize_ip called");
 		if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
 			// IPv4
 			$parts = explode( '.', $ip );
