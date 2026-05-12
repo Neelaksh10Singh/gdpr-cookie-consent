@@ -736,6 +736,51 @@ class Gdpr_Cookie_Consent_Consent_Logs {
 	}
 
 	/**
+	 * Anonymizes an IP address based on the configured masking level.
+	 *
+	 * IPv4 masking:
+	 *   Level 1 → 192.168.100.xxx
+	 *   Level 2 → 192.168.xxx.xxx  (Recommended)
+	 *   Level 3 → 192.xxx.xxx.xxx
+	 *   Full    → xxx.xxx.xxx.xxx
+	 *
+	 * @param string $ip    The raw IP address.
+	 * @param int|string $level  Masking level: 1, 2, 3, or 'full'.
+	 * @return string The anonymized IP address.
+	 */
+	public function wpl_anonymize_ip( $ip, $level ) {
+		if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+			// IPv4
+			$parts = explode( '.', $ip );
+			switch ( $level ) {
+				case 1:
+					$parts[3] = 'xxx';
+					break;
+				case 2:
+					$parts[2] = 'xxx';
+					$parts[3] = 'xxx';
+					break;
+				case 3:
+					$parts[1] = 'xxx';
+					$parts[2] = 'xxx';
+					$parts[3] = 'xxx';
+					break;
+				case 'full':
+					$parts = array( 'xxx', 'xxx', 'xxx', 'xxx' );
+					break;
+				default:
+					// Fallback to level 2 (recommended) if unexpected value
+					$parts[2] = 'xxx';
+					$parts[3] = 'xxx';
+					break;
+			}
+			return implode( '.', $parts );
+
+		}
+		// If IP is invalid/unknown, return as ip as it is
+		return $ip;
+	}
+	/**
 	 * Returns IP address of the user for consent log.
 	 *
 	 * @since 3.0.0
@@ -772,6 +817,17 @@ class Gdpr_Cookie_Consent_Consent_Logs {
 			$ipaddress = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
 		} else {
 			$ipaddress = 'UNKNOWN';
+		}
+		if ( class_exists( 'Gdpr_Cookie_Consent' ) ) {
+			$the_options = Gdpr_Cookie_Consent::gdpr_get_settings();
+		}
+
+		$anonymization_enabled = isset( $the_options['ip_anonymization_on'] )
+    		&& ( $the_options['ip_anonymization_on'] === true || $the_options['ip_anonymization_on'] === 1 || $the_options['ip_anonymization_on'] === '1' || $the_options['ip_anonymization_on'] === 'true' );
+
+		if ( $anonymization_enabled && ! empty( $ipaddress ) && $ipaddress !== 'UNKNOWN' ) {
+			$level     = isset( $the_options['ip_masking_level'] ) ? $the_options['ip_masking_level'] : 2;
+			$ipaddress = $this->wpl_anonymize_ip( $ipaddress, $level );
 		}
 		return esc_html($ipaddress);
 	}
