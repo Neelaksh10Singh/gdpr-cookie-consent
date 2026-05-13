@@ -245,7 +245,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 										<?php 
 											$is_disabled = (!$is_user_connected || $api_user_plan === 'free');
 										?>
-										<c-switch v-bind="labelIcon" v-model="show_credits" id="gdpr-cookie-consent-show-credits" variant="3d"  color="success" :checked="<?php echo $is_disabled ? 'true' : '!show_credits'; ?>" v-on:update:checked="onSwitchShowCredits"  <?php echo $is_disabled ? 'disabled' : ''; ?>></c-switch>
+										<c-switch v-bind="labelIcon" v-model="show_credits" id="gdpr-cookie-consent-show-credits" variant="3d"  color="success" :checked="<?php echo $is_disabled ? 'false' : '!show_credits'; ?>" v-on:update:checked="onSwitchShowCredits"  <?php echo $is_disabled ? 'disabled' : ''; ?>></c-switch>
 										<input type="hidden" name="gcc-show-credits" v-model="show_credits">
 										<?php if ($is_disabled): ?>
 											<p class="gdpr-show_credits_message">
