@@ -695,6 +695,17 @@ class Gdpr_Cookie_Consent_Consent_Logs {
 			$user_id = get_current_user_id();
 
 			$user_ip = $this->wpl_get_user_ip();
+
+			// Skip geo lookup for masking level > 2
+			$the_options = Gdpr_Cookie_Consent::gdpr_get_settings();
+			$anonymization_enabled = isset( $the_options['ip_anonymization_on'] )
+				&& ( $the_options['ip_anonymization_on'] === true || $the_options['ip_anonymization_on'] === 1 || $the_options['ip_anonymization_on'] === '1' || $the_options['ip_anonymization_on'] === 'true' );
+			$masking_level = isset( $the_options['ip_masking_level'] ) ? (string) $the_options['ip_masking_level'] : '2';
+			$skip_geo = $anonymization_enabled && in_array( $masking_level, array('3', 'full' ), true );
+
+			if ( $skip_geo ) {
+				$user_country = 'Unknown';
+			} else{
 			// Fetch country information using ip-api.com.
 			$api_url  = 'http://ip-api.com/json/' . $user_ip;
 			$response = wp_safe_remote_get( $api_url );
@@ -708,6 +719,7 @@ class Gdpr_Cookie_Consent_Consent_Logs {
 				$user_country = $data->country;
 			} else {
 				$user_country = 'unknown';
+			}
 			}
 			if ( is_multisite() && $consent_forward == true ) {
 				global $wpdb;
