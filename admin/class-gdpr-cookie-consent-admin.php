@@ -1909,7 +1909,7 @@ class Gdpr_Cookie_Consent_Admin {
 			'id'     => 'gdpr-quick-menu-item-1',
 			'title'  => 'Scan this Page',
 			'parent' => 'gdpr-quick-menu',
-			'href'   => admin_url( 'admin.php?page=gdpr-cookie-consent&scan_url=' ) . get_permalink() . '#cookie_settings#cookie_list#discovered_cookies',
+			'href'   => admin_url( 'admin.php?page=gdpr-cookie-consent&scan_url=' ) . get_permalink() . '#cookie_manager',
 		);
 
 		$wp_admin_bar->add_node( $args );
