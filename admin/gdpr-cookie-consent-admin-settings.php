@@ -2859,7 +2859,102 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 									<button  type="button" class="done-button-settings" @click="opt_out_link_popup=false">Done</button>
 								</div>
 							</c-modal> </div>
+							<!-- Revoke Consent settings for CCPA -->
+								<c-row v-show="is_ccpa">
+								<c-col class="col-sm-32">
+									<div id="gdpr-cookie-consent-settings-cookie-notice">
+										<?php esc_html_e( 'Revoke Consent', 'gdpr-cookie-consent' ); ?>
+									</div>
+								</c-col>
+							</c-row>
+							<c-row v-show="is_ccpa">
+								<c-col class="col-sm-4">
+									<label>
+										<?php esc_attr_e( 'Enable Revoke Consent', 'gdpr-cookie-consent' ); ?>
+										<tooltip text="<?php esc_html_e( 'Enable to give user the option to revoke their consent.', 'gdpr-cookie-consent' ); ?>"></tooltip>
+									</label>
+								</c-col>
+								<c-col class="col-sm-4">
+									<c-switch 
+										v-bind="labelIcon" 
+										v-model="is_ccpa_revoke_consent_on" 
+										id="gdpr-cookie-consent-ccpa-revoke-consent" 
+										variant="3d" 
+										color="success" 
+										:checked="is_ccpa_revoke_consent_on" 
+										v-on:update:checked="onSwitchCcpaRevokeConsentEnable">
+									</c-switch>
+									<input type="hidden" name="gcc-ccpa-revoke-consent-enable" v-model="is_ccpa_revoke_consent_on">
+								</c-col>
+								<c-col class="col-sm-3">
+									<c-button :disabled="!is_ccpa_revoke_consent_on" class="gdpr-configure-button" @click="ccpa_revoke_consent_popup=true">
+										<span>
+											<img class="gdpr-configure-image" :src="configure_image_url.default" alt="WPCS Configure Logo icon">
+											<?php esc_attr_e( 'Configuration', 'gdpr-cookie-consent' ); ?>
+										</span>
+									</c-button>
+								</c-col>
+							</c-row>
 
+							<div class="opt-out-link-container">
+								<c-modal
+									title="CCPA Revoke Consent Settings"
+									:show.sync="ccpa_revoke_consent_popup"
+									size="lg"
+									:close-on-backdrop="closeOnBackdrop"
+									:centered="centered"
+								>
+									<div class="optout-settings-tittle-bar">
+										<div class="optout-setting-tittle"><?php esc_attr_e( 'CCPA Revoke Consent Settings', 'gdpr-cookie-consent' ); ?></div>
+										<img @click="ccpa_revoke_consent_popup=false" class="add-new-entry-img" 
+											src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL ) . 'admin/images/cancel.svg'; ?>" 
+											alt="Add new entry logo">
+									</div>
+
+									<div class="optout-settings-main-container">
+										<c-row v-show="is_ccpa" class="gdpr-label-row">
+											<c-col class="col-sm-6"><label><?php esc_attr_e( 'Text', 'gdpr-cookie-consent' ); ?></label></c-col>
+											<c-col class="col-sm-6"><label><?php esc_attr_e( 'Text Color', 'gdpr-cookie-consent' ); ?></label></c-col>
+										</c-row>
+										<c-row v-show="is_ccpa">
+											<c-col class="col-sm-6">
+												<c-input name="ccpa_show_again_text_field" v-model="ccpa_tab_text"></c-input>
+											</c-col>
+											<c-col class="col-sm-6 gdpr-color-pick">
+												<c-input class="gdpr-color-input" type="text" v-model="ccpa_button_revoke_consent_text_color"></c-input>
+												<c-input class="gdpr-color-select" type="color" name="gcc-ccpa-revoke-consent-text-color" v-model="ccpa_button_revoke_consent_text_color"></c-input>
+											</c-col>
+										</c-row>
+										<c-row v-show="is_ccpa" class="gdpr-label-row">
+											<c-col class="col-sm-6"><label><?php esc_attr_e( 'Background Color', 'gdpr-cookie-consent' ); ?></label></c-col>
+											<c-col class="col-sm-6"><label><?php esc_attr_e( 'Tab Position', 'gdpr-cookie-consent' ); ?></label></c-col>
+										</c-row>
+										<c-row v-show="is_ccpa">
+											<c-col class="col-sm-6 gdpr-color-pick">
+												<c-input class="gdpr-color-input" type="text" v-model="ccpa_button_revoke_consent_background_color"></c-input>
+												<c-input class="gdpr-color-select" type="color" name="gcc-ccpa-revoke-consent-background-color" v-model="ccpa_button_revoke_consent_background_color"></c-input>
+											</c-col>
+											<c-col class="col-sm-6">
+												<v-select 
+													class="form-group" 
+													id="ccpa-cookie-consent-tab-position" 
+													:reduce="label => label.code" 
+													:options="tab_position_options" 
+													v-model="ccpa_tab_position">
+												</v-select>
+												<input type="hidden" name="gcc-ccpa-tab-position" v-model="ccpa_tab_position">
+											</c-col>
+										</c-row>
+										<c-row v-show="is_ccpa" class="gdpr-label-row">
+											<c-col class="col-sm-3"><label><?php esc_attr_e( 'Tab margin (in percent)', 'gdpr-cookie-consent' ); ?></label></c-col>
+											<c-col class="col-sm-9">
+												<c-input type="number" min="0" max="100" name="gcc-ccpa-tab-margin" v-model="ccpa_tab_margin"></c-input>
+											</c-col>
+										</c-row>
+										<button type="button" class="done-button-settings" @click="ccpa_revoke_consent_popup=false">Done</button>
+									</div>
+								</c-modal>
+							</div>
 					</c-card>
 					</c-card>
 					<!-- Adding Virat-->
@@ -5490,7 +5585,103 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 							</div>
 						</c-card-body>
 					</c-card>
+						
+					<!-- Revoke Consent settings for CCPA -->
+					<c-card v-show="is_ccpa">
+						<c-card-header class="gdpr-cookie-consent-design-subheading">
+							<?php esc_html_e( 'Revoke Consent', 'gdpr-cookie-consent' ); ?>
+						</c-card-header>
+						<c-card-body>
+						<c-row>
+							<c-col class="col-sm-4">
+								<label>
+									<?php esc_attr_e( 'Enable Revoke Consent', 'gdpr-cookie-consent' ); ?>
+									<tooltip text="<?php esc_html_e( 'Enable to give user the option to revoke their consent.', 'gdpr-cookie-consent' ); ?>"></tooltip>
+								</label>
+							</c-col>
+							<c-col class="col-sm-4">
+								<c-switch 
+									v-bind="labelIcon" 
+									v-model="is_ccpa_revoke_consent_on1" 
+									id="ccpa-cookie-consent-revoke-consent1" 
+									variant="3d" 
+									color="success" 
+									:checked="is_ccpa_revoke_consent_on1" 
+									v-on:update:checked="onSwitchCcpaRevokeConsentEnable1">
+								</c-switch>
+								<input type="hidden" name="gcc-ccpa-revoke-consent-enable1" v-model="is_ccpa_revoke_consent_on1">
+							</c-col>
+							<c-col class="col-sm-3">
+								<c-button :disabled="!is_ccpa_revoke_consent_on1" class="gdpr-configure-button" @click="ccpa_revoke_consent_popup1=true">
+									<span>
+										<img class="gdpr-configure-image" :src="configure_image_url.default" alt="WPCS Configure Logo icon">
+										<?php esc_attr_e( 'Configuration', 'gdpr-cookie-consent' ); ?>
+									</span>
+								</c-button>
+							</c-col>
+						</c-row>
 
+						<div class="opt-out-link-container">
+							<c-modal
+								title="CCPA Revoke Consent Settings"
+								:show.sync="ccpa_revoke_consent_popup1"
+								size="lg"
+								:close-on-backdrop="closeOnBackdrop"
+								:centered="centered"
+							>
+								<div class="optout-settings-tittle-bar">
+									<div class="optout-setting-tittle"><?php esc_attr_e( 'CCPA Revoke Consent Settings', 'gdpr-cookie-consent' ); ?></div>
+									<img @click="ccpa_revoke_consent_popup1=false" class="add-new-entry-img" 
+										src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL ) . 'admin/images/cancel.svg'; ?>" 
+										alt="Add new entry logo">
+								</div>
+
+								<div class="optout-settings-main-container">
+									<c-row v-show="is_ccpa" class="gdpr-label-row">
+										<c-col class="col-sm-6"><label><?php esc_attr_e( 'Text', 'gdpr-cookie-consent' ); ?></label></c-col>
+										<c-col class="col-sm-6"><label><?php esc_attr_e( 'Text Color', 'gdpr-cookie-consent' ); ?></label></c-col>
+									</c-row>
+									<c-row v-show="is_ccpa">
+										<c-col class="col-sm-6">
+											<c-input name="ccpa_show_again_text_field1" v-model="ccpa_tab_text1"></c-input>
+										</c-col>
+										<c-col class="col-sm-6 gdpr-color-pick">
+											<c-input class="gdpr-color-input" type="text" v-model="ccpa_button_revoke_consent_text_color1"></c-input>
+											<c-input class="gdpr-color-select" type="color" name="gcc-ccpa-revoke-consent-text-color1" v-model="ccpa_button_revoke_consent_text_color1"></c-input>
+										</c-col>
+									</c-row>
+									<c-row v-show="is_ccpa" class="gdpr-label-row">
+										<c-col class="col-sm-6"><label><?php esc_attr_e( 'Background Color', 'gdpr-cookie-consent' ); ?></label></c-col>
+										<c-col class="col-sm-6"><label><?php esc_attr_e( 'Tab Position', 'gdpr-cookie-consent' ); ?></label></c-col>
+									</c-row>
+									<c-row v-show="is_ccpa">
+										<c-col class="col-sm-6 gdpr-color-pick">
+											<c-input class="gdpr-color-input" type="text" v-model="ccpa_button_revoke_consent_background_color1"></c-input>
+											<c-input class="gdpr-color-select" type="color" name="gcc-ccpa-revoke-consent-background-color1" v-model="ccpa_button_revoke_consent_background_color1"></c-input>
+										</c-col>
+										<c-col class="col-sm-6">
+											<v-select 
+												class="form-group" 
+												id="ccpa-cookie-consent-tab-position1" 
+												:reduce="label => label.code" 
+												:options="tab_position_options" 
+												v-model="ccpa_tab_position1">
+											</v-select>
+											<input type="hidden" name="gcc-ccpa-tab-position1" v-model="ccpa_tab_position1">
+										</c-col>
+									</c-row>
+									<c-row v-show="is_ccpa" class="gdpr-label-row">
+										<c-col class="col-sm-3"><label><?php esc_attr_e( 'Tab margin (in percent)', 'gdpr-cookie-consent' ); ?></label></c-col>
+										<c-col class="col-sm-9">
+											<c-input type="number" min="0" max="100" name="gcc-ccpa-tab-margin1" v-model="ccpa_tab_margin1"></c-input>
+										</c-col>
+									</c-row>
+									<button type="button" class="done-button-settings" @click="ccpa_revoke_consent_popup1=false">Done</button>
+								</div>
+							</c-modal>
+						</div>
+					</c-card-body>
+				</c-card>
 							</c-card-body>
 						<c-card-body v-show="active_test_banner_tab === 2">
 								<c-card-body >
@@ -6699,6 +6890,102 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 								
 							</c-modal>
 							</div>
+						</c-card-body>
+					</c-card>
+					<!-- Revoke Consent settings for CCPA -->
+					<c-card v-show="is_ccpa">
+						<c-card-header class="gdpr-cookie-consent-design-subheading">
+							<?php esc_html_e( 'Revoke Consent', 'gdpr-cookie-consent' ); ?>
+						</c-card-header>
+						<c-card-body>
+						<c-row>
+							<c-col class="col-sm-4">
+								<label>
+									<?php esc_attr_e( 'Enable Revoke Consent', 'gdpr-cookie-consent' ); ?>
+									<tooltip text="<?php esc_html_e( 'Enable to give user the option to revoke their consent.', 'gdpr-cookie-consent' ); ?>"></tooltip>
+								</label>
+							</c-col>
+							<c-col class="col-sm-4">
+								<c-switch 
+									v-bind="labelIcon" 
+									v-model="is_ccpa_revoke_consent_on2" 
+									id="ccpa-cookie-consent-revoke-consent2" 
+									variant="3d" 
+									color="success" 
+									:checked="is_ccpa_revoke_consent_on2" 
+									v-on:update:checked="onSwitchCcpaRevokeConsentEnable2">
+								</c-switch>
+								<input type="hidden" name="gcc-ccpa-revoke-consent-enable2" v-model="is_ccpa_revoke_consent_on2">
+							</c-col>
+							<c-col class="col-sm-3">
+								<c-button :disabled="!is_ccpa_revoke_consent_on2" class="gdpr-configure-button" @click="ccpa_revoke_consent_popup2=true">
+									<span>
+										<img class="gdpr-configure-image" :src="configure_image_url.default" alt="WPCS Configure Logo icon">
+										<?php esc_attr_e( 'Configuration', 'gdpr-cookie-consent' ); ?>
+									</span>
+								</c-button>
+							</c-col>
+						</c-row>
+
+						<div class="opt-out-link-container">
+							<c-modal
+								title="CCPA Revoke Consent Settings"
+								:show.sync="ccpa_revoke_consent_popup2"
+								size="lg"
+								:close-on-backdrop="closeOnBackdrop"
+								:centered="centered"
+							>
+								<div class="optout-settings-tittle-bar">
+									<div class="optout-setting-tittle"><?php esc_attr_e( 'CCPA Revoke Consent Settings', 'gdpr-cookie-consent' ); ?></div>
+									<img @click="ccpa_revoke_consent_popup2=false" class="add-new-entry-img" 
+										src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL ) . 'admin/images/cancel.svg'; ?>" 
+										alt="Add new entry logo">
+								</div>
+
+								<div class="optout-settings-main-container">
+									<c-row v-show="is_ccpa" class="gdpr-label-row">
+										<c-col class="col-sm-6"><label><?php esc_attr_e( 'Text', 'gdpr-cookie-consent' ); ?></label></c-col>
+										<c-col class="col-sm-6"><label><?php esc_attr_e( 'Text Color', 'gdpr-cookie-consent' ); ?></label></c-col>
+									</c-row>
+									<c-row v-show="is_ccpa">
+										<c-col class="col-sm-6">
+											<c-input name="ccpa_show_again_text_field2" v-model="ccpa_tab_text2"></c-input>
+										</c-col>
+										<c-col class="col-sm-6 gdpr-color-pick">
+											<c-input class="gdpr-color-input" type="text" v-model="ccpa_button_revoke_consent_text_color2"></c-input>
+											<c-input class="gdpr-color-select" type="color" name="gcc-ccpa-revoke-consent-text-color2" v-model="ccpa_button_revoke_consent_text_color2"></c-input>
+										</c-col>
+									</c-row>
+									<c-row v-show="is_ccpa" class="gdpr-label-row">
+										<c-col class="col-sm-6"><label><?php esc_attr_e( 'Background Color', 'gdpr-cookie-consent' ); ?></label></c-col>
+										<c-col class="col-sm-6"><label><?php esc_attr_e( 'Tab Position', 'gdpr-cookie-consent' ); ?></label></c-col>
+									</c-row>
+									<c-row v-show="is_ccpa">
+										<c-col class="col-sm-6 gdpr-color-pick">
+											<c-input class="gdpr-color-input" type="text" v-model="ccpa_button_revoke_consent_background_color2"></c-input>
+											<c-input class="gdpr-color-select" type="color" name="gcc-ccpa-revoke-consent-background-color2" v-model="ccpa_button_revoke_consent_background_color2"></c-input>
+										</c-col>
+										<c-col class="col-sm-6">
+											<v-select 
+												class="form-group" 
+												id="ccpa-cookie-consent-tab-position2" 
+												:reduce="label => label.code" 
+												:options="tab_position_options" 
+												v-model="ccpa_tab_position2">
+											</v-select>
+											<input type="hidden" name="gcc-ccpa-tab-position2" v-model="ccpa_tab_position2">
+										</c-col>
+									</c-row>
+									<c-row v-show="is_ccpa" class="gdpr-label-row">
+										<c-col class="col-sm-3"><label><?php esc_attr_e( 'Tab margin (in percent)', 'gdpr-cookie-consent' ); ?></label></c-col>
+										<c-col class="col-sm-9">
+											<c-input type="number" min="0" max="100" name="gcc-ccpa-tab-margin2" v-model="ccpa_tab_margin2"></c-input>
+										</c-col>
+									</c-row>
+									<button type="button" class="done-button-settings" @click="ccpa_revoke_consent_popup2=false">Done</button>
+								</div>
+							</c-modal>
+						</div>
 						</c-card-body>
 					</c-card>
 							</c-card-body>	
