@@ -41,9 +41,59 @@ Vue.component("aceeditor", AceEditor);
 Vue.component("ab-testing-chart", AB_Testing_Chart);
 Vue.component("datepicker", vuejsDatepicker);
 const j = jQuery.noConflict();
+const toBool = (value) => {
+    return value === true || value === "true" || value === "1" || value === 1 || value === "yes" || value === "on";
+};
+
+const isButtonVisible = (item, options = {}, suffix = '') => {
+    switch (item) {
+        case "acceptAll":
+        case "accept_all":
+            return toBool(options["button_accept_all_is_on" + suffix]);
+
+        case "accept":
+            return toBool(options["button_accept_is_on" + suffix]);
+
+        case "decline":
+            return toBool(options["button_decline_is_on" + suffix]);
+
+        case "settings":
+            return options["cookie_usage_for"] !== "eprivacy"
+                && toBool(options["button_settings_is_on" + suffix]);
+
+        default:
+            return false;
+    }
+};
 var gen = new Vue({
   el: "#gdpr-cookie-consent-settings-app",
   data() {
+    let bannerStructure = settings_obj.the_options.hasOwnProperty("banner_structure")
+        ? settings_obj.the_options.banner_structure
+        : {};
+
+    if (typeof bannerStructure === "string") {
+        try {
+            bannerStructure = JSON.parse(bannerStructure);
+        } catch (e) {
+            bannerStructure = {};
+        }
+    }
+
+    const c5Buttons = Array.isArray(bannerStructure?.c5)
+        ? bannerStructure.c5
+        : ["accept_all", "accept", "settings"];
+
+    const c6Buttons = Array.isArray(bannerStructure?.c6)
+        ? bannerStructure.c6
+        : ["decline"];
+
+    const visibleC5Items = c5Buttons.filter((item) => isButtonVisible(item, settings_obj.the_options, ''));
+    const visibleC6Items = c6Buttons.filter((item) => isButtonVisible(item, settings_obj.the_options, ''));
+    const visibleC5Items1 = c5Buttons.filter((item) => isButtonVisible(item, settings_obj.the_options, '1'));
+    const visibleC6Items1 = c6Buttons.filter((item) => isButtonVisible(item, settings_obj.the_options, '1'));
+    const visibleC5Items2 = c5Buttons.filter((item) => isButtonVisible(item, settings_obj.the_options, '2'));
+    const visibleC6Items2 = c6Buttons.filter((item) => isButtonVisible(item, settings_obj.the_options, '2'));
     return {
       labelIcon: {},
       labelIconNew: {
@@ -646,8 +696,8 @@ var gen = new Vue({
           1 === settings_obj.the_options["notify_animate_show"])
           ? true
           : false,
-      cookie_text_color: settings_obj.the_options.hasOwnProperty("text")
-        ? settings_obj.the_options["text"]
+      cookie_text_color: settings_obj.the_options.hasOwnProperty("cookie_text_color")
+        ? settings_obj.the_options["cookie_text_color"]
         : "#000000",
       cookie_bar_opacity: settings_obj.the_options.hasOwnProperty("opacity")
         ? settings_obj.the_options["opacity"]
@@ -677,6 +727,231 @@ var gen = new Vue({
       cookie_font: settings_obj.the_options.hasOwnProperty("font_family")
         ? settings_obj.the_options["font_family"]
         : "inherit",
+      cookie_bar_padding: settings_obj.the_options.hasOwnProperty("cookie_bar_padding")
+        ? settings_obj.the_options["cookie_bar_padding"]
+        : "20",
+      cookie_bar_horizontal_padding: settings_obj.the_options.hasOwnProperty("cookie_bar_horizontal_padding")
+        ? settings_obj.the_options["cookie_bar_horizontal_padding"]
+        : "120",
+      cookie_bar_vertical_padding: settings_obj.the_options.hasOwnProperty("cookie_bar_vertical_padding")
+        ? settings_obj.the_options["cookie_bar_vertical_padding"]
+        : "20",
+      cookie_bar_spacing: settings_obj.the_options.hasOwnProperty("cookie_bar_spacing")
+        ? settings_obj.the_options["cookie_bar_spacing"]
+        : "15",
+      cookie_bar_blur: settings_obj.the_options.hasOwnProperty("cookie_bar_blur")
+        ? settings_obj.the_options["cookie_bar_blur"]
+        : "0",
+      cookie_bar_shadow_color: settings_obj.the_options.hasOwnProperty("cookie_bar_shadow_color")
+        ? settings_obj.the_options["cookie_bar_shadow_color"]
+        : "#000000",
+      cookie_bar_shadow_size: settings_obj.the_options.hasOwnProperty("cookie_bar_shadow_size")
+        ? settings_obj.the_options["cookie_bar_shadow_size"]
+        : "5",
+      bypass_button_is_on: settings_obj.the_options.hasOwnProperty("bypass_button_is_on") &&
+        (true == settings_obj.the_options["bypass_button_is_on"] || 1 == settings_obj.the_options["bypass_button_is_on"] )
+        ? true
+        : false,
+      bypass_button_size: settings_obj.the_options.hasOwnProperty("bypass_button_size")
+        ? settings_obj.the_options["bypass_button_size"]
+        : "md",
+      bypass_button_text_color: settings_obj.the_options.hasOwnProperty("bypass_button_text_color")
+        ? settings_obj.the_options["bypass_button_text_color"]
+        : "#176CAE",
+      banner_text_alignment: settings_obj.the_options.hasOwnProperty("banner_text_alignment")
+        ? settings_obj.the_options["banner_text_alignment"]
+        : "left",
+      cookie_font_size: settings_obj.the_options.hasOwnProperty("cookie_font_size")
+        ? settings_obj.the_options["cookie_font_size"]
+        : "12",
+      cookie_text_weight: settings_obj.the_options.hasOwnProperty("cookie_text_weight")
+        ? settings_obj.the_options["cookie_text_weight"]
+        : '400',
+      button_font_size: settings_obj.the_options.hasOwnProperty("button_font_size")
+        ? settings_obj.the_options["button_font_size"]
+        : "14",
+      button_text_weight: settings_obj.the_options.hasOwnProperty("button_text_weight")
+        ? settings_obj.the_options["button_text_weight"]
+        : '500',
+      logo_is_on: settings_obj.the_options.hasOwnProperty("logo_is_on") &&
+        (true == settings_obj.the_options["logo_is_on"] || 1 == settings_obj.the_options["logo_is_on"])
+        ? true
+        : false,
+      default_logo: settings_obj.the_options.hasOwnProperty("default_logo") 
+        ? settings_obj.the_options["default_logo"] 
+        : "icon1",
+      use_uploaded_logo: settings_obj.the_options.hasOwnProperty("use_uploaded_logo") &&
+        (true == settings_obj.the_options["use_uploaded_logo"] || 1 == settings_obj.the_options["use_uploaded_logo"])
+        ? true
+        : false,
+      heading_is_on: settings_obj.the_options.hasOwnProperty("heading_is_on") &&
+        (true == settings_obj.the_options["heading_is_on"] || 1 == settings_obj.the_options["heading_is_on"])
+        ? true
+        : false,
+      cookie_heading_color: settings_obj.the_options.hasOwnProperty("cookie_heading_color")
+        ? settings_obj.the_options["cookie_heading_color"]
+        : "#000000",
+      heading_text_size: settings_obj.the_options.hasOwnProperty("heading_text_size")
+        ? settings_obj.the_options["heading_text_size"]
+        : "18",
+      heading_text_weight: settings_obj.the_options.hasOwnProperty("heading_text_weight")
+        ? settings_obj.the_options["heading_text_weight"]
+        : '700',
+      c5_buttons: c5Buttons,
+
+      c6_buttons: c6Buttons,
+
+      visible_c5_items: visibleC5Items,
+
+      visible_c6_items: visibleC6Items,
+      cookie_bar_padding1: settings_obj.the_options.hasOwnProperty("cookie_bar_padding1")
+        ? settings_obj.the_options["cookie_bar_padding1"]
+        : "20",
+      cookie_bar_horizontal_padding1: settings_obj.the_options.hasOwnProperty("cookie_bar_horizontal_padding1")
+        ? settings_obj.the_options["cookie_bar_horizontal_padding1"]
+        : "120",
+      cookie_bar_vertical_padding1: settings_obj.the_options.hasOwnProperty("cookie_bar_vertical_padding1")
+        ? settings_obj.the_options["cookie_bar_vertical_padding1"]
+        : "20",
+      cookie_bar_spacing1: settings_obj.the_options.hasOwnProperty("cookie_bar_spacing1")
+        ? settings_obj.the_options["cookie_bar_spacing1"]
+        : "15",
+      cookie_bar_blur1: settings_obj.the_options.hasOwnProperty("cookie_bar_blur1")
+        ? settings_obj.the_options["cookie_bar_blur1"]
+        : "0",
+      cookie_bar_shadow_color1: settings_obj.the_options.hasOwnProperty("cookie_bar_shadow_color1")
+        ? settings_obj.the_options["cookie_bar_shadow_color1"]
+        : "#000000",
+      cookie_bar_shadow_size1: settings_obj.the_options.hasOwnProperty("cookie_bar_shadow_size1")
+        ? settings_obj.the_options["cookie_bar_shadow_size1"]
+        : "5",
+      bypass_button_is_on1: settings_obj.the_options.hasOwnProperty("bypass_button_is_on1") &&
+        (true == settings_obj.the_options["bypass_button_is_on1"] || 1 == settings_obj.the_options["bypass_button_is_on1"] )
+        ? true
+        : false,
+      bypass_button_size1: settings_obj.the_options.hasOwnProperty("bypass_button_size1")
+        ? settings_obj.the_options["bypass_button_size1"]
+        : "md",
+      bypass_button_text_color1: settings_obj.the_options.hasOwnProperty("bypass_button_text_color1")
+        ? settings_obj.the_options["bypass_button_text_color1"]
+        : "#176CAE",
+      banner_text_alignment1: settings_obj.the_options.hasOwnProperty("banner_text_alignment1")
+        ? settings_obj.the_options["banner_text_alignment1"]
+        : "left",
+      cookie_font_size1: settings_obj.the_options.hasOwnProperty("cookie_font_size1")
+        ? settings_obj.the_options["cookie_font_size1"]
+        : "12",
+      cookie_text_weight1: settings_obj.the_options.hasOwnProperty("cookie_text_weight1")
+        ? settings_obj.the_options["cookie_text_weight1"]
+        : '400',
+      button_font_size1: settings_obj.the_options.hasOwnProperty("button_font_size1")
+        ? settings_obj.the_options["button_font_size1"]
+        : "14",
+      button_text_weight1: settings_obj.the_options.hasOwnProperty("button_text_weight1")
+        ? settings_obj.the_options["button_text_weight1"]
+        : '500',
+      logo_is_on1: settings_obj.the_options.hasOwnProperty("logo_is_on1") &&
+        (true == settings_obj.the_options["logo_is_on1"] || 1 == settings_obj.the_options["logo_is_on1"])
+        ? true
+        : false,
+      default_logo1: settings_obj.the_options.hasOwnProperty("default_logo1") 
+        ? settings_obj.the_options["default_logo1"] 
+        : "icon1",
+      use_uploaded_logo1: settings_obj.the_options.hasOwnProperty("use_uploaded_logo1") &&
+        (true == settings_obj.the_options["use_uploaded_logo1"] || 1 == settings_obj.the_options["use_uploaded_logo1"])
+        ? true
+        : false,
+      heading_is_on1: settings_obj.the_options.hasOwnProperty("heading_is_on1") &&
+        (true == settings_obj.the_options["heading_is_on1"] || 1 == settings_obj.the_options["heading_is_on1"])
+        ? true
+        : false,
+      cookie_heading_color1: settings_obj.the_options.hasOwnProperty("cookie_heading_color1")
+        ? settings_obj.the_options["cookie_heading_color1"]
+        : "#000000",
+      heading_text_size1: settings_obj.the_options.hasOwnProperty("heading_text_size1")
+        ? settings_obj.the_options["heading_text_size1"]
+        : "18",
+      heading_text_weight1: settings_obj.the_options.hasOwnProperty("heading_text_weight1")
+        ? settings_obj.the_options["heading_text_weight1"]
+        : '700',
+
+      visible_c5_items1: visibleC5Items1,
+
+      visible_c6_items1: visibleC6Items1,
+      cookie_bar_padding2: settings_obj.the_options.hasOwnProperty("cookie_bar_padding2")
+        ? settings_obj.the_options["cookie_bar_padding2"]
+        : "20",
+      cookie_bar_horizontal_padding2: settings_obj.the_options.hasOwnProperty("cookie_bar_horizontal_padding2")
+        ? settings_obj.the_options["cookie_bar_horizontal_padding2"]
+        : "120",
+      cookie_bar_vertical_padding2: settings_obj.the_options.hasOwnProperty("cookie_bar_vertical_padding2")
+        ? settings_obj.the_options["cookie_bar_vertical_padding2"]
+        : "20",
+      cookie_bar_spacing2: settings_obj.the_options.hasOwnProperty("cookie_bar_spacing2")
+        ? settings_obj.the_options["cookie_bar_spacing2"]
+        : "15",
+      cookie_bar_blur2: settings_obj.the_options.hasOwnProperty("cookie_bar_blur2")
+        ? settings_obj.the_options["cookie_bar_blur2"]
+        : "0",
+      cookie_bar_shadow_color2: settings_obj.the_options.hasOwnProperty("cookie_bar_shadow_color2")
+        ? settings_obj.the_options["cookie_bar_shadow_color2"]
+        : "#000000",
+      cookie_bar_shadow_size2: settings_obj.the_options.hasOwnProperty("cookie_bar_shadow_size2")
+        ? settings_obj.the_options["cookie_bar_shadow_size2"]
+        : "5",
+      bypass_button_is_on2: settings_obj.the_options.hasOwnProperty("bypass_button_is_on2") &&
+        (true == settings_obj.the_options["bypass_button_is_on2"] || 1 == settings_obj.the_options["bypass_button_is_on2"] )
+        ? true
+        : false,
+      bypass_button_size2: settings_obj.the_options.hasOwnProperty("bypass_button_size2")
+        ? settings_obj.the_options["bypass_button_size2"]
+        : "md",
+      bypass_button_text_color2: settings_obj.the_options.hasOwnProperty("bypass_button_text_color2")
+        ? settings_obj.the_options["bypass_button_text_color2"]
+        : "#176CAE",
+      banner_text_alignment2: settings_obj.the_options.hasOwnProperty("banner_text_alignment2")
+        ? settings_obj.the_options["banner_text_alignment2"]
+        : "left",
+      cookie_font_size2: settings_obj.the_options.hasOwnProperty("cookie_font_size2")
+        ? settings_obj.the_options["cookie_font_size2"]
+        : "12",
+      cookie_text_weight2: settings_obj.the_options.hasOwnProperty("cookie_text_weight2")
+        ? settings_obj.the_options["cookie_text_weight2"]
+        : '400',
+      button_font_size2: settings_obj.the_options.hasOwnProperty("button_font_size2")
+        ? settings_obj.the_options["button_font_size2"]
+        : "14",
+      button_text_weight2: settings_obj.the_options.hasOwnProperty("button_text_weight2")
+        ? settings_obj.the_options["button_text_weight2"]
+        : '500',
+      logo_is_on2: settings_obj.the_options.hasOwnProperty("logo_is_on2") &&
+        (true == settings_obj.the_options["logo_is_on2"] || 1 == settings_obj.the_options["logo_is_on2"])
+        ? true
+        : false,
+      default_logo2: settings_obj.the_options.hasOwnProperty("default_logo2") 
+        ? settings_obj.the_options["default_logo2"] 
+        : "icon1",
+      use_uploaded_logo2: settings_obj.the_options.hasOwnProperty("use_uploaded_logo2") &&
+        (true == settings_obj.the_options["use_uploaded_logo2"] || 1 == settings_obj.the_options["use_uploaded_logo2"])
+        ? true
+        : false,
+      heading_is_on2: settings_obj.the_options.hasOwnProperty("heading_is_on2") &&
+        (true == settings_obj.the_options["heading_is_on2"] || 1 == settings_obj.the_options["heading_is_on2"])
+        ? true
+        : false,
+      cookie_heading_color2: settings_obj.the_options.hasOwnProperty("cookie_heading_color2")
+        ? settings_obj.the_options["cookie_heading_color2"]
+        : "#000000",
+      heading_text_size2: settings_obj.the_options.hasOwnProperty("heading_text_size2")
+        ? settings_obj.the_options["heading_text_size2"]
+        : "18",
+      heading_text_weight2: settings_obj.the_options.hasOwnProperty("heading_text_weight2")
+        ? settings_obj.the_options["heading_text_weight2"]
+        : '700',
+
+      visible_c5_items2: visibleC5Items2,
+
+      visible_c6_items2: visibleC6Items2,
       cookie_accept_on:
         settings_obj.the_options.hasOwnProperty("button_accept_is_on") &&
         (true === settings_obj.the_options["button_accept_is_on"] ||
@@ -747,6 +1022,36 @@ var gen = new Vue({
       )
         ? settings_obj.the_options["button_accept_button_border_radius"]
         : "0",
+      accept_button_width: settings_obj.the_options.hasOwnProperty(
+        "button_accept_button_width"
+      )
+        ? settings_obj.the_options["button_accept_button_width"]
+        : "fit",
+      accept_button_min_width: settings_obj.the_options.hasOwnProperty(
+        "button_accept_button_min_width"
+      )        
+        ? settings_obj.the_options["button_accept_button_min_width"]
+        : "0",
+      accept_button_width1: settings_obj.the_options.hasOwnProperty(
+        "button_accept_button_width1"
+      )
+        ? settings_obj.the_options["button_accept_button_width1"]
+        : "fit",
+      accept_button_min_width1: settings_obj.the_options.hasOwnProperty(
+        "button_accept_button_min_width1"
+      )        
+        ? settings_obj.the_options["button_accept_button_min_width1"]
+        : "0",
+      accept_button_width2: settings_obj.the_options.hasOwnProperty(
+        "button_accept_button_width2"
+      )
+        ? settings_obj.the_options["button_accept_button_width2"]
+        : "fit",
+      accept_button_min_width2: settings_obj.the_options.hasOwnProperty(
+        "button_accept_button_min_width2"
+      )        
+        ? settings_obj.the_options["button_accept_button_min_width2"]
+        : "0",
       cookie_decline_on:
         settings_obj.the_options.hasOwnProperty("button_decline_is_on") &&
         (true === settings_obj.the_options["button_decline_is_on"] ||
@@ -798,6 +1103,36 @@ var gen = new Vue({
         "button_decline_button_border_radius"
       )
         ? settings_obj.the_options["button_decline_button_border_radius"]
+        : "0",
+      decline_button_width: settings_obj.the_options.hasOwnProperty(
+        "button_decline_button_width"
+      )
+        ? settings_obj.the_options["button_decline_button_width"]
+        : "fit",
+      decline_button_min_width: settings_obj.the_options.hasOwnProperty(
+        "button_decline_button_min_width"
+      )
+        ? settings_obj.the_options["button_decline_button_min_width"]
+        : "0",
+      decline_button_width1: settings_obj.the_options.hasOwnProperty(
+        "button_decline_button_width1"
+      )
+        ? settings_obj.the_options["button_decline_button_width1"]
+        : "fit",
+      decline_button_min_width1: settings_obj.the_options.hasOwnProperty(
+        "button_decline_button_min_width1"
+      )
+        ? settings_obj.the_options["button_decline_button_min_width1"]
+        : "0",
+      decline_button_width2: settings_obj.the_options.hasOwnProperty(
+        "button_decline_button_width2"
+      )
+        ? settings_obj.the_options["button_decline_button_width2"]
+        : "fit",
+      decline_button_min_width2: settings_obj.the_options.hasOwnProperty(
+        "button_decline_button_min_width2"
+      )
+        ? settings_obj.the_options["button_decline_button_min_width2"]
         : "0",
       decline_action: settings_obj.the_options.hasOwnProperty(
         "button_decline_action"
@@ -871,6 +1206,36 @@ var gen = new Vue({
         "button_settings_button_border_radius"
       )
         ? settings_obj.the_options["button_settings_button_border_radius"]
+        : "0",
+      settings_button_width: settings_obj.the_options.hasOwnProperty(
+        "button_settings_button_width"
+      )
+        ? settings_obj.the_options["button_settings_button_width"]
+        : "fit",
+      settings_button_min_width: settings_obj.the_options.hasOwnProperty(
+        "button_settings_button_min_width"
+      )
+        ? settings_obj.the_options["button_settings_button_min_width"]
+        : "0", 
+      settings_button_width1: settings_obj.the_options.hasOwnProperty(
+        "button_settings_button_width1"
+      )
+        ? settings_obj.the_options["button_settings_button_width1"]
+        : "fit",
+      settings_button_min_width1: settings_obj.the_options.hasOwnProperty(
+        "button_settings_button_min_width1"
+      )
+        ? settings_obj.the_options["button_settings_button_min_width1"]
+        : "0", 
+      settings_button_width2: settings_obj.the_options.hasOwnProperty(
+        "button_settings_button_width2"
+      )
+        ? settings_obj.the_options["button_settings_button_width2"]
+        : "fit",
+      settings_button_min_width2: settings_obj.the_options.hasOwnProperty(
+        "button_settings_button_min_width2"
+      )
+        ? settings_obj.the_options["button_settings_button_min_width2"]
         : "0",
       cookie_on_frontend:
         settings_obj.the_options.hasOwnProperty(
@@ -2244,6 +2609,36 @@ var gen = new Vue({
         "button_accept_all_btn_border_radius"
       )
         ? settings_obj.the_options["button_accept_all_btn_border_radius"]
+        : "0",
+      accept_all_btn_width: settings_obj.the_options.hasOwnProperty(
+        "button_accept_all_btn_width"
+      )
+        ? settings_obj.the_options["button_accept_all_btn_width"]
+        : "fit",
+      accept_all_btn_min_width: settings_obj.the_options.hasOwnProperty(
+        "button_accept_all_btn_min_width"
+      )
+        ? settings_obj.the_options["button_accept_all_btn_min_width"]
+        : "0",
+      accept_all_btn_width1: settings_obj.the_options.hasOwnProperty(
+        "button_accept_all_btn_width1"
+      )
+        ? settings_obj.the_options["button_accept_all_btn_width1"]
+        : "fit",
+      accept_all_btn_min_width1: settings_obj.the_options.hasOwnProperty(
+        "button_accept_all_btn_min_width1"
+      )
+        ? settings_obj.the_options["button_accept_all_btn_min_width1"]
+        : "0",
+      accept_all_btn_width2: settings_obj.the_options.hasOwnProperty(
+        "button_accept_all_btn_width2"
+      )
+        ? settings_obj.the_options["button_accept_all_btn_width2"]
+        : "fit",
+      accept_all_btn_min_width2: settings_obj.the_options.hasOwnProperty(
+        "button_accept_all_btn_min_width2"
+      )
+        ? settings_obj.the_options["button_accept_all_btn_min_width2"]
         : "0",
       //custom css
       gdpr_css_text: settings_obj.the_options.hasOwnProperty("gdpr_css_text")
