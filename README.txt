@@ -4,7 +4,7 @@ Donate link: https://wplegalpages.com/
 Tags: cookie banner, cookie consent, cookie notice, eu cookie law, gdpr
 Requires at least: 3.3.1
 Tested up to: 6.9
-Stable tag: 4.2.9
+Stable tag: 4.3.1
 Requires PHP: 7.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -195,6 +195,22 @@ Yes, the plugin supports multiple languages, ensuring that your cookie consent b
 11.Consent Log table
 
 == Change Log ==
+
+= 4.3.1 =
+* Improvements*
+    * Improved auto-generate banner logic for better compatibility and more consistent banner setup experience.
+    * Added option to anonymize IP addresses after consent is provided for improved GDPR compliance.
+* Bug Fixes
+    * Fixed inconsistent credit settings behavior between the plugin and SaaS dashboard.
+    * Fixed Save Changes button being clickable inside Script Blocker even when Safe Mode was enabled.
+    * Other minor bugfixes and improvements.
+
+= 4.3.0 =
+* Fixed minor bugs.
+* Fixed minor issue related to custom CSS section.
+* Fixed minor issue with banner close icon (was not compatible with some themes).
+* Enhanced Cookie Settings, Script Blocker persistence, and SaaS configuration behavior.
+* Minor UI changes.
 
 = 4.2.9 =
 * New Features
@@ -801,6 +817,22 @@ Yes, the plugin supports multiple languages, ensuring that your cookie consent b
 * Initial version
 
 == Upgrade Notice ==
+
+= 4.3.1 =
+* Improvements*
+    * Improved auto-generate banner logic for better compatibility and more consistent banner setup experience.
+    * Added option to anonymize IP addresses after consent is provided for improved GDPR compliance.
+* Bug Fixes
+    * Fixed inconsistent credit settings behavior between the plugin and SaaS dashboard.
+    * Fixed Save Changes button being clickable inside Script Blocker even when Safe Mode was enabled.
+    * Other minor bugfixes and improvements.
+
+= 4.3.0 =
+* Fixed minor bugs.
+* Fixed minor issue related to custom CSS section.
+* Fixed minor issue with banner close icon (was not compatible with some themes).
+* Enhanced Cookie Settings, Script Blocker persistence, and SaaS configuration behavior.
+* Minor UI changes.
 
 = 4.2.9 =
 * New Features

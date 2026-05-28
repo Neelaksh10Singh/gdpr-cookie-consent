@@ -114,7 +114,14 @@ class Gdpr_Cookie_Consent_Cookie_Scanner_Ajax extends Gdpr_Cookie_Consent_Cookie
 			if ( $scan_limit_int > 5 ) {
 				exit();
 			}
+		} else if ( '3sites' === strtolower( $this->plan ) ) {
+			$scan_limit     = get_transient( 'gdpr_monthly_scan_limit_exhausted' );
+			$scan_limit_int = (int) $scan_limit;
+			if ( $scan_limit_int > 50 ) {
+				exit();
+			}
 		}
+
 		if ( isset( $_POST['wpl_scanner_action'] ) ) {
 			$wpl_scan_action = sanitize_text_field( wp_unslash( $_POST['wpl_scanner_action'] ) );
 			$allowed_actions = array( 'get_pages', 'scan_pages', 'stop_scan', 'check_api', 'scan_cookie_list', 'update_scan_cookie', 'get_post_scan_cookies', 'get_scanned_cookies_list' );
@@ -458,7 +465,7 @@ class Gdpr_Cookie_Consent_Cookie_Scanner_Ajax extends Gdpr_Cookie_Consent_Cookie
 					$category_id = $wpdb->get_var(
 						$wpdb->prepare(
 							"SELECT id_gdpr_cookie_category 
-							FROM {$category_table} 
+							FROM `{$category_table}` 
 							WHERE gdpr_cookie_category_slug = %s 
 							LIMIT 1",
 							$category
@@ -468,7 +475,7 @@ class Gdpr_Cookie_Consent_Cookie_Scanner_Ajax extends Gdpr_Cookie_Consent_Cookie
 						$category_id = $wpdb->get_var(
 							$wpdb->prepare(
 								"SELECT id_gdpr_cookie_category 
-								FROM {$category_table} 
+								FROM `{$category_table}` 
 								WHERE gdpr_cookie_category_slug = %s LIMIT 1",'unclassified'
 							)
 						);
@@ -681,7 +688,7 @@ class Gdpr_Cookie_Consent_Cookie_Scanner_Ajax extends Gdpr_Cookie_Consent_Cookie
 				$ccategory = isset( $cookie['ccategory'] ) ? sanitize_text_field( wp_unslash( $cookie['ccategory'] ) ) : '';
 				$cdesc     = isset( $cookie['cdesc'] ) ? sanitize_text_field( wp_unslash( $cookie['cdesc'] ) ) : '';
 				global $wpdb;
-				$cat_data_arr = $wpdb->get_row( $wpdb->prepare( 'SELECT gdpr_cookie_category_name FROM ' . $wpdb->prefix . 'gdpr_cookie_scan_categories WHERE id_gdpr_cookie_category=%d', array( $ccategory ) ), ARRAY_A ); // db call ok; no-cache ok.
+				$cat_data_arr = $wpdb->get_row( $wpdb->prepare( 'SELECT gdpr_cookie_category_name FROM `' . $wpdb->prefix . 'gdpr_cookie_scan_categories` WHERE id_gdpr_cookie_category=%d', array( $ccategory ) ), ARRAY_A ); // db call ok; no-cache ok.
 				if ( $cat_data_arr ) {
 					$ccategoryname = $cat_data_arr['gdpr_cookie_category_name'];
 				}
