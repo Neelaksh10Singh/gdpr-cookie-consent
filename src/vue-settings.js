@@ -393,6 +393,58 @@ var gen = new Vue({
         1 === settings_obj.the_options["show_again2"])
         ? true
         : false,
+        // CCPA Revoke Consent
+        is_ccpa_revoke_consent_on: settings_obj.the_options.hasOwnProperty("ccpa_show_again") &&
+        (true === settings_obj.the_options["ccpa_show_again"] ||
+          1 === settings_obj.the_options["ccpa_show_again"])
+          ? true
+          : false,
+        is_ccpa_revoke_consent_on1:  settings_obj.the_options.hasOwnProperty("ccpa_show_again1") &&
+      (true === settings_obj.the_options["ccpa_show_again1"] ||
+        1 === settings_obj.the_options["ccpa_show_again1"])
+        ? true
+        : false,
+        
+        is_ccpa_revoke_consent_on2:  settings_obj.the_options.hasOwnProperty("ccpa_show_again2") &&
+      (true === settings_obj.the_options["ccpa_show_again2"] ||
+        1 === settings_obj.the_options["ccpa_show_again2"])
+        ? true
+        : false,
+
+        ccpa_revoke_consent_popup: false,
+        ccpa_revoke_consent_popup1: false,
+        ccpa_revoke_consent_popup2: false,
+        ccpa_tab_text: settings_obj.the_options.hasOwnProperty("ccpa_show_again_text")
+          ? settings_obj.the_options["ccpa_show_again_text"]
+        : "Opt Out",
+        ccpa_tab_text1: settings_obj.the_options.hasOwnProperty("ccpa_show_again_text1")
+          ? settings_obj.the_options["ccpa_show_again_text1"]
+        : "Opt Out",
+         ccpa_tab_text2: settings_obj.the_options.hasOwnProperty("ccpa_show_again_text2")
+          ? settings_obj.the_options["ccpa_show_again_text2"]
+        : "Opt Out",
+        ccpa_tab_position: settings_obj.the_options.hasOwnProperty(
+         "ccpa_show_again_position")
+        ? settings_obj.the_options["ccpa_show_again_position"]
+        : "right",
+        ccpa_tab_position1: settings_obj.the_options.hasOwnProperty(
+        "ccpa_show_again_position1")
+        ? settings_obj.the_options["ccpa_show_again_position1"]
+        : "right",
+        ccpa_tab_position2: settings_obj.the_options.hasOwnProperty(
+        "ccpa_show_again_position2"
+        )
+        ? settings_obj.the_options["ccpa_show_again_position2"]
+        : "right",
+        ccpa_tab_margin: settings_obj.the_options.hasOwnProperty("ccpa_show_again_margin")
+        ? settings_obj.the_options["ccpa_show_again_margin"]
+        : "5",
+        ccpa_tab_margin1: settings_obj.the_options.hasOwnProperty("ccpa_show_again_margin1")
+        ? settings_obj.the_options["ccpa_show_again_margin1"]
+        : "5",
+        ccpa_tab_margin2: settings_obj.the_options.hasOwnProperty("ccpa_show_again_margin2")
+        ? settings_obj.the_options["ccpa_show_again_margin2"]
+        : "5",
       tab_position_options: settings_obj.tab_position_options,
       tab_position: settings_obj.the_options.hasOwnProperty(
         "show_again_position"
@@ -428,6 +480,7 @@ var gen = new Vue({
         ? settings_obj.the_options["show_again_text2"]
         : "Cookie Settings",
       show_revoke_card: this.is_gdpr || this.is_eprivacy,
+      //add here for CCPA -(see if needed or not ----- no as it is equal to is_ccpa)
       autotick:
         settings_obj.the_options.hasOwnProperty("is_ticked") &&
         (true === settings_obj.the_options["is_ticked"] ||
@@ -2832,6 +2885,36 @@ var gen = new Vue({
         )
           ? settings_obj.the_options["button_revoke_consent_background_color2"]
           : "",
+      ccpa_button_revoke_consent_text_color: settings_obj.the_options.hasOwnProperty(
+        "ccpa_button_revoke_consent_text_color"
+      )
+        ? settings_obj.the_options["ccpa_button_revoke_consent_text_color"]
+        : "",
+      ccpa_button_revoke_consent_text_color1:  settings_obj.the_options.hasOwnProperty(
+        "ccpa_button_revoke_consent_text_color1"
+      )
+        ? settings_obj.the_options["ccpa_button_revoke_consent_text_color1"]
+        : "",
+      ccpa_button_revoke_consent_text_color2: settings_obj.the_options.hasOwnProperty(
+        "ccpa_button_revoke_consent_text_color2"
+      )
+        ? settings_obj.the_options["ccpa_button_revoke_consent_text_color2"]
+        : "",
+      ccpa_button_revoke_consent_background_color: settings_obj.the_options.hasOwnProperty(
+          "ccpa_button_revoke_consent_background_color"
+        )
+          ? settings_obj.the_options["ccpa_button_revoke_consent_background_color"]
+          : "",
+      ccpa_button_revoke_consent_background_color1: settings_obj.the_options.hasOwnProperty(
+          "ccpa_button_revoke_consent_background_color1"
+        )
+          ? settings_obj.the_options["ccpa_button_revoke_consent_background_color1"]
+          : "",
+      ccpa_button_revoke_consent_background_color2: settings_obj.the_options.hasOwnProperty(
+          "ccpa_button_revoke_consent_background_color2"
+        )
+          ? settings_obj.the_options["ccpa_button_revoke_consent_background_color2"]
+          : "",
       is_selectedCountry_on:
         settings_obj.the_options.hasOwnProperty("is_selectedCountry_on") &&
         (true === settings_obj.the_options["is_selectedCountry_on"] ||
@@ -3453,6 +3536,15 @@ var gen = new Vue({
     onSwitchRevokeConsentEnable2() {
       this.is_revoke_consent_on2 = !this.is_revoke_consent_on2;
     },
+    onSwitchCcpaRevokeConsentEnable(){
+      this.is_ccpa_revoke_consent_on = !this.is_ccpa_revoke_consent_on;
+    },
+    onSwitchCcpaRevokeConsentEnable1(){
+      this.is_ccpa_revoke_consent_on1 = !this.is_ccpa_revoke_consent_on1;
+    },
+    onSwitchCcpaRevokeConsentEnable2(){
+      this.is_ccpa_revoke_consent_on2 = !this.is_ccpa_revoke_consent_on2;
+    },
     onSwitchAutoBannerInitialize() {
       this.auto_banner_initialize = !this.auto_banner_initialize;
     },
@@ -3780,6 +3872,8 @@ var gen = new Vue({
       this.opt_out_text_color =                     selectedTemplate['opt_out_button']['color'];
       this.button_revoke_consent_text_color =       selectedTemplate['revoke_consent_button']['color'];
       this.button_revoke_consent_background_color = selectedTemplate['revoke_consent_button']['background-color'];
+      this.ccpa_button_revoke_consent_text_color =       selectedTemplate['revoke_consent_button']['color']; //change this in the pro templates
+      this.ccpa_button_revoke_consent_background_color = selectedTemplate['revoke_consent_button']['background-color'];
       //ab testing banners settings
       
       this.cookie_bar_color1 =                       selectedTemplate['styles']['background-color'];
@@ -3836,7 +3930,8 @@ var gen = new Vue({
       this.button_readmore_button_border_width1 =    selectedTemplate['readmore_button']['border-width'].substring(0, selectedTemplate['readmore_button']['border-width'].length - 2);
       this.button_revoke_consent_text_color1 =       selectedTemplate['revoke_consent_button']['color'];
       this.button_revoke_consent_background_color1 = selectedTemplate['revoke_consent_button']['background-color'];
-
+      this.ccpa_button_revoke_consent_text_color1 =       selectedTemplate['revoke_consent_button']['color'];
+      this.ccpa_button_revoke_consent_background_color1 = selectedTemplate['revoke_consent_button']['background-color'];
       this.cookie_bar_color2 =                       selectedTemplate['styles']['background-color'];
       this.cookie_bar_opacity2 =                     selectedTemplate['styles']['opacity'];
       this.cookie_text_color2 =                      selectedTemplate['styles']['color'];
@@ -3891,7 +3986,8 @@ var gen = new Vue({
       this.button_readmore_button_border_width2 =    selectedTemplate['readmore_button']['border-width'].substring(0, selectedTemplate['readmore_button']['border-width'].length - 2);
       this.button_revoke_consent_text_color2 =       selectedTemplate['revoke_consent_button']['color'];
       this.button_revoke_consent_background_color2 = selectedTemplate['revoke_consent_button']['background-color'];
-
+      this.ccpa_button_revoke_consent_text_color2 =       selectedTemplate['revoke_consent_button']['color'];
+      this.ccpa_button_revoke_consent_background_color2 = selectedTemplate['revoke_consent_button']['background-color'];
       // Multiple Legislation
       this.multiple_legislation_cookie_bar_color1 =         selectedTemplate["styles"]["background-color"];
       this.multiple_legislation_cookie_bar_border_radius1 = selectedTemplate['styles']['border-radius'].substring(0, selectedTemplate['styles']['border-radius'].length - 2);
@@ -4372,6 +4468,9 @@ var gen = new Vue({
       this.is_revoke_consent_on = true;
       this.is_revoke_consent_on1 = true;
       this.is_revoke_consent_on2 = true;
+      this.is_ccpa_revoke_consent_on = false;
+      this.is_ccpa_revoke_consent_on1 = false;
+      this.is_ccpa_revoke_consent_on2 = false;
       this.is_script_blocker_on = false;
       this.auto_hide = false;
       this.auto_banner_initialize = false;
@@ -4524,6 +4623,8 @@ var gen = new Vue({
       this.opt_out_text_color =                     selectedTemplate['opt_out_button']['color'];
       this.button_revoke_consent_text_color =       selectedTemplate['revoke_consent_button']['color'];
       this.button_revoke_consent_background_color = selectedTemplate['revoke_consent_button']['background-color'];
+      this.ccpa_button_revoke_consent_text_color =       selectedTemplate['revoke_consent_button']['color']; //change this may be as per the pro templates
+      this.ccpa_button_revoke_consent_background_color = selectedTemplate['revoke_consent_button']['background-color'];
       //ab testing banners settings
       
       this.cookie_bar_color1 =                       selectedTemplate['styles']['background-color'];
