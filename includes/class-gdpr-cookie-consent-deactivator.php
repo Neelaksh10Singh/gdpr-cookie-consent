@@ -38,7 +38,7 @@ class Gdpr_Cookie_Consent_Deactivator {
 			);
 			foreach ( $tables_arr as $table ) {
 				$tablename = $wpdb->prefix . $table;
-				$wpdb->query( 'DROP TABLE IF EXISTS ' . $tablename ); // phpcs:ignore
+				$wpdb->query( 'DROP TABLE IF EXISTS `' . $tablename . '`' ); // phpcs:ignore
 			}
 			delete_option( 'gdpr_admin_modules' );
 			delete_option( 'gdpr_public_modules' );
@@ -47,6 +47,9 @@ class Gdpr_Cookie_Consent_Deactivator {
 			delete_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD1 );
 			delete_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD2 );
 			
+			delete_option( GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON );
+			delete_option( GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON1 );
+			delete_option( GDPR_COOKIE_CONSENT_SETTINGS_REVOKE_ICON2 );
 		}
 		delete_option( 'wpl_ab_options');
 		delete_option( GDPR_COOKIE_CONSENT_SETTINGS_VENDOR);

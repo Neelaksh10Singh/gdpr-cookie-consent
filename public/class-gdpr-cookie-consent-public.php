@@ -576,16 +576,16 @@ class Gdpr_Cookie_Consent_Public {
 
 			// Fetch Youtube category
 			//$total_results = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM ' . $wpdb->prefix . 'wpl_cookie_scripts WHERE `script_key`=%s', array( $value['script_key'] ) ), ARRAY_A ); // db call ok; no-cache ok.
-$selected_script_category = $wpdb->get_var(
-    $wpdb->prepare(
-        "SELECT cat.gdpr_cookie_category_name
-         FROM {$wpdb->prefix}wpl_cookie_scripts AS script
-         JOIN {$wpdb->prefix}gdpr_cookie_scan_categories AS cat
-           ON script.script_category = cat.id_gdpr_cookie_category
-         WHERE script.script_title = %s",
-        'Youtube Embed'
-    )
-);
+			$selected_script_category = $wpdb->get_var(
+			    $wpdb->prepare(
+			        "SELECT cat.gdpr_cookie_category_name
+			         FROM `{$wpdb->prefix}wpl_cookie_scripts` AS script
+			         JOIN `{$wpdb->prefix}gdpr_cookie_scan_categories` AS cat
+			           ON script.script_category = cat.id_gdpr_cookie_category
+			         WHERE script.script_title = %s",
+			        'Youtube Embed'
+			    )
+			);
 
 			wp_localize_script(
 				$this->plugin_name,
@@ -1250,6 +1250,42 @@ $selected_script_category = $wpdb->get_var(
 			if ( $the_options['consent_forward'] !== true ) {
 				$the_options['select_sites'] = null;
 			}
+
+			$gdpr_monthly_page_views = get_option('wpl_monthly_page_views', 0);
+			$settings = new GDPR_Cookie_Consent_Settings();
+			$api_user_plan     = $settings->get_plan();
+			$gdpr_monthly_page_views_percent = 0;
+			if ( 'free' === $api_user_plan ) { 
+				$gdpr_monthly_page_views_percent = ( ( $gdpr_monthly_page_views ) / 20000 ) * 100;
+			} else if ( '3sites' === $api_user_plan ) {
+				$gdpr_monthly_page_views_percent = ( ( $gdpr_monthly_page_views ) / 100000 ) * 100;
+			}
+
+
+			global $wpdb;
+			$youtube_category = array( 'slug' => 'preferences', 'name' => 'Preferences' );
+					
+			$youtube_script = $wpdb->get_row(
+	    		"SELECT script_category FROM `{$wpdb->prefix}wpl_cookie_scripts`
+	    		 WHERE script_key = 'youtube_embed' AND script_status = 1 
+	    		 LIMIT 1"
+			);
+			
+			if ( $youtube_script ) {
+			    $category = $wpdb->get_row( $wpdb->prepare(
+			        "SELECT gdpr_cookie_category_slug, gdpr_cookie_category_name 
+			         FROM `{$wpdb->prefix}gdpr_cookie_scan_categories` 
+			         WHERE id_gdpr_cookie_category = %d",
+			        $youtube_script->script_category
+			    ));
+			    if ( $category ) {
+			        $youtube_category = array(
+			            'slug' => $category->gdpr_cookie_category_slug,
+			            'name' => $category->gdpr_cookie_category_name,
+			        );
+			    }
+			}
+
 			$cookies_list_data = array(
 				'gdpr_cookies_list'                 		=> wp_json_encode( $categories_json_data),
 				'gdpr_cookiebar_settings'          		 	=> wp_json_encode( Gdpr_Cookie_Consent::gdpr_get_json_settings() ),
@@ -1258,6 +1294,8 @@ $selected_script_category = $wpdb->get_var(
 				'gdpr_consent_renew' 						=> $the_options['ip_and_consent_renew'],
 				'gdpr_user_ip'           					=> $user_ip,
 				'gdpr_do_not_track'      		    		=> $the_options['do_not_track_on'],
+				'ip_anonymization_on'                 		=> $the_options['ip_anonymization_on'],
+				'ip_masking_level'                          => $the_options['ip_masking_level'],
 				'gdpr_select_pages'       					=> $the_options['select_pages'],
 				'gdpr_select_sites'      					=> $the_options['select_sites'],
 				'consent_forwarding'      					=> $the_options['consent_forward'],
@@ -1279,14 +1317,62 @@ $selected_script_category = $wpdb->get_var(
 				'is_gcm_debug_on'							=> isset($the_options['is_gcm_debug_mode']) ? $this->convert_boolean($the_options['is_gcm_debug_mode']) : false,
 				'vendor_data'	                            => Gdpr_Cookie_Consent::gdpr_get_all_vendors(),
 				'cookieSettingsPopupAccentColor'	        => strtoupper(substr($finalColor, 0, -2)) === strtoupper($acceptAllBGColor) ? $the_options['button_accept_all_link_color'] : $acceptAllBGColor,
-				'template_parts' 	                        => $the_options['template_parts']
-        
+				'template_parts' 	                        => $the_options['template_parts'],
+				'gdpr_monthly_page_views_percent'			=> $gdpr_monthly_page_views_percent,
+				'youtube_embed_category'					=> $youtube_category
 			);
 
 
 			wp_localize_script( $this->plugin_name, 'gdpr_cookies_obj', $cookies_list_data );
 		}
 	}
+
+	/**
+	 * Anonymizes an IP address based on the configured masking level.
+	 *
+	 * IPv4 masking:
+	 *   Level 1 → 192.168.100.xxx
+	 *   Level 2 → 192.168.xxx.xxx  (Recommended)
+	 *   Level 3 → 192.xxx.xxx.xxx
+	 *   Full    → xxx.xxx.xxx.xxx
+	 *
+	 * @param string $ip    The raw IP address.
+	 * @param int|string $level  Masking level: 1, 2, 3, or 'full'.
+	 * @return string The anonymized IP address.
+	 */
+	public function wpl_anonymize_ip( $ip, $level ) {
+		if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+			// IPv4
+			$parts = explode( '.', $ip );
+			switch ( $level ) {
+				case 1:
+					$parts[3] = 'xxx';
+					break;
+				case 2:
+					$parts[2] = 'xxx';
+					$parts[3] = 'xxx';
+					break;
+				case 3:
+					$parts[1] = 'xxx';
+					$parts[2] = 'xxx';
+					$parts[3] = 'xxx';
+					break;
+				case 'full':
+					$parts = array( 'xxx', 'xxx', 'xxx', 'xxx' );
+					break;
+				default:
+					// Fallback to level 2 (recommended) if unexpected value
+					$parts[2] = 'xxx';
+					$parts[3] = 'xxx';
+					break;
+			}
+			return implode( '.', $parts );
+		}
+
+		// If IP is invalid/unknown, return ip as it is
+		return $ip;
+	}
+
 	/**
 	 * Returns IP address of the user for consent log.
 	 *
@@ -1324,6 +1410,19 @@ $selected_script_category = $wpdb->get_var(
 			$ipaddress = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
 		} else {
 			$ipaddress = 'UNKNOWN';
+		}
+
+	
+		if ( class_exists( 'Gdpr_Cookie_Consent' ) ) {
+			$the_options = Gdpr_Cookie_Consent::gdpr_get_settings();
+		}
+
+		$anonymization_enabled = isset( $the_options['ip_anonymization_on'] )
+    		&& ( $the_options['ip_anonymization_on'] === true || $the_options['ip_anonymization_on'] === 1 || $the_options['ip_anonymization_on'] === '1' || $the_options['ip_anonymization_on'] === 'true' );
+
+		if ( $anonymization_enabled && ! empty( $ipaddress ) && $ipaddress !== 'UNKNOWN' ) {
+			$level     = isset( $the_options['ip_masking_level'] ) ? $the_options['ip_masking_level'] : 2;
+			$ipaddress = $this->wpl_anonymize_ip( $ipaddress, $level );
 		}
 		return esc_html($ipaddress);
 	}

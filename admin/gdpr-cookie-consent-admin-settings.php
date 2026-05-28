@@ -758,16 +758,31 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 								<c-row>
 									<c-col class="col-sm-32"><div id="gdpr-cookie-consent-settings-cookie-notice-top"><?php esc_html_e( 'Cookie Notice', 'gdpr-cookie-consent' ); ?></div></c-col>
 								</c-row>
+								<?php $gdpr_monthly_page_views = get_option('wpl_monthly_page_views', 0);
+									$gdpr_monthly_page_views_percent = 0;
+									if ( 'free' === $api_user_plan ) { 
+										$gdpr_monthly_page_views_percent = ( ( $gdpr_monthly_page_views ) / 20000 ) * 100;
+									} else if ( '3sites' === $api_user_plan ) {
+										$gdpr_monthly_page_views_percent = ( ( $gdpr_monthly_page_views ) / 100000 ) * 100;
+									}
+								?>
 								<c-row>
 									<c-col class="col-sm-4"><label><?php esc_attr_e( 'Enable Cookie Notice', 'gdpr-cookie-consent' ); ?></label></c-col>
 									<c-col class="col-sm-8">
 										<label for="gdpr-cookie-consent-cookie-on" class="screen-reader-text"><?php esc_attr_e( 'Enable Cookie Consent', 'gdpr-cookie-consent' ); ?></label>
-										<c-switch v-bind="labelIcon" v-model="cookie_is_on" id="gdpr-cookie-consent-cookie-on" variant="3d"  color="success" :checked="cookie_is_on" v-on:update:checked="onSwitchCookieEnable"></c-switch>
+										<div class="gdpr-disabled-cookie-notice-integration">
+										<c-switch v-bind="labelIcon" v-model="cookie_is_on" id="gdpr-cookie-consent-cookie-on" variant="3d"  color="success" :checked="<?php echo $gdpr_monthly_page_views_percent === 100 ? 'false' : 'cookie_is_on'; ?>" v-on:update:checked="onSwitchCookieEnable" <?php echo $gdpr_monthly_page_views_percent === 100 ? 'disabled' : ''; ?>></c-switch>
 										<input type="hidden" name="gcc-cookie-enable" v-model="cookie_is_on">
+										<?php if ($gdpr_monthly_page_views_percent === 100): ?>
+											<p class="gdpr-cookie_notice_message">
+												<?php esc_attr_e( 'Page views limit exhausted, upgrade to continue.', 'gdpr-cookie-consent' ); ?>
+											</p>
+										<?php endif; ?>
+										</div>
 									</c-col>
 								</c-row>
 								<c-row v-show="is_gdpr">
-									<c-col class="col-sm-4"><label><?php esc_attr_e( 'Support IAB TCF v2.2', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'Enable this to show a consent banner that complies with IAB Europe’s Transparency and Consent Framework v2.2 for ad personalization and tracking.', 'gdpr-cookie-consent'  ); ?>"></tooltip>  <span class="probadge bg-badge"><?php esc_attr_e( 'Pro', 'gdpr-cookie-consent' ); ?></span></label></c-col>
+									<c-col class="col-sm-4"><label><?php esc_attr_e( 'Support IAB TCF v2.3', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'Enable this to show a consent banner that complies with IAB Europe’s Transparency and Consent Framework v2.3 for ad personalization and tracking.', 'gdpr-cookie-consent'  ); ?>"></tooltip>  <span class="probadge bg-badge"><?php esc_attr_e( 'Pro', 'gdpr-cookie-consent' ); ?></span></label></c-col>
 									<c-col class="col-sm-8">
 										<?php 
 											$is_disabled = (!$is_user_connected || $api_user_plan === 'free');
@@ -7011,6 +7026,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 													showPrintMargin: false,
 													showGutter: true,
 												}"
+												@keydown.native.stop
 											/>
 										</c-col>
 							<?php
@@ -7041,6 +7057,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 									showPrintMargin: false,
 									showGutter: true,
 								}"
+								@keydown.native.stop
 							/>
 						</c-col>
 						<?php
