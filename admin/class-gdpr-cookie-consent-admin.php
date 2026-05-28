@@ -9137,6 +9137,77 @@ class Gdpr_Cookie_Consent_Admin {
 
 		}, 10, 4);
 	}
+
+	public function permission_callback_for_wplp_connect_site(WP_REST_Request $request) {
+		
+		$auth_header = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+
+    	if ( ! preg_match( '/Bearer\s(\S+)/', $auth_header, $matches ) ) {
+    	    return new WP_Error(
+    	        'no_token',
+    	        'Authorization token missing.',
+    	        [ 'status' => 401 ]
+    	    );
+    	}
+
+    	$token = sanitize_text_field( $matches[1] );
+
+    	$validate = wp_remote_post(
+    	    GDPR_APP_URL . '/wp-json/jwt-auth/v1/token/validate',
+    	    [
+    	        'headers' => [
+    	            'Authorization' => 'Bearer ' . $token,
+    	            'Content-Type'  => 'application/json',
+    	        ],
+    	        'timeout' => 15,
+    	    ]
+    	);
+
+    	if ( is_wp_error( $validate ) ) {
+    	    return new WP_Error(
+    	        'token_validation_failed',
+    	        $validate->get_error_message(),
+    	        [ 'status' => 401 ]
+    	    );
+    	}
+		
+		$code = wp_remote_retrieve_response_code( $validate );
+
+    	if ( $code !== 200 ) {
+    	    return new WP_Error(
+    	        'invalid_token',
+    	        'Token validation failed.',
+    	        [ 'status' => 401 ]
+    	    );
+    	}
+
+		$username = sanitize_text_field( $request->get_param( 'username' ) );
+
+    	$user = get_user_by( 'email', $username );
+
+    	if ( ! $user ) {
+    	    $user = get_user_by( 'login', $username );
+    	}
+
+    	if ( ! $user ) {
+    	    return new WP_Error(
+    	        'invalid_user',
+    	        'User does not exist.',
+    	        [ 'status' => 401 ]
+    	    );
+    	}
+
+    	if ( ! user_can( $user, 'manage_options' ) ) {
+    	    return new WP_Error(
+    	        'invalid_user',
+    	        'User is not an administrator.',
+    	        [ 'status' => 403 ]
+    	    );
+    	}
+
+    	return true;
+	}
+
 	public function permission_callback_for_react_app(WP_REST_Request $request) {
 		$this->settings = new GDPR_Cookie_Consent_Settings();
 
@@ -9511,6 +9582,26 @@ class Gdpr_Cookie_Consent_Admin {
 				'methods' => 'POST',
 				'callback' => array( $this, 'saas_upload_logo' ),
 				'permission_callback' => array($this, 'permission_callback_for_react_app'),
+			)
+		);
+
+		register_rest_route(
+			'wplp-react-gdpr/v1',
+			'/connect_to_wplp_compliance',
+			array(
+				'methods'	=> 'POST',
+				'callback'	=> array( $this, 'wplp_connect_plugin_to_wplp_compliance' ),
+				'permission_callback'	=> array( $this, 'permission_callback_for_wplp_connect_site' ),
+			)
+		);
+
+		register_rest_route(
+			'wplp-react-gdpr/v1',
+			'/store-auth',
+			array(
+				'methods'	=> 'POST',
+				'callback'	=> array( $this, 'rest_store_auth_key' ),
+				'permission_callback'	=> array( $this, 'permission_callback_for_wplp_connect_site' ),
 			)
 		);
 
@@ -11944,7 +12035,82 @@ public function gdpr_support_request_handler() {
 		);
 	}
 
-	
+	public function wplp_connect_plugin_to_wplp_compliance( WP_REST_Request $request ) {
+		
+		global $wcam_lib_gdpr;
+
+		$data_key = $wcam_lib_gdpr->data_key;
+		$instance_key = $data_key . '_instance';
+    
+    	$instance_id      = get_option( $instance_key );
+    	$object           = str_ireplace( array( 'http://', 'https://' ), '', home_url() );
+    	$software_version = $wcam_lib_gdpr->software_version;
+
+		$response = array(
+			'site'				=> rawurlencode( get_site_url() ),
+			'rest_url'			=> rawurlencode( get_rest_url() ),
+			'instance_id'		=> rawurldecode( $instance_id ),
+			'object'			=> rawurldecode( $object ),
+			'software_version'	=> rawurldecode( $software_version ),
+		);
+
+
+		return rest_ensure_response( $response );
+	}
+
+	public function rest_store_auth_key( WP_REST_Request $request ) {		
+		
+		$data			= $request->get_param( 'response' );
+    	$origin			= $request->get_param( 'origin' ) ? esc_url_raw( $request->get_param( 'origin' ) ) : false;
+    	$no_of_scans	= $request->get_param( 'no_of_scans' );
+    	$update_opts 	= $request->get_param( 'update_options' );
+    	$activated_key 	= $request->get_param( 'activated_key' );
+    	$deactivate_key = $request->get_param( 'deactivate_checkbox_key' );
+
+		if ( empty( $data ) || GDPR_APP_URL !== $origin ) {
+    	    return new WP_REST_Response( array( 'success' => false, 'message' => 'Invalid data or origin.' ), 400 );
+    	}
+
+		if ( in_array( get_option( 'app_wplp_subscription_status_pending_cancel' ), array( 1, '1', true ), true ) ) {
+    	    if ( ! empty( $data['account']['plan'] ) && strtolower( $data['account']['plan'] ) !== 'free' ) {
+    	        delete_option( 'app_wplp_subscription_status_pending_cancel' );
+    	    }
+    	}
+
+    	if ( $no_of_scans !== '' && $no_of_scans !== null ) {
+    	    update_option( 'gdpr_no_of_page_scan', $no_of_scans );
+    	}
+
+    	update_option( 'wpeka_api_framework_app_settings', $data );
+
+		global $wcam_lib_gdpr;
+		$wcam_lib_gdpr->product_id = $data['account']['product_id'] ?? '';
+
+    	require_once plugin_dir_path( __DIR__ ) . 'includes/settings/class-gdpr-cookie-consent-settings.php';
+    	new GDPR_Cookie_Consent_Settings();
+
+		if ( ! empty( $update_opts ) ) {
+    	    if ( 'success' === $update_opts ) {
+    	        update_option( $wcam_lib_gdpr->wc_am_activated_key, $activated_key );
+    	        update_option( $wcam_lib_gdpr->wc_am_deactivate_checkbox_key, $deactivate_key );
+    	    } elseif ( in_array( $update_opts, array( 'fail_1', 'fail_2' ), true ) ) {
+    	        if ( isset( $wcam_lib_gdpr->data[ $wcam_lib_gdpr->wc_am_activated_key ] ) ) {
+    	            update_option( $wcam_lib_gdpr->data[ $wcam_lib_gdpr->wc_am_activated_key ], $activated_key );
+    	        }
+    	    }
+    	} else {
+    	    update_option( $wcam_lib_gdpr->wc_am_activated_key, 'Activated' );
+    	}
+
+		return new WP_REST_Response(
+    	    array(
+    	        'success' => true,
+    	        'title'   => __( 'Authentication successfully completed', 'gdpr-cookie-consent' ),
+    	        'text'    => __( 'Reloading page, please wait.', 'gdpr-cookie-consent' ),
+    	    ),
+    	    200
+    	);
+	}
 
 	public function gdpr_check_gcm_status( WP_REST_Request $request ) {
 
