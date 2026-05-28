@@ -52,6 +52,237 @@ if ( $api_user_plan == 'free' ) {
 } else {
 	$total_pages_scan_limit = 20000;
 }
+$banner_layouts = json_decode($the_options['banner_layouts'], true);
+$banner_structure = json_decode($the_options['banner_structure'], true);
+$c5_buttons = isset( $banner_structure['c5'] ) && is_array( $banner_structure['c5'] )
+		? $banner_structure['c5']
+		: array( 'accept_all', 'accept', 'settings' );
+
+$c6_buttons = isset( $banner_structure['c6'] ) && is_array( $banner_structure['c6'] )
+		? $banner_structure['c6']
+		: array( 'decline' );
+if ( ! function_exists( 'wplp_render_notice_button' ) ) {
+	function wplp_render_notice_button( $button ) {
+		$button = is_string( $button ) ? $button : '';
+
+		// Supports: accept_all, acceptAll, accept-all
+		$button = str_replace( '-', '_', $button );
+		$button = strtolower( $button );
+
+		if ( 'acceptall' === $button ) {
+			$button = 'accept_all';
+		}
+
+		switch ( $button ) {
+			case 'decline':
+				?>
+				<a v-show="cookie_decline_on"
+				  href="#"
+				  :style="{
+						  'background-color': decline_as_button ? `${decline_background_color}${Math.floor(decline_opacity * 255).toString(16).toUpperCase()}` : 'transparent',
+						  'color': decline_text_color,
+						  'border-style': decline_as_button ? decline_style : 'none',
+						  'border-width': decline_as_button ? decline_border_width + 'px' : '0',
+						  'border-color': decline_as_button ? decline_border_color : 'transparent',
+						  'border-radius': decline_as_button ? decline_border_radius + 'px' : '0',
+						  'font-family': cookie_font,
+						  'padding' : '8px 16px',
+						  'font-size': button_font_size + 'px',
+						  'font-weight': button_text_weight,
+						  'width': decline_button_width === 'fit' ? 'fit-content' : '100%',
+						  'min-width': decline_button_min_width + 'px',
+						}"
+				>
+				  {{ decline_text }}
+				</a>
+				<?php
+				break;
+
+			case 'settings':
+				?>
+				<a v-show="cookie_settings_on && !is_eprivacy" id="cookie_action_settings_preview"
+				  href="#"
+				  :style="{
+						  'background-color': settings_as_button ? `${settings_background_color}${Math.floor(settings_opacity * 255).toString(16).toUpperCase()}` : 'transparent',
+						  'color': settings_text_color,
+						  'border-style': settings_as_button ? settings_style : 'none',
+						  'border-width': settings_as_button ? settings_border_width + 'px' : '0',
+						  'border-color': settings_as_button ? settings_border_color : 'transparent',
+						  'border-radius': settings_as_button ? settings_border_radius + 'px' : '0',
+						  'font-family': cookie_font,
+						  'padding' : '8px 16px',
+						  'font-size': button_font_size + 'px',
+						  'font-weight': button_text_weight,
+						  'width': settings_button_width === 'fit' ? 'fit-content' : '100%',
+						  'min-width': settings_button_min_width + 'px',
+						}"
+				>
+					{{ settings_text }}
+				</a>
+				<?php
+				break;
+
+			case 'accept':
+				?>
+				<a v-show="cookie_accept_on" 
+				  href="#"
+				  :style="{
+						  'background-color': accept_as_button ? `${accept_background_color}${Math.floor(accept_opacity * 255).toString(16).toUpperCase()}` : 'transparent',
+						  'color': accept_text_color,
+						  'border-style': accept_as_button ? accept_style : 'none', 
+						  'border-width': accept_as_button ? accept_border_width + 'px' : '0',
+						  'border-color': accept_as_button ? accept_border_color : 'transparent',
+						  'border-radius': accept_as_button ? accept_border_radius + 'px' : '0',
+						  'font-family': cookie_font,
+						  'padding' : '8px 16px',
+						  'font-size': button_font_size + 'px',
+						  'font-weight': button_text_weight,
+						  'width': accept_button_width === 'fit' ? 'fit-content' : '100%',
+						  'min-width': accept_button_min_width + 'px',
+						}"
+				>
+					{{ accept_text }}
+				</a>
+				<?php
+				break;
+
+			case 'accept_all':
+				?>
+				<a v-show="cookie_accept_all_on" 
+				  href="#"
+				  :style="{
+						  'background-color': accept_all_as_button ? `${accept_all_background_color}${Math.floor(accept_all_opacity * 255).toString(16).toUpperCase()}` : 'transparent',
+						  'color': accept_all_text_color,
+						  'border-style': accept_all_as_button ? accept_all_style : 'none',
+						  'border-width': accept_all_as_button ? accept_all_border_width + 'px' : '0',
+						  'border-color': accept_all_as_button ? accept_all_border_color : 'transparent',
+						  'border-radius': accept_all_as_button ? accept_all_border_radius + 'px' : '0',
+						  'font-family': cookie_font,
+						  'padding' : '8px 16px',
+						  'font-size': button_font_size + 'px',
+						  'font-weight': button_text_weight,
+						  'width': accept_all_btn_width === 'fit' ? 'fit-content' : '100%',
+						  'min-width': accept_all_btn_min_width + 'px',
+						}"
+				>
+					{{ accept_all_text }}
+				</a>
+				<?php
+				break;
+		}
+	}
+}	
+if ( ! function_exists( 'wplp_render_notice_button_ab_test' ) ) {
+	function wplp_render_notice_button_ab_test( $button ) {
+		$button = is_string( $button ) ? $button : '';
+
+		// Supports: accept_all, acceptAll, accept-all
+		$button = str_replace( '-', '_', $button );
+		$button = strtolower( $button );
+
+		if ( 'acceptall' === $button ) {
+			$button = 'accept_all';
+		}
+
+		switch ( $button ) {
+			case 'decline':
+				?>
+				<a v-show="this[`cookie_decline_on${active_test_banner_tab}`]"
+				  href="#"
+				  :style="{
+						  'background-color': this[`decline_as_button${active_test_banner_tab}`] ? `${this[`decline_background_color${active_test_banner_tab}`]}${Math.floor(this[`decline_opacity${active_test_banner_tab}`] * 255).toString(16).toUpperCase()}` : 'transparent',
+						  'color': this[`decline_text_color${active_test_banner_tab}`],
+						  'border-style': this[`decline_as_button${active_test_banner_tab}`] ? this[`decline_style${active_test_banner_tab}`] : 'none',
+						  'border-width': this[`decline_as_button${active_test_banner_tab}`] ? this[`decline_border_width${active_test_banner_tab}`] + 'px' : '0',
+						  'border-color': this[`decline_as_button${active_test_banner_tab}`] ? this[`decline_border_color${active_test_banner_tab}`] : 'transparent',
+						  'border-radius': this[`decline_as_button${active_test_banner_tab}`] ? this[`decline_border_radius${active_test_banner_tab}`] + 'px' : '0',
+						  'font-family': this[`cookie_font${active_test_banner_tab}`],
+						  'padding' : '8px 16px',
+						  'font-size': this[`button_font_size${active_test_banner_tab}`] + 'px',
+						  'font-weight': this[`button_text_weight${active_test_banner_tab}`],
+						  'width': this[`decline_button_width${active_test_banner_tab}`] === 'fit' ? 'fit-content' : '100%',
+						  'min-width': this[`decline_button_min_width${active_test_banner_tab}`] + 'px',
+						}"
+				>
+				  {{ decline_text }}
+				</a>
+				<?php
+				break;
+
+			case 'settings':
+				?>
+				<a v-show="this[`cookie_settings_on${active_test_banner_tab}`] && !is_eprivacy" id="cookie_action_settings_preview"
+				  href="#"
+				  :style="{
+						  'background-color': this[`settings_as_button${active_test_banner_tab}`] ? `${this[`settings_background_color${active_test_banner_tab}`]}${Math.floor(this[`settings_opacity${active_test_banner_tab}`] * 255).toString(16).toUpperCase()}` : 'transparent',
+						  'color': this[`settings_text_color${active_test_banner_tab}`],
+						  'border-style': this[`settings_as_button${active_test_banner_tab}`] ? this[`settings_style${active_test_banner_tab}`] : 'none',
+						  'border-width': this[`settings_as_button${active_test_banner_tab}`] ? this[`settings_border_width${active_test_banner_tab}`] + 'px' : '0',
+						  'border-color': this[`settings_as_button${active_test_banner_tab}`] ? this[`settings_border_color${active_test_banner_tab}`] : 'transparent',
+						  'border-radius': this[`settings_as_button${active_test_banner_tab}`] ? this[`settings_border_radius${active_test_banner_tab}`] + 'px' : '0',
+						  'font-family': this[`cookie_font${active_test_banner_tab}`],
+						  'padding' : '8px 16px',
+						  'font-size': this[`button_font_size${active_test_banner_tab}`] + 'px',
+						  'font-weight': this[`button_text_weight${active_test_banner_tab}`],
+						  'width': this[`settings_button_width${active_test_banner_tab}`] === 'fit' ? 'fit-content' : '100%',
+						  'min-width': this[`settings_button_min_width${active_test_banner_tab}`] + 'px',
+						}"
+				>
+					{{ settings_text }}
+				</a>
+				<?php
+				break;
+
+			case 'accept':
+				?>
+				<a v-show="this[`cookie_accept_on${active_test_banner_tab}`]" 
+				  href="#"
+				  :style="{
+						  'background-color': this[`accept_as_button${active_test_banner_tab}`] ? `${this[`accept_background_color${active_test_banner_tab}`]}${Math.floor(this[`accept_opacity${active_test_banner_tab}`] * 255).toString(16).toUpperCase()}` : 'transparent',
+						  'color': this[`accept_text_color${active_test_banner_tab}`],
+						  'border-style': this[`accept_as_button${active_test_banner_tab}`] ? this[`accept_style${active_test_banner_tab}`] : 'none', 
+						  'border-width': this[`accept_as_button${active_test_banner_tab}`] ? this[`accept_border_width${active_test_banner_tab}`] + 'px' : '0',
+						  'border-color': this[`accept_as_button${active_test_banner_tab}`] ? this[`accept_border_color${active_test_banner_tab}`] : 'transparent',
+						  'border-radius': this[`accept_as_button${active_test_banner_tab}`] ? this[`accept_border_radius${active_test_banner_tab}`] + 'px' : '0',
+						  'font-family': this[`cookie_font${active_test_banner_tab}`],
+						  'padding' : '8px 16px',
+						  'font-size': this[`button_font_size${active_test_banner_tab}`] + 'px',
+						  'font-weight': this[`button_text_weight${active_test_banner_tab}`],
+						  'width': this[`accept_button_width${active_test_banner_tab}`] === 'fit' ? 'fit-content' : '100%',
+						  'min-width': this[`accept_button_min_width${active_test_banner_tab}`] + 'px',
+						}"
+				>
+					{{ accept_text }}
+				</a>
+				<?php
+				break;
+
+			case 'accept_all':
+				?>
+				<a v-show="this[`cookie_accept_all_on${active_test_banner_tab}`]" 
+				  href="#"
+				  :style="{
+						  'background-color': this[`accept_all_as_button${active_test_banner_tab}`] ? `${this[`accept_all_background_color${active_test_banner_tab}`]}${Math.floor(this[`accept_all_opacity${active_test_banner_tab}`] * 255).toString(16).toUpperCase()}` : 'transparent',
+						  'color': this[`accept_all_text_color${active_test_banner_tab}`],
+						  'border-style': this[`accept_all_as_button${active_test_banner_tab}`] ? this[`accept_all_style${active_test_banner_tab}`] : 'none',
+						  'border-width': this[`accept_all_as_button${active_test_banner_tab}`] ? this[`accept_all_border_width${active_test_banner_tab}`] + 'px' : '0',
+						  'border-color': this[`accept_all_as_button${active_test_banner_tab}`] ? this[`accept_all_border_color${active_test_banner_tab}`] : 'transparent',
+						  'border-radius': this[`accept_all_as_button${active_test_banner_tab}`] ? this[`accept_all_border_radius${active_test_banner_tab}`] + 'px' : '0',
+						  'font-family': this[`cookie_font${active_test_banner_tab}`],
+						  'padding' : '8px 16px',
+						  'font-size': this[`button_font_size${active_test_banner_tab}`] + 'px',
+						  'font-weight': this[`button_text_weight${active_test_banner_tab}`],
+						  'width': this[`accept_all_btn_width${active_test_banner_tab}`] === 'fit' ? 'fit-content' : '100%',
+						  'min-width': this[`accept_all_btn_min_width${active_test_banner_tab}`] + 'px',
+						}"
+				>
+					{{ accept_all_text }}
+				</a>
+				<?php
+				break;
+		}
+	}
+}	
 ?>
 
 <?php
@@ -77,27 +308,29 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 		  	'border-style': this[`border_style${active_test_banner_tab}`],
 			'border-width': this[`cookie_bar_border_width${active_test_banner_tab}`] + 'px',
 			'border-radius': this[`cookie_bar_border_radius${active_test_banner_tab}`] + 'px',
-			'border-color': this[`cookie_border_color${active_test_banner_tab}`]
+			'border-color': this[`cookie_border_color${active_test_banner_tab}`],
+			'padding': show_cookie_as != 'banner' ? this[`cookie_bar_padding${active_test_banner_tab}`] + 'px' : undefined,
+			'padding-inline': show_cookie_as == 'banner' ? this[`cookie_bar_horizontal_padding${active_test_banner_tab}`] + 'px' : undefined,
+			'padding-block': show_cookie_as == 'banner' ? this[`cookie_bar_vertical_padding${active_test_banner_tab}`] + 'px' : undefined,
+			'gap': this[`cookie_bar_spacing${active_test_banner_tab}`] + 'px',
+			'backdrop-filter': cookie_bar_blur > 0 ? `blur(${this[`cookie_bar_blur${active_test_banner_tab}`]}px)` : undefined,
+			'box-shadow': `${this[`cookie_bar_shadow_size${active_test_banner_tab}`]}px ${this[`cookie_bar_shadow_size${active_test_banner_tab}`]}px ${this[`cookie_bar_shadow_size${active_test_banner_tab}`]*2}px ${this[`cookie_bar_shadow_color${active_test_banner_tab}`]}${Math.floor(0.5 * 255).toString(16).toUpperCase()}`
 		  }"
 		>
-			<div v-show="ab_testing_enabled && ( active_test_banner_tab == 1 || active_test_banner_tab == 2 )" class="notice-content" :class="'notice-template-' + template"
-			:style="{
-			  'width': '100%',
-			  'border-radius': this[`cookie_bar_border_radius${active_test_banner_tab}`] + 'px',
-			}"
-			>
-			<span :style="{ 'border': 'none', 'cursor': 'pointer', 'display':'inline-flex','justify-content': 'center', 'align-items': 'center', 'height':'20px', 'width': '20px', 'position': 'absolute', 'top': (parseInt(this[`cookie_bar_border_radius${active_test_banner_tab}`])/3 + 10) + 'px', 'right': (parseInt(this[`cookie_bar_border_radius${active_test_banner_tab}`])/3 + 10) + 'px', 'border-radius': '50%', 'color': cookieSettingsPopupAccentColor, 'background-color': 'transparent' }" @click="turnOffPreviewBanner">
+			
+			<span v-if="this[`bypass_button_is_on${active_test_banner_tab}`]" :style="{ 'border': 'none', 'cursor': 'pointer', 'display':'inline-flex','justify-content': 'center', 'align-items': 'center', 'height':'20px', 'width': '20px', 'position': 'absolute', 'top': (parseInt(this[`cookie_bar_border_radius${active_test_banner_tab}`])/3 + 10) + 'px', 'right': (parseInt(this[`cookie_bar_border_radius${active_test_banner_tab}`])/3 + 10) + 'px', 'border-radius': '50%','color': this[`bypass_button_text_color${active_test_banner_tab}`], 'background-color':'transparent', 'scale': this[`bypass_button_size${active_test_banner_tab}`] == 'lg' ? '110%' : this[`bypass_button_size${active_test_banner_tab}`] == 'sm' ? '90%' : '100%' }" @click="turnOffPreviewBanner">
 				<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
 					<path fill-rule="evenodd" clip-rule="evenodd" d="M5.29289 5.29289C5.68342 4.90237 6.31658 4.90237 6.70711 5.29289L12 10.5858L17.2929 5.29289C17.6834 4.90237 18.3166 4.90237 18.7071 5.29289C19.0976 5.68342 19.0976 6.31658 18.7071 6.70711L13.4142 12L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L12 13.4142L6.70711 18.7071C6.31658 19.0976 5.68342 19.0976 5.29289 18.7071C4.90237 18.3166 4.90237 17.6834 5.29289 17.2929L10.5858 12L5.29289 6.70711C4.90237 6.31658 4.90237 5.68342 5.29289 5.29289Z" fill="currentColor"/>
 				</svg>
 			</span>
+			<div class="notice-content-header" style="flex-direction: <?php echo esc_attr($banner_layouts['c1']['direction'] ?? 'row') == 'col' ? ($banner_structure['c1'][0] === 'logo' ? 'column' : 'column-reverse') : ($banner_structure['c1'][0] === 'logo' ? 'row' : 'row-reverse'); ?>; <?php echo $banner_layouts['c1']['direction'] === 'row' ? 'align-items: center; justify-content: ' . ($banner_layouts['c1']['justify'] ===  'between' ? 'space-between' : ($banner_layouts['c1']['justify'] ?? '')) : 'align-items: ' . ($banner_layouts['c1']['justify'] ?? '') ?>">
 				<div class="notice-logo-container">
-					<div v-if="active_test_banner_tab == 1">
+					<div v-if="logo_is_on1 && active_test_banner_tab == 1">
 					<?php
 						$get_banner_img1 = get_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD1 );
 						if ( ! empty( $get_banner_img1 ) ) {
 						?>
-							<img class="gdpr_logo_image" alt="logo-image" src="<?php echo esc_url_raw( $get_banner_img1 ); ?>"
+							<img v-if="use_uploaded_logo1" class="gdpr_logo_image" alt="logo-image" src="<?php echo esc_url_raw( $get_banner_img1 ); ?>"
 							  :style="{
 							  	'margin-left': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['margin-left'],
 								'width': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['fit-content'],
@@ -109,13 +342,14 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 						<?php
 						}
 					?>
+					<img v-if="!use_uploaded_logo1" alt="Logo image" class="gdpr_logo_image" src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL . 'includes/templates/logo_images/banner_' . sanitize_file_name( $the_options['default_logo1'] ) . '.svg' ); ?>">
 					</div>
-					<div v-if="active_test_banner_tab == 2">
+					<div v-if="logo_is_on2 && active_test_banner_tab == 2">
 					<?php
 						$get_banner_img2 = get_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD2 );
 						if ( ! empty( $get_banner_img2 ) ) {
 						?>
-							<img class="gdpr_logo_image" alt="logo-image" src="<?php echo esc_url_raw( $get_banner_img2 ); ?>"
+							<img v-if="use_uploaded_logo2" class="gdpr_logo_image" alt="logo-image" src="<?php echo esc_url_raw( $get_banner_img2 ); ?>"
 							:style="{
 							  	'margin-left': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['margin-left'],
 								'width': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['fit-content'],
@@ -127,578 +361,186 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 						<?php
 						}
 					?>
+					<img v-if="!use_uploaded_logo2" alt="Logo image" class="gdpr_logo_image" src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL . 'includes/templates/logo_images/banner_' . sanitize_file_name( $the_options['default_logo2'] ) . '.svg' ); ?>">
 					</div>
 				</div>
-
-				<div v-if="(template === 'default' ? default_template_json : json_templates[template])?.decoration" class ="gdpr_banner_decoration" :style="{
-						  	'background-color': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['background-color'],
-							'position': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['position'],
-							'height': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['height'],
-							'top': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['top'],
-							'left': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['left']
-						  }"></div>
+				<div class="notice-heading-wrapper" v-if="this[`heading_is_on${active_test_banner_tab}`]" :style = "{
+					'color': this[`cookie_heading_color${active_test_banner_tab}`],
+					'font-size': this[`heading_text_size${active_test_banner_tab}`] + 'px',
+					'font-weight': this[`heading_text_weight${active_test_banner_tab}`],
+				}">
+					<h3 v-if="gdpr_message_heading.length>0 && is_gdpr">{{gdpr_message_heading}}</h3>
+					<h3  v-if="lgpd_message_heading.length>0 && is_lgpd">{{lgpd_message_heading}}</h3>
+				</div>	
+			</div>
 
 				
 				
 				<div class="notice-content-body" :class="'notice-template-name-' + (template == 'default' ? default_template_json : json_templates[template])?.name + ' template-' + (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.['layout']">
 					<div style="display: flex; flex-direction: column; gap:10px;">
-						<div class="notice-heading-wrapper" v-if="(gdpr_message_heading.length>0 && is_gdpr) || (lgpd_message_heading.length>0 && is_lgpd) || template == 'blue_split'">
-								<h3 :style = "{ 'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['text-align'], 'position': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['position'], 'color': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['color'], 'z-index': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['z-index'] }" v-if="gdpr_message_heading.length>0 && is_gdpr">{{gdpr_message_heading}}</h3>
-								<h3 :style = "{ 'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['text-align'], 'position': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['position'], 'color': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['color'], 'z-index': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['z-index'] }"  v-if="lgpd_message_heading.length>0 && is_lgpd">{{lgpd_message_heading}}</h3>
-								<h3 :style = "{ 'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['text-align'], 'position': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['position'], 'color': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['color'], 'z-index': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['z-index'] }"  v-if=" template == 'blue_split' && ((is_gdpr && gdpr_message_heading.length==0) || (lgpd_message_heading.length==0 && is_lgpd) || !is_ccpa)"><?php echo esc_html("We value your privacy"); ?></h3>
-						</div>	
-						<p>	
-							<span :style= "{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_gdpr" v-html ="gdpr_message"></span>
-							<span :style= "{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_lgpd" v-html ="lgpd_message"></span>
-							<span :style= "{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_ccpa" v-html ="ccpa_message"></span>
-							<span :style= "{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_eprivacy" v-html ="eprivacy_message"></span>
-							<a  v-if="!is_ccpa && this[`button_readmore_is_on${active_test_banner_tab}`]" :style="{ 
+						<p :style="{
+							'color': this[`cookie_text_color${active_test_banner_tab}`],
+							'font-size': this[`cookie_font_size${active_test_banner_tab}`] + 'px',
+							'font-weight': this[`cookie_text_weight${active_test_banner_tab}`],
+							'text-align': this[`banner_text_alignment${active_test_banner_tab}`],
+						}">	
+							<span :style="{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_gdpr" v-html ="gdpr_message"></span>
+							<span :style="{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_lgpd" v-html ="lgpd_message"></span>
+							<span :style="{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_ccpa && gdpr_policy !== 'both'" v-html ="ccpa_message"></span>
+							<span :style="{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_eprivacy" v-html ="eprivacy_message"></span>
+							<a v-if="this[`button_readmore_is_on${active_test_banner_tab}`]" :style="{ 
 								'font-family': this[`cookie_font${active_test_banner_tab}`],
-								'color':button_readmore_link_color,
-								'textDecoration':
-									(template === 'blue_full' ||
-									template === 'blue_center' ||
-									template === 'blue_center_column' ||
-									template === 'blue_split' ||
-									template === 'gray' ||
-									template === 'bold' ||
-									template === 'dark' )
-										? 'underline'
-										: 'none',
-								'border-style': button_readmore_as_button ? button_readmore_button_border_style : 'none', 
-								'border-width': button_readmore_as_button ? button_readmore_button_border_width + 'px':'0', 
-								'border-color': button_readmore_as_button ? button_readmore_button_border_color : 'transparent', 
-								'border-radius': button_readmore_as_button ? button_readmore_button_border_radius+'px' : '0px',
-								'background-color': button_readmore_as_button ? `${button_readmore_button_color}${Math.floor(button_readmore_button_opacity * 255).toString(16).toUpperCase()}`:'transparent',
-								...(button_readmore_as_button ? {
-								'display': 'block',
-								'width': 'fit-content',
-								'margin-top': '5px',
-								'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-								} : { 'display': 'inline-block',
-								}) 
+								'color':this[`button_readmore_link_color${active_test_banner_tab}`],
+								'cursor':'pointer',
 							}" >
-								
 								<span>{{ button_readmore_text }}</span>
 							</a>
-							<a id="cookie_action_opt_out_preview" v-if="is_ccpa" :style="{'font-family': this[`cookie_font${active_test_banner_tab}`],'color':this[`opt_out_text_color${active_test_banner_tab}`], 'cursor':'pointer'}"><span>{{ opt_out_text }}</span></a>
+							<a id="cookie_action_opt_out_preview" v-if="is_ccpa && gdpr_policy !== 'both'" :style="{'font-family': this[`cookie_font${active_test_banner_tab}`],'color': this[`opt_out_text_color${active_test_banner_tab}`],'cursor':'pointer'}"><span>{{ opt_out_text }}</span></a>
+						</p>
+						<p v-if="gdpr_policy === 'both'">
+							<span :style="{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_ccpa" v-html ="ccpa_message"></span>
+							<a id="cookie_action_opt_out_preview" v-if="is_ccpa" :style="{'font-family': this[`cookie_font${active_test_banner_tab}`],'color': this[`opt_out_text_color${active_test_banner_tab}`],'cursor':'pointer'}"><span>{{ opt_out_text }}</span></a>
 						</p>
 					</div>
 					
 
-					<div  v-if="ab_testing_enabled && !is_ccpa" class="notice-buttons-wrapper" :class="'template-' + (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.['layout'] + '-buttons'">
-						<div  v-show="template != 'blue_full' || ( this[`cookie_decline_on${active_test_banner_tab}`] || (this[`cookie_settings_on${active_test_banner_tab} `] && !is_eprivacy))" class="notice-left-buttons">
-							<a v-show="( active_test_banner_tab == 1 || active_test_banner_tab == 2 ) && this[`cookie_decline_on${active_test_banner_tab}`]"
-							  href="#"
-							  :style="{
-								  'background-color': this[`decline_as_button${active_test_banner_tab}`]
-								    ? `${this[`decline_background_color${active_test_banner_tab}`]}${Math.floor(this[`decline_opacity${active_test_banner_tab}`] * 255).toString(16).toUpperCase()}`
-								    : 'transparent',
-  								  'color': this[`decline_text_color${active_test_banner_tab}`],
-  								  'border-style': this[`decline_as_button${active_test_banner_tab}`] ? this[`decline_style${active_test_banner_tab}`] : 'none',
-    							  'border-width': this[`decline_as_button${active_test_banner_tab}`] ? this[`decline_border_width${active_test_banner_tab}`] + 'px' : '0',
-    							  'border-color': this[`decline_as_button${active_test_banner_tab}`] ? this[`decline_border_color${active_test_banner_tab}`] : 'transparent',
-    							  'border-radius': this[`decline_as_button${active_test_banner_tab}`] ? this[`decline_border_radius${active_test_banner_tab}`] + 'px' : '0',
-    							  'font-family': this[`cookie_font${active_test_banner_tab}`],
-								  ...(this[`cookie_decline_on${active_test_banner_tab}`] ? {
-  								    'min-width': (template == 'default' ? default_template_json : json_templates[template])['decline_button']['min-width'],
-									'width': (template == 'default' ? default_template_json : json_templates[template])['decline_button']?.['width'],
-  								    'display': (template == 'default' ? default_template_json : json_templates[template])['decline_button']['display'],
-  								    'justify-content': (template == 'default' ? default_template_json : json_templates[template])['decline_button']['justify-content'],
-  								    'align-items': (template == 'default' ? default_template_json : json_templates[template])['decline_button']['align-items'],
-  								    'text-align': (template == 'default' ? default_template_json : json_templates[template])['decline_button']['text-align'],
-									'padding': (template == 'default' ? default_template_json : json_templates[template])['static-settings'][`button_padding`]
-  								  } : {})
-  								}"
-							>
-							  {{ this[`decline_text${active_test_banner_tab}`] }}
-							</a>
+					<div v-if="ab_testing_enabled && gdpr_policy !== 'ccpa'" class="notice-buttons-wrapper" :style="{'gap': this[`cookie_bar_spacing${active_test_banner_tab}`] + 'px'}" style="display: flex; flex-direction: <?php echo esc_attr($banner_layouts['c4']['direction'] ?? 'row') == 'col' ? 'column' : 'row'; ?>; <?php echo $banner_layouts['c2']['direction'] == 'row' ? 'width: 40%' : '' ;?>">
+					<div class="notice-left-buttons" :style="{'gap': this[`cookie_bar_spacing${active_test_banner_tab}`] + 'px', display: this[`visible_c5_items${active_test_banner_tab}`].length > 0 ? 'flex' : 'none', width: '100%'}" style=" flex-direction: <?php echo esc_attr($banner_layouts['c5']['direction'] ?? 'row') == 'col' ? 'column' : 'row'; ?>; <?php echo $banner_layouts['c5']['direction'] === 'row' ? 'align-items: center; justify-content: ' . ($banner_layouts['c5']['justify'] ===  'between' ? 'space-between' : ($banner_layouts['c5']['justify'] ?? '')) : 'align-items: ' . ($banner_layouts['c5']['justify'] ?? '') ?>">
+						
+						<?php
+						foreach ( $c5_buttons as $button ) {
+							wplp_render_notice_button_ab_test( $button );
+						}
+						?>
+						
+					</div>
 
-							<a v-show="( active_test_banner_tab == 1 || active_test_banner_tab == 2 ) && this[`cookie_settings_on${active_test_banner_tab}`] && !is_eprivacy"
-							  id="cookie_action_settings_preview"
-							  href="#"
-							  :style="{
-								  'background-color': this[`settings_as_button${active_test_banner_tab}`]
-								    ? `${this[`settings_background_color${active_test_banner_tab}`]}${Math.floor(this[`settings_opacity${active_test_banner_tab}`] * 255).toString(16).toUpperCase()}`
-								    : 'transparent',
-  								  'color': this[`settings_text_color${active_test_banner_tab}`],
-  								  'border-style': this[`settings_as_button${active_test_banner_tab}`] ? this[`settings_style${active_test_banner_tab}`] : 'none',
-    							  'border-width': this[`settings_as_button${active_test_banner_tab}`] ? this[`settings_border_width${active_test_banner_tab}`] + 'px' : '0',
-    							  'border-color': this[`settings_as_button${active_test_banner_tab}`] ? this[`settings_border_color${active_test_banner_tab}`] : 'transparent',
-    							  'border-radius': this[`settings_as_button${active_test_banner_tab}`] ? this[`settings_border_radius${active_test_banner_tab}`] + 'px' : '0',
-    							  'font-family': this[`cookie_font${active_test_banner_tab}`],
-								  ...(this[`cookie_settings_on${active_test_banner_tab}`] && !is_eprivacy ? {
-  								    'min-width': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']['min-width'],
-									'width': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['width'],
-  								    'display': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']['display'],
-  								    'justify-content': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['justify-content'],
-  								    'align-items': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['align-items'],
-  								    'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['text-align'],
-									'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-  								  } : {})
-  								}"
-							>
-							  {{ this[`settings_text${active_test_banner_tab}`] }}
-							</a>
-						</div>
+					<div class="notice-right-buttons" :style="{'gap': this[`cookie_bar_spacing${active_test_banner_tab}`] + 'px', display: this[`visible_c6_items${active_test_banner_tab}`].length > 0 ? 'flex' : 'none', width: '100%'}" style=" flex-direction: <?php echo esc_attr($banner_layouts['c6']['direction'] ?? 'row') == 'col' ? 'column' : 'row'; ?>; <?php echo $banner_layouts['c6']['direction'] === 'row' ? 'align-items: center; justify-content: ' . ($banner_layouts['c6']['justify'] ===  'between' ? 'space-between' : ($banner_layouts['c6']['justify'] ?? '')) : 'align-items: ' . ($banner_layouts['c6']['justify'] ?? '') ?>">
+						
+						<?php
+						foreach ( $c6_buttons as $button ) {
+							wplp_render_notice_button_ab_test( $button );
+						}
+						?>
 
-						<div v-show="template != 'blue_full' || ( this[`cookie_accept_on${active_test_banner_tab}`] || this[`cookie_accept_all_on${active_test_banner_tab}`])" class="notice-right-buttons">
-							<a v-show="( active_test_banner_tab == 1 || active_test_banner_tab == 2 ) && this[`cookie_accept_on${active_test_banner_tab}`]"
-							  href="#"
-							  :style="{
-								  'background-color': this[`accept_as_button${active_test_banner_tab}`]
-								    ? `${this[`accept_background_color${active_test_banner_tab}`]}${Math.floor(this[`accept_opacity${active_test_banner_tab}`] * 255).toString(16).toUpperCase()}`
-								    : 'transparent',
-  								  'color': this[`accept_text_color${active_test_banner_tab}`],
-  								  'border-style': this[`accept_as_button${active_test_banner_tab}`] ? this[`accept_style${active_test_banner_tab}`] : 'none',
-    							  'border-width': this[`accept_as_button${active_test_banner_tab}`] ? this[`accept_border_width${active_test_banner_tab}`] + 'px' : '0',
-    							  'border-color': this[`accept_as_button${active_test_banner_tab}`] ? this[`accept_border_color${active_test_banner_tab}`] : 'transparent',
-    							  'border-radius': this[`accept_as_button${active_test_banner_tab}`] ? this[`accept_border_radius${active_test_banner_tab}`] + 'px' : '0',
-    							  'font-family': this[`cookie_font${active_test_banner_tab}`],
-								  ...(this[`cookie_accept_on${active_test_banner_tab}`] ? {
-  								    'min-width': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['min-width'],
-									'width': (template == 'default' ? default_template_json : json_templates[template])['accept_button']?.['width'],
-  								    'display': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['display'],
-  								    'justify-content': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['justify-content'],
-  								    'align-items': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['align-items'],
-  								    'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['text-align'],
-									'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-  								  } : {})
-  								}"
-							>
-							  {{ this[`accept_text${active_test_banner_tab}`] }}
-							</a>
-
-							<a v-show="( active_test_banner_tab == 1 || active_test_banner_tab == 2 ) && this[`cookie_accept_all_on${active_test_banner_tab}`]"
-							  href="#"
-							  :style="{
-								  'background-color': this[`accept_all_as_button${active_test_banner_tab}`]
-								    ? `${this[`accept_all_background_color${active_test_banner_tab}`]}${Math.floor(this[`accept_all_opacity${active_test_banner_tab}`] * 255).toString(16).toUpperCase()}`
-								    : 'transparent',
-  								  'color': this[`accept_all_text_color${active_test_banner_tab}`],
-  								  'border-style': this[`accept_all_as_button${active_test_banner_tab}`] ? this[`accept_all_style${active_test_banner_tab}`] : 'none',
-    							  'border-width': this[`accept_all_as_button${active_test_banner_tab}`] ? this[`accept_all_border_width${active_test_banner_tab}`] + 'px' : '0',
-    							  'border-color': this[`accept_all_as_button${active_test_banner_tab}`] ? this[`accept_all_border_color${active_test_banner_tab}`] : 'transparent',
-    							  'border-radius': this[`accept_all_as_button${active_test_banner_tab}`] ? this[`accept_all_border_radius${active_test_banner_tab}`] + 'px' : '0',
-    							  'font-family': this[`cookie_font${active_test_banner_tab}`],
-								  ...(this[`cookie_accept_all_on${active_test_banner_tab}`] ? {
-  								    'min-width': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['min-width'],
-									'width': (template == 'default' ? default_template_json : json_templates[template])['accept_all_button']?.['width'],
-  								    'display': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['display'],
-  								    'justify-content': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['justify-content'],
-  								    'align-items': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['align-items'],
-  								    'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['text-align'],
-									'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-  								  } : {})
-  								}"
-							>
-							  {{ this[`accept_all_text${active_test_banner_tab}`] }}
-							</a>
-						</div>
-					</div>			
+						
+					</div>
+				</div>			
 				</div>
 				<div v-show="show_credits" class="powered-by-credits"  :style="{'--popup_accent_color': cookieSettingsPopupAccentColor, 'text-align':'center', 'font-size': '10px', 'margin-bottom':'-10px'}"><?php echo wp_kses_post( $credit_link  ); ?></div>
-				
-			</div>
 		</div>
 	<?php } elseif ( $ab_options['ab_testing_enabled'] === false || $ab_options['ab_testing_enabled'] === 'false' ) { ?>
-		<div v-if="banner_preview_is_on && gdpr_policy !== 'both'" class="notice-container" :class="{ 'notice-type-banner': show_cookie_as == 'banner', 'notice-type-popup': show_cookie_as == 'popup', 'notice-type-widget': show_cookie_as == 'widget', 'banner-top': cookie_position == 'top' && show_cookie_as == 'banner' ,'banner-bottom': cookie_position == 'bottom' && show_cookie_as == 'banner', 'widget-left': cookie_widget_position == 'left' && show_cookie_as == 'widget','widget-right': cookie_widget_position == 'right' && show_cookie_as == 'widget', 'widget-top-right': cookie_widget_position == 'top_right' && show_cookie_as == 'widget', 'widget-top-left': cookie_widget_position == 'top_left' && show_cookie_as == 'widget' }"
+		<div v-if="banner_preview_is_on " class="notice-container" :class="{ 'notice-type-banner': show_cookie_as == 'banner', 'notice-type-popup': show_cookie_as == 'popup', 'notice-type-widget': show_cookie_as == 'widget', 'banner-top': cookie_position == 'top' && show_cookie_as == 'banner' ,'banner-bottom': cookie_position == 'bottom' && show_cookie_as == 'banner', 'widget-left': cookie_widget_position == 'left' && show_cookie_as == 'widget','widget-right': cookie_widget_position == 'right' && show_cookie_as == 'widget', 'widget-top-right': cookie_widget_position == 'top_right' && show_cookie_as == 'widget', 'widget-top-left': cookie_widget_position == 'top_left' && show_cookie_as == 'widget' }"
 			:style="{
 				'background-color': `${cookie_bar_color}${Math.floor(cookie_bar_opacity * 255).toString(16).toUpperCase()}`,
 				'color': cookie_text_color,
 				'border-style': border_style,
 				'border-width': cookie_bar_border_width + 'px',
 				'border-radius': cookie_bar_border_radius + 'px',
-				'border-color': cookie_border_color
+				'border-color': cookie_border_color,
+				'padding': show_cookie_as != 'banner' ? cookie_bar_padding + 'px' : undefined,
+				'padding-inline': show_cookie_as == 'banner' ? cookie_bar_horizontal_padding + 'px' : undefined,
+				'padding-block': show_cookie_as == 'banner' ? cookie_bar_vertical_padding + 'px' : undefined,
+				'gap': cookie_bar_spacing + 'px',
+				'backdrop-filter': cookie_bar_blur > 0 ? `blur(${cookie_bar_blur}px)` : undefined,
+				'box-shadow': `${cookie_bar_shadow_size}px ${cookie_bar_shadow_size}px ${cookie_bar_shadow_size*2}px ${cookie_bar_shadow_color}${Math.floor(0.5 * 255).toString(16).toUpperCase()}`
 			}"
 		>
-			<div class="notice-content" :class="'notice-template-' + template"
-			  :style="{
-			  	'width': '100%',
-				'border-radius': cookie_bar_border_radius + 'px',
-			  }"
-			>
-				<span :style="{ 'border': 'none', 'cursor': 'pointer', 'display':'inline-flex','justify-content': 'center', 'align-items': 'center', 'height':'20px', 'width': '20px', 'position': 'absolute', 'top': (parseInt(cookie_bar_border_radius)/3 + 10) + 'px', 'right': (parseInt(cookie_bar_border_radius)/3 + 10) + 'px', 'border-radius': '50%','color': cookieSettingsPopupAccentColor, 'background-color':'transparent' }" @click="turnOffPreviewBanner">
-					<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-						<path fill-rule="evenodd" clip-rule="evenodd" d="M5.29289 5.29289C5.68342 4.90237 6.31658 4.90237 6.70711 5.29289L12 10.5858L17.2929 5.29289C17.6834 4.90237 18.3166 4.90237 18.7071 5.29289C19.0976 5.68342 19.0976 6.31658 18.7071 6.70711L13.4142 12L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L12 13.4142L6.70711 18.7071C6.31658 19.0976 5.68342 19.0976 5.29289 18.7071C4.90237 18.3166 4.90237 17.6834 5.29289 17.2929L10.5858 12L5.29289 6.70711C4.90237 6.31658 4.90237 5.68342 5.29289 5.29289Z" fill="currentColor"/>
-					</svg>
-				</span>
-				<div class="notice-logo-container">
+			
+			<span v-if="bypass_button_is_on" :style="{ 'border': 'none', 'cursor': 'pointer', 'display':'inline-flex','justify-content': 'center', 'align-items': 'center', 'height':'20px', 'width': '20px', 'position': 'absolute', 'top': (parseInt(cookie_bar_border_radius)/3 + 10) + 'px', 'right': (parseInt(cookie_bar_border_radius)/3 + 10) + 'px', 'border-radius': '50%','color': bypass_button_text_color, 'background-color':'transparent', 'scale': bypass_button_size == 'lg' ? '110%' : bypass_button_size == 'sm' ? '90%' : '100%' }" @click="turnOffPreviewBanner">
+				<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+					<path fill-rule="evenodd" clip-rule="evenodd" d="M5.29289 5.29289C5.68342 4.90237 6.31658 4.90237 6.70711 5.29289L12 10.5858L17.2929 5.29289C17.6834 4.90237 18.3166 4.90237 18.7071 5.29289C19.0976 5.68342 19.0976 6.31658 18.7071 6.70711L13.4142 12L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L12 13.4142L6.70711 18.7071C6.31658 19.0976 5.68342 19.0976 5.29289 18.7071C4.90237 18.3166 4.90237 17.6834 5.29289 17.2929L10.5858 12L5.29289 6.70711C4.90237 6.31658 4.90237 5.68342 5.29289 5.29289Z" fill="currentColor"/>
+				</svg>
+			</span>
+			<div class="notice-content-header" style="flex-direction: <?php echo esc_attr($banner_layouts['c1']['direction'] ?? 'row') == 'col' ? ($banner_structure['c1'][0] === 'logo' ? 'column' : 'column-reverse') : ($banner_structure['c1'][0] === 'logo' ? 'row' : 'row-reverse'); ?>; <?php echo $banner_layouts['c1']['direction'] === 'row' ? 'align-items: center; justify-content: ' . ($banner_layouts['c1']['justify'] ===  'between' ? 'space-between' : ($banner_layouts['c1']['justify'] ?? '')) : 'align-items: ' . ($banner_layouts['c1']['justify'] ?? '') ?>">
+				<div v-if="logo_is_on" class="notice-logo-container">
 				<?php
 					$get_banner_img = get_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELD );
 					if ( ! empty( $get_banner_img ) ) {
 					?>
-						<img class="gdpr_logo_image" alt="logo-image" src="<?php echo esc_url_raw( $get_banner_img ); ?>"
+						<img v-if="use_uploaded_logo" class="gdpr_logo_image" alt="logo-image" src="<?php echo esc_url_raw( $get_banner_img ); ?>"
 						:style="{
-						  	'margin-left': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['margin-left'],
+							'margin-left': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['margin-left'],
 							'width': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['fit-content'],
 							'height': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['height'],
 							'transform': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['transform'],
 								'position': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['position'],
 								'z-index': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['z-index']
-						  }"  >
+						}"  >
 					<?php
 				}
 				?>
+				<img v-if="!use_uploaded_logo" alt="Logo image" class="gdpr_logo_image" src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL . 'includes/templates/logo_images/banner_' . sanitize_file_name( $the_options['default_logo'] ) . '.svg' ); ?>">
 				</div>	
+				<div v-if="heading_is_on" class="notice-heading-wrapper" :style = "{
+					'color': cookie_heading_color,
+					'font-size': heading_text_size + 'px',
+					'font-weight': heading_text_weight,
+				}">
+						<h3 v-if="gdpr_message_heading.length>0 && is_gdpr">{{gdpr_message_heading}}</h3>
+						<h3  v-if="lgpd_message_heading.length>0 && is_lgpd">{{lgpd_message_heading}}</h3>
+				</div>
+			</div>
+			
 
-				<div v-if="(template === 'default' ? default_template_json : json_templates[template])?.decoration" class ="gdpr_banner_decoration" :style="{
-						  	'background-color': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['background-color'],
-							'position': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['position'],
-							'height': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['height'],
-							'top': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['top'],
-							'left': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['left']
-						  }"></div>
+			
 					
-				<div class="notice-content-body" :class="'notice-template-name-' + (template == 'default' ? default_template_json : json_templates[template])?.name + ' template-' + (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.['layout']">
-					<div style="display: flex; flex-direction: column; gap:10px;">
-						<div class="notice-heading-wrapper" v-if="(gdpr_message_heading.length>0 && is_gdpr) || (lgpd_message_heading.length>0 && is_lgpd) || template == 'blue_split'">
-							<h3 :style = "{ 'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['text-align'], 'position': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['position'], 'color': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['color'], 'z-index': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['z-index'] }" v-if="gdpr_message_heading.length>0 && is_gdpr">{{gdpr_message_heading}}</h3>
-							<h3 :style = "{ 'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['text-align'], 'position': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['position'], 'color': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['color'], 'z-index': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['z-index'] }"  v-if="lgpd_message_heading.length>0 && is_lgpd">{{lgpd_message_heading}}</h3>
-							<h3 :style = "{ 'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['text-align'], 'position': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['position'], 'color': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['color'], 'z-index': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['z-index'] }" v-if="template == 'blue_split' && ((is_gdpr && gdpr_message_heading.length==0) || (lgpd_message_heading.length==0 && is_lgpd))"><?php echo esc_html("We value your privacy"); ?></h3>
-						</div>
-						<p>	
-							<span :style="{'font-family': cookie_font}" v-show="is_gdpr" v-html ="gdpr_message"></span>
-							<span :style="{'font-family': cookie_font}" v-show="is_lgpd" v-html ="lgpd_message"></span>
-							<span :style="{'font-family': cookie_font}" v-show="is_ccpa" v-html ="ccpa_message"></span>
-							<span :style="{'font-family': cookie_font}" v-show="is_eprivacy" v-html ="eprivacy_message"></span>
-							<a v-if="!is_ccpa && button_readmore_is_on" :style="{ 
-								'font-family': cookie_font,
-								'color':button_readmore_link_color,
-								'textDecoration':
-									(template === 'blue_full' ||
-									template === 'blue_center' ||
-									template === 'blue_center_column' ||
-									template === 'blue_split' ||
-									template === 'gray' ||
-									template === 'bold' ||
-									 template === 'dark' )
-										? 'underline'
-										: 'none',
-								'border-style': button_readmore_as_button ? button_readmore_button_border_style : 'none', 
-								'border-width': button_readmore_as_button ? button_readmore_button_border_width + 'px':'0', 
-								'border-color': button_readmore_as_button ? button_readmore_button_border_color : 'transparent', 
-								'border-radius': button_readmore_as_button ? button_readmore_button_border_radius+'px' : '0px',
-								'background-color': button_readmore_as_button ? `${button_readmore_button_color}${Math.floor(button_readmore_button_opacity * 255).toString(16).toUpperCase()}`:'transparent',
-								...(button_readmore_as_button ? {
-								'display': 'block',
-								'width': 'fit-content',
-								'margin-top': '5px',
-								'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-								} : { 'display': 'inline-block',
-								})
-							}" >
-								<span>{{ button_readmore_text }}</span>
-							</a>
-							<a id="cookie_action_opt_out_preview" v-if="is_ccpa" :style="{'font-family': cookie_font,'color': opt_out_text_color,'cursor':'pointer'}"><span>{{ opt_out_text }}</span></a>
-						</p>
-					</div>	
+			<div class="notice-content-body" :style="{'gap': cookie_bar_spacing + 'px'}" style="flex-direction: <?php echo esc_attr($banner_layouts['c2']['direction'] == 'col' ? ($banner_structure['c2'][0] === 'bannerText' ? 'column' : 'column-reverse') : ($banner_structure['c2'][0] === 'bannerText' ? 'row' : 'row-reverse')); ?>;" :class="'notice-template-name-' + (template == 'default' ? default_template_json : json_templates[template])?.name + ' template-' + (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.['layout']">
+				<div style="display: flex; flex-direction: column; gap:10px;">
+					<p :style="{
+						'color': cookie_text_color,
+						'font-size': cookie_font_size + 'px',
+						'font-weight': cookie_text_weight,
+						'text-align': banner_text_alignment,
+					}">	
+						<span :style="{'font-family': cookie_font}" v-show="is_gdpr" v-html ="gdpr_message"></span>
+						<span :style="{'font-family': cookie_font}" v-show="is_lgpd" v-html ="lgpd_message"></span>
+						<span :style="{'font-family': cookie_font}" v-show="is_ccpa && gdpr_policy !== 'both'" v-html ="ccpa_message"></span>
+						<span :style="{'font-family': cookie_font}" v-show="is_eprivacy" v-html ="eprivacy_message"></span>
+						<a v-if="button_readmore_is_on" :style="{ 
+							'font-family': cookie_font,
+							'color':button_readmore_link_color,
+							'cursor':'pointer',
+						}" >
+							<span>{{ button_readmore_text }}</span>
+						</a>
+						<a id="cookie_action_opt_out_preview" v-if="is_ccpa && gdpr_policy !== 'both'" :style="{'font-family': cookie_font,'color': opt_out_text_color,'cursor':'pointer'}"><span>{{ opt_out_text }}</span></a>
+					</p>
+					<p v-if="gdpr_policy === 'both'">
+						<span :style="{'font-family': cookie_font}" v-show="is_ccpa" v-html ="ccpa_message"></span>
+						<a id="cookie_action_opt_out_preview" v-if="is_ccpa" :style="{'font-family': cookie_font,'color': opt_out_text_color,'cursor':'pointer'}"><span>{{ opt_out_text }}</span></a>
+					</p>
+				</div>	
 				
 
-					<div v-show="!is_ccpa" class="notice-buttons-wrapper" :class="'template-' + (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.['layout'] + '-buttons'">
-						<div v-show="template != 'blue_full' || (cookie_decline_on || (cookie_settings_on && !is_eprivacy))" class="notice-left-buttons">
-							<a v-show="cookie_decline_on"
-							  href="#"
-							  :style="{
-  								  'background-color': decline_as_button ? `${decline_background_color}${Math.floor(decline_opacity * 255).toString(16).toUpperCase()}` : 'transparent',
-  								  'color': decline_text_color,
-  								  'border-style': decline_as_button ? decline_style : 'none',
-  								  'border-width': decline_as_button ? decline_border_width + 'px' : '0',
-  								  'border-color': decline_as_button ? decline_border_color : 'transparent',
-  								  'border-radius': decline_as_button ? decline_border_radius + 'px' : '0',
-  								  'font-family': cookie_font,
-								  ...(cookie_decline_on ? {
-  								    'min-width': (template == 'default' ? default_template_json : json_templates[template])?.['decline_button']?.['min-width'],
-									'width': (template == 'default' ? default_template_json : json_templates[template])?.['decline_button']?.['width'],
-  								    'display': (template == 'default' ? default_template_json : json_templates[template])?.['decline_button']?.['display'],
-  								    'justify-content': (template == 'default' ? default_template_json : json_templates[template])?.['decline_button']?.['justify-content'],
-  								    'align-items': (template == 'default' ? default_template_json : json_templates[template])?.['decline_button']?.['align-items'],
-  								    'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['decline_button']?.['text-align'],
-									'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-  								  } : {})
-  								}"
-							>
-							  {{ decline_text }}
-							</a>
+				<div v-if="gdpr_policy !== 'ccpa'" class="notice-buttons-wrapper" :style="{'gap': cookie_bar_spacing + 'px'}" style="display: flex; flex-direction: <?php echo esc_attr($banner_layouts['c4']['direction'] ?? 'row') == 'col' ? 'column' : 'row'; ?>; <?php echo $banner_layouts['c2']['direction'] == 'row' ? 'width: 40%' : '' ;?>">
+					<div class="notice-left-buttons" :style="{'gap': cookie_bar_spacing + 'px', display: visible_c5_items.length > 0 ? 'flex' : 'none', width: '100%'}" style=" flex-direction: <?php echo esc_attr($banner_layouts['c5']['direction'] ?? 'row') == 'col' ? 'column' : 'row'; ?>; <?php echo $banner_layouts['c5']['direction'] === 'row' ? 'align-items: center; justify-content: ' . ($banner_layouts['c5']['justify'] ===  'between' ? 'space-between' : ($banner_layouts['c5']['justify'] ?? '')) : 'align-items: ' . ($banner_layouts['c5']['justify'] ?? '') ?>">
+						
+						<?php
+						foreach ( $c5_buttons as $button ) {
+							wplp_render_notice_button( $button );
+						}
+						?>
+						
+					</div>
 
-							<a v-show="cookie_settings_on && !is_eprivacy" id="cookie_action_settings_preview"
-							  href="#"
-							  :style="{
-  								  'background-color': settings_as_button ? `${settings_background_color}${Math.floor(settings_opacity * 255).toString(16).toUpperCase()}` : 'transparent',
-  								  'color': settings_text_color,
-  								  'border-style': settings_as_button ? settings_style : 'none',
-  								  'border-width': settings_as_button ? settings_border_width + 'px' : '0',
-  								  'border-color': settings_as_button ? settings_border_color : 'transparent',
-  								  'border-radius': settings_as_button ? settings_border_radius + 'px' : '0',
-  								  'font-family': cookie_font,
-								  ...(cookie_settings_on && !is_eprivacy ? {
-  								    'min-width': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['min-width'],
-									'width': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['width'],
-  								    'display': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['display'],
-  								    'justify-content': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['justify-content'],
-  								    'align-items': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['align-items'],
-  								    'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['text-align'],
-									'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-  								  } : {})
-  								}"
-							>
-								{{ settings_text }}
-							</a>
-						</div>
+					<div class="notice-right-buttons" :style="{'gap': cookie_bar_spacing + 'px', display: visible_c6_items.length > 0 ? 'flex' : 'none', width: '100%'}" style=" flex-direction: <?php echo esc_attr($banner_layouts['c6']['direction'] ?? 'row') == 'col' ? 'column' : 'row'; ?>; <?php echo $banner_layouts['c6']['direction'] === 'row' ? 'align-items: center; justify-content: ' . ($banner_layouts['c6']['justify'] ===  'between' ? 'space-between' : ($banner_layouts['c6']['justify'] ?? '')) : 'align-items: ' . ($banner_layouts['c6']['justify'] ?? '') ?>">
+						
+						<?php
+						foreach ( $c6_buttons as $button ) {
+							wplp_render_notice_button( $button );
+						}
+						?>
 
-						<div  v-show="template != 'blue_full' || (cookie_accept_on || cookie_accept_all_on)" class="notice-right-buttons">
-							<a v-show="cookie_accept_on" 
-							  href="#"
-							  :style="{
-  								  'background-color': accept_as_button ? `${accept_background_color}${Math.floor(accept_opacity * 255).toString(16).toUpperCase()}` : 'transparent',
-  								  'color': accept_text_color,
-  								  'border-style': accept_as_button ? accept_style : 'none', 
-  								  'border-width': accept_as_button ? accept_border_width + 'px' : '0',
-  								  'border-color': accept_as_button ? accept_border_color : 'transparent',
-  								  'border-radius': accept_as_button ? accept_border_radius + 'px' : '0',
-  								  'font-family': cookie_font,
-								  ...(cookie_accept_on ? {
-  								    'min-width': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['min-width'],
-									'width': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['width'],
-  								    'display': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']['display'],
-  								    'justify-content': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['justify-content'],
-  								    'align-items': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['align-items'],
-  								    'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['text-align'],
-									'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-  								  } : {})
-  								}"
-							>
-								{{ accept_text }}
-							</a>
-
-							<a v-show="cookie_accept_all_on" 
-							  href="#"
-							  :style="{
-  								  'background-color': accept_all_as_button ? `${accept_all_background_color}${Math.floor(accept_all_opacity * 255).toString(16).toUpperCase()}` : 'transparent',
-  								  'color': accept_all_text_color,
-  								  'border-style': accept_all_as_button ? accept_all_style : 'none',
-  								  'border-width': accept_all_as_button ? accept_all_border_width + 'px' : '0',
-  								  'border-color': accept_all_as_button ? accept_all_border_color : 'transparent',
-  								  'border-radius': accept_all_as_button ? accept_all_border_radius + 'px' : '0',
-  								  'font-family': cookie_font,
-								  ...(cookie_accept_all_on ? {
-  								    'min-width': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['min-width'],
-									'width': (template == 'default' ? default_template_json : json_templates[template])['accept_all_button']?.['width'],
-  								    'display': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['display'],
-  								    'justify-content': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['justify-content'],
-  								    'align-items': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['align-items'],
-  								    'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['text-align'],
-									'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-  								  } : {})
-  								}"
-							>
-								{{ accept_all_text }}
-							</a>
-						</div>
+						
 					</div>
 				</div>
-				<div v-show="show_credits" class="powered-by-credits"  :style="{'--popup_accent_color': cookieSettingsPopupAccentColor, 'text-align':'center', 'font-size': '10px', 'margin-bottom':'-10px'}"><?php echo wp_kses_post($credit_link  ); ?></div>
-				
 			</div>
+			<div v-show="show_credits" class="powered-by-credits"  :style="{'--popup_accent_color': cookieSettingsPopupAccentColor, 'text-align':'center', 'font-size': '10px', 'margin-bottom':'-10px'}"><?php echo wp_kses_post($credit_link  ); ?></div>
+				
 		</div>
 
-		<div v-else-if="banner_preview_is_on && gdpr_policy === 'both'" class="notice-container" :class="{ 'notice-type-banner': show_cookie_as == 'banner', 'notice-type-popup': show_cookie_as == 'popup', 'notice-type-widget': show_cookie_as == 'widget', 'banner-top': cookie_position == 'top' && show_cookie_as == 'banner' ,'banner-bottom': cookie_position == 'bottom' && show_cookie_as == 'banner', 'widget-left': cookie_widget_position == 'left' && show_cookie_as == 'widget','widget-right': cookie_widget_position == 'right' && show_cookie_as == 'widget', 'widget-top-right': cookie_widget_position == 'top_right' && show_cookie_as == 'widget', 'widget-top-left': cookie_widget_position == 'top_left' && show_cookie_as == 'widget' }"
-			:style="{
-				'background-color': active_default_multiple_legislation === 'gdpr' ? `${multiple_legislation_cookie_bar_color1}${Math.floor(multiple_legislation_cookie_bar_opacity1 * 255).toString(16).toUpperCase()}` : `${multiple_legislation_cookie_bar_color2}${Math.floor(multiple_legislation_cookie_bar_opacity2 * 255).toString(16).toUpperCase()}`,
-				'color': active_default_multiple_legislation === 'gdpr' ? multiple_legislation_cookie_text_color1 : multiple_legislation_cookie_text_color2,
-				'border-style': active_default_multiple_legislation === 'gdpr' ? multiple_legislation_border_style1 : multiple_legislation_border_style2,
-				'border-width': active_default_multiple_legislation === 'gdpr' ? multiple_legislation_cookie_bar_border_width1 + 'px' : multiple_legislation_cookie_bar_border_width2 + 'px',
-				'border-radius': active_default_multiple_legislation === 'gdpr' ? multiple_legislation_cookie_bar_border_radius1 + 'px' : multiple_legislation_cookie_bar_border_radius2 + 'px',
-				'border-color': active_default_multiple_legislation === 'gdpr' ? multiple_legislation_cookie_border_color1 : multiple_legislation_cookie_border_color2,
-			}"
-		>
-			<div class="notice-content" :class="'notice-template-' + template"
-			  :style="{
-				'width': '100%',
-				'border-radius': active_default_multiple_legislation === 'gdpr' ? multiple_legislation_cookie_bar_border_radius1 + 'px' : multiple_legislation_cookie_bar_border_radius2 + 'px',
-			  }"
-			>
-				<span :style="{ 'border': 'none', 'cursor': 'pointer', 'display':'inline-flex','justify-content': 'center', 'align-items': 'center', 'height':'20px', 'width': '20px', 'position': 'absolute', 'top': (parseInt( active_default_multiple_legislation === 'gdpr' ? multiple_legislation_cookie_bar_border_radius1 : multiple_legislation_cookie_bar_border_radius2 )/3 + 10) + 'px', 'right': (parseInt( active_default_multiple_legislation === 'gdpr' ? multiple_legislation_cookie_bar_border_radius1 : multiple_legislation_cookie_bar_border_radius2 )/3 + 10) + 'px', 'border-radius': '50%', 'color': cookieSettingsPopupAccentColor, 'background-color': 'transparent' }" @click="turnOffPreviewBanner">
-					<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-						<path fill-rule="evenodd" clip-rule="evenodd" d="M5.29289 5.29289C5.68342 4.90237 6.31658 4.90237 6.70711 5.29289L12 10.5858L17.2929 5.29289C17.6834 4.90237 18.3166 4.90237 18.7071 5.29289C19.0976 5.68342 19.0976 6.31658 18.7071 6.70711L13.4142 12L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L12 13.4142L6.70711 18.7071C6.31658 19.0976 5.68342 19.0976 5.29289 18.7071C4.90237 18.3166 4.90237 17.6834 5.29289 17.2929L10.5858 12L5.29289 6.70711C4.90237 6.31658 4.90237 5.68342 5.29289 5.29289Z" fill="currentColor"/>
-					</svg>
-				</span>
-				<div class="notice-logo-container">
-				<?php
-					$get_banner_imgml1 = get_option( GDPR_COOKIE_CONSENT_SETTINGS_LOGO_IMAGE_FIELDML1 );
-					if ( ! empty( $get_banner_imgml1 ) ) {
-					?>
-						<img class="gdpr_logo_image" alt="logo-image" src="<?php echo esc_url_raw( $get_banner_imgml1 ); ?>"
-						:style="{
-						  	'margin-left': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['margin-left'],
-							'width': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['fit-content'],
-							'height': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['height'],
-							'transform': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['transform'],
-								'position': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['position'],
-								'z-index': (template == 'default' ? default_template_json : json_templates[template])?.['logo']?.['z-index']
-						  }"  >
-					<?php
-					}
-					?>
-				</div>	
-				<div v-if="(template === 'default' ? default_template_json : json_templates[template])?.decoration" class ="gdpr_banner_decoration" :style="{
-						  	'background-color': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['background-color'],
-							'position': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['position'],
-							'height': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['height'],
-							'top': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['top'],
-							'left': (template == 'default' ? default_template_json : json_templates[template])?.['decoration']?.['left']
-						  }"></div>
-					
-				<div class="notice-content-body" :class="'notice-template-name-' + (template == 'default' ? default_template_json : json_templates[template])?.name + ' template-' + (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.['layout']">
-					<div style="display: flex; flex-direction: column; gap:10px;">
-						<div class="notice-heading-wrapper" v-if="active_default_multiple_legislation === 'gdpr' && (gdpr_message_heading.length>0 || template == 'blue_split')">
-							<h3 :style = "{ 'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['text-align'], 'position': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['position'], 'color': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['color'], 'z-index': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['z-index'] }" v-if="gdpr_message_heading.length>0">{{gdpr_message_heading}}</h3>
-							<h3 :style = "{ 'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['text-align'], 'position': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['position'], 'color': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['color'], 'z-index': (template == 'default' ? default_template_json : json_templates[template])?.['heading']?.['z-index'] }" v-if="template == 'blue_split' && gdpr_message_heading.length==0"><?php echo esc_html("We value your privacy"); ?></h3>
-						</div>
-						<p>	
-							<span :style="{'font-family': multiple_legislation_cookie_font1}" v-show="active_default_multiple_legislation === 'gdpr'" v-html ="gdpr_message"></span>
-							<span :style="{'font-family': multiple_legislation_cookie_font2}" v-show="active_default_multiple_legislation === 'ccpa'" v-html ="ccpa_message"></span>
-							<a v-if="active_default_multiple_legislation === 'gdpr' && button_readmore_is_on" :style="{ 
-								'font-family': multiple_legislation_cookie_font1,
-								'color':button_readmore_link_color,
-								'textDecoration':
-									(template === 'blue_full' ||
-									template === 'blue_center' ||
-									template === 'blue_center_column' ||
-									template === 'blue_split' ||
-									template === 'gray' ||
-									template === 'bold' || 
-									template === 'dark' )
-										? 'underline'
-										: 'none',
-								'border-style': button_readmore_as_button ? button_readmore_button_border_style : 'none', 
-								'border-width': button_readmore_as_button ? button_readmore_button_border_width + 'px':'0', 
-								'border-color': button_readmore_as_button ? button_readmore_button_border_color : 'transparent', 
-								'border-radius': button_readmore_as_button ? button_readmore_button_border_radius+'px' : '0px',
-								'background-color': button_readmore_as_button ? `${button_readmore_button_color}${Math.floor(button_readmore_button_opacity * 255).toString(16).toUpperCase()}`:'transparent',
-								...(button_readmore_as_button ? {
-								'display': 'block',
-								'width': 'fit-content',
-								'margin-top': '5px',
-								'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-								} : { 'display': 'inline-block',
-								})
-							}" >
-								<span>{{ button_readmore_text }}</span>
-								
-							</a>
-							<a id="cookie_action_opt_out_preview" v-if="active_default_multiple_legislation === 'ccpa'" :style="{'font-family': multiple_legislation_cookie_font2, 'color':opt_out_text_color1, 'cursor':'pointer'}"><span>{{ opt_out_text }}</span></a>
-						</p>
-					</div>
-					
-
-					<div v-show="active_default_multiple_legislation === 'gdpr'" class="notice-buttons-wrapper" :class="'template-' + (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.['layout'] + '-buttons'">
-						<div v-show="template != 'blue_full' || (cookie_decline_on1 || cookie_settings_on1)" class="notice-left-buttons">
-							<a v-show="cookie_decline_on1"
-							  href="#"
-							  :style="{
-  								  'background-color': decline_as_button1 ? `${decline_background_color1}${Math.floor(decline_opacity1 * 255).toString(16).toUpperCase()}` : 'transparent',
-  								  'color': decline_text_color1,
-  								  'border-style': decline_as_button1 ? decline_style1 : 'none',
-  								  'border-width': decline_as_button1 ? decline_border_width1 + 'px' : '0',
-  								  'border-color': decline_as_button1 ? decline_border_color1 : 'transparent',
-  								  'border-radius': decline_as_button1 ? decline_border_radius1 + 'px' : '0',
-  								  'font-family': active_default_multiple_legislation === 'gdpr' ? multiple_legislation_cookie_font1 : multiple_legislation_cookie_font2,
-								  ...(cookie_decline_on1 ? {
-  								    'min-width': (template == 'default' ? default_template_json : json_templates[template])?.['decline_button']?.['min-width'],
-									'width': (template == 'default' ? default_template_json : json_templates[template])?.['decline_button']?.['width'],
-  								    'display': (template == 'default' ? default_template_json : json_templates[template])?.['decline_button']?.['display'],
-  								    'justify-content': (template == 'default' ? default_template_json : json_templates[template])?.['decline_button']?.['justify-content'],
-  								    'align-items': (template == 'default' ? default_template_json : json_templates[template])?.['decline_button']?.['align-items'],
-  								    'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['decline_button']?.['text-align'],
-									'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-  								  } : {})
-  								}"
-							>
-							  {{ decline_text1 }}
-							</a>
-
-							<a v-show="cookie_settings_on1 && !is_eprivacy" id="cookie_action_settings_preview"
-							  href="#"
-							  :style="{
-  								  'background-color': settings_as_button1 ? `${settings_background_color1}${Math.floor(settings_opacity1 * 255).toString(16).toUpperCase()}` : 'transparent',
-  								  'color': settings_text_color1,
-  								  'border-style': settings_as_button1 ? settings_style1 : 'none',
-  								  'border-width': settings_as_button1 ? settings_border_width1 + 'px' : '0',
-  								  'border-color': settings_as_button1 ? settings_border_color1 : 'transparent',
-  								  'border-radius': settings_as_button1 ? settings_border_radius1 + 'px' : '0',
-  								  'font-family': active_default_multiple_legislation === 'gdpr' ? multiple_legislation_cookie_font1 : multiple_legislation_cookie_font2,
-								  ...(cookie_settings_on1 ? {
-  								    'min-width': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['min-width'],
-									'width': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['width'],
-  								    'display': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['display'],
-  								    'justify-content': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['justify-content'],
-  								    'align-items': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['align-items'],
-  								    'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['settings_button']?.['text-align'],
-									'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-  								  } : {})
-  								}"
-							>
-								{{ settings_text1 }}
-							</a>
-						</div>
-
-						<div v-show="template != 'blue_full' || (cookie_accept_on1 || cookie_accept_all_on1)" class="notice-right-buttons">
-							<a v-show="cookie_accept_on1" 
-							  href="#"
-							  :style="{
-  								  'background-color': accept_as_button1 ? `${accept_background_color1}${Math.floor(accept_opacity1 * 255).toString(16).toUpperCase()}` : 'transparent',
-  								  'color': accept_text_color1,
-  								  'border-style': accept_as_button1 ? accept_style1 : 'none',
-  								  'border-width': accept_as_button1 ? accept_border_width1 + 'px' : '0',
-  								  'border-color': accept_as_button1 ? accept_border_color1 : 'transparent',
-  								  'border-radius': accept_as_button1 ? accept_border_radius1 + 'px' : '0',
-  								  'font-family': active_default_multiple_legislation === 'gdpr' ? multiple_legislation_cookie_font1 : multiple_legislation_cookie_font2,
-								  ...(cookie_accept_on1 ? {
-  								    'min-width': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['min-width'],
-									'width': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['width'],
-  								    'display': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']['display'],
-  								    'justify-content': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['justify-content'],
-  								    'align-items': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['align-items'],
-  								    'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['accept_button']?.['text-align'],
-									'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-  								  } : {})
-  								}"
-							>
-								{{ accept_text1 }}
-							</a>
-
-							<a v-show="cookie_accept_all_on1" 
-							  href="#"
-							  :style="{
-  								  'background-color': accept_all_as_button1 ? `${accept_all_background_color1}${Math.floor(accept_all_opacity1 * 255).toString(16).toUpperCase()}` : 'transparent',
-  								  'color': accept_all_text_color1,
-  								  'border-style': accept_all_style1,
-  								  'border-width': accept_all_border_width1 + 'px',
-  								  'border-color': accept_all_border_color1,
-  								  'border-radius': accept_all_border_radius1 + 'px',
-  								  'font-family': active_default_multiple_legislation === 'gdpr' ? multiple_legislation_cookie_font1 : multiple_legislation_cookie_font2,
-								  ...(cookie_accept_all_on1 ? {
-  								    'min-width': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['min-width'],
-									'width': (template == 'default' ? default_template_json : json_templates[template])['accept_all_button']?.['width'],
-  								    'display': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['display'],
-  								    'justify-content': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['justify-content'],
-  								    'align-items': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['align-items'],
-  								    'text-align': (template == 'default' ? default_template_json : json_templates[template])?.['accept_all_button']?.['text-align'],
-									'padding': (template == 'default' ? default_template_json : json_templates[template])?.['static-settings']?.[`button_padding`]
-  								  } : {})
-  								}"
-							>
-								{{ accept_all_text1 }}
-							</a>
-						</div>
-					</div>
-				</div>
-				
-				<div v-show="show_credits" class="powered-by-credits"  :style="{'--popup_accent_color': cookieSettingsPopupAccentColor, 'text-align':'center', 'font-size': '10px', 'margin-bottom':'-10px'}"><?php echo wp_kses_post( $credit_link  ); ?></div>
-					
-			</div>
-		</div>
+		
 	<?php } ?>
 	
 	<c-container class="gdpr-cookie-consent-settings-container">
@@ -3023,9 +2865,9 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 									<c-row>
 										<c-col class="col-sm-4"><label><?php esc_attr_e( 'Text Color', 'gdpr-cookie-consent' ); ?></label></c-col>
 										<c-col class="col-sm-8 gdpr-color-pick" >
-										<c-input class="gdpr-color-input" type="text" v-model="multiple_legislation_cookie_text_color1" aria-label="<?php esc_attr_e('GDPR Cookie input fields data', 'gdpr-cookie-consent'); ?>"></c-input>
+										<c-input class="gdpr-color-input" type="text" v-model="cookie_text_color" aria-label="<?php esc_attr_e('GDPR Cookie input fields data', 'gdpr-cookie-consent'); ?>"></c-input>
 										<label for="gdpr-multiple-legislation-cookie-text-color1" class="screen-reader-text"><?php esc_attr_e('gdpr multiple legislation cookie text color1', 'gdpr-cookie-consent'); ?></label>
-										<c-input class="gdpr-color-select" id="gdpr-multiple-legislation-cookie-text-color1" type="color" name="gdpr-multiple-legislation-cookie-text-color1" v-model="multiple_legislation_cookie_text_color1"></c-input>
+										<c-input class="gdpr-color-select" id="gdpr-multiple-legislation-cookie-text-color1" type="color" name="gdpr-cookie-text-color" v-model="cookie_text_color"></c-input>
 										</c-col>
 									</c-row>
 									<c-row>
@@ -3977,9 +3819,9 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 									<c-row>
 										<c-col class="col-sm-4"><label><?php esc_attr_e( 'Text Color', 'gdpr-cookie-consent' ); ?></label></c-col>
 										<c-col class="col-sm-8 gdpr-color-pick" >
-										<c-input class="gdpr-color-input" type="text" v-model="multiple_legislation_cookie_text_color2" aria-label="<?php esc_attr_e('GDPR Cookie input fields data', 'gdpr-cookie-consent'); ?>"></c-input>
+										<c-input class="gdpr-color-input" type="text" v-model="cookie_text_color" aria-label="<?php esc_attr_e('GDPR Cookie input fields data', 'gdpr-cookie-consent'); ?>"></c-input>
 										<label for="gdpr-multiple-legislation-cookie-text-color2" class="screen-reader-text"><?php esc_attr_e('gdpr multiple legislation cookie text color2', 'gdpr-cookie-consent'); ?></label>
-										<c-input class="gdpr-color-select" id="gdpr-multiple-legislation-cookie-text-color2" type="color" name="gdpr-multiple-legislation-cookie-text-color2" v-model="multiple_legislation_cookie_text_color2"></c-input>
+										<c-input class="gdpr-color-select" id="gdpr-multiple-legislation-cookie-text-color2" type="color" name="gdpr-cookie-text-color" v-model="cookie_text_color"></c-input>
 										</c-col>
 									</c-row>
 									<c-row>

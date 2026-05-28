@@ -1172,7 +1172,7 @@ class Gdpr_Cookie_Consent_Public {
 						
 			$template_object = json_decode($the_options['selected_template_json'], true);			
 			// include plugin_dir_path( __FILE__ ) . 'templates/default.php';
-			include plugin_dir_path(__FILE__) . 'templates/cookie-notice.php';
+			include_once plugin_dir_path(__FILE__) . 'templates/cookie-notice.php';
 			?>
 			<style>
 				.gdpr_messagebar_detail .category-group .category-item .description-container .group-toggle .checkbox input:checked+label,
