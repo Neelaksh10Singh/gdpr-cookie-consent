@@ -2975,7 +2975,7 @@ banner.style.display = "none";
           } else {
             self.show_again_elm.slideDown(self.settings.animate_speed_hide);
           }
-          
+        }
         } else if (this.settings.cookie_usage_for == "ccpa") {
             var self = this;
             if (self.settings.ccpa_show_again === true || self.settings.ccpa_show_again === "true") {
@@ -2985,7 +2985,6 @@ banner.style.display = "none";
                     }, self.settings.auto_banner_initialize_delay);
                 } else {
                     $("#ccpa-cookie-consent-show-again").slideDown(self.settings.animate_speed_hide);
-                }
             }
         }
         }
