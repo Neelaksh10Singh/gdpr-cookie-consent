@@ -9351,6 +9351,22 @@ class Gdpr_Cookie_Consent_Admin {
 		return true; // All good → allow callback
 	}
 
+	/** new permission callback function for auto disconnection of connected sites from plugin */
+	public function permission_callback_for_delete_activation( WP_REST_Request $request ) {
+		$this->settings  = new GDPR_Cookie_Consent_Settings();
+		$master_key      = $this->settings->get( 'api', 'token' );
+		// 1.Extract master_key from the request body
+		$body = $request->get_json_params();
+		$incoming_key = isset($body['master_key']) ? sanitize_text_field($body['master_key']) : '';
+		if ( empty($incoming_key) ) {
+			return new WP_Error('master_key_missing', 'Master key not provided.', ['status' => 401]);
+		}
+		if ( $master_key !== $incoming_key ) {
+			return new WP_Error('invalid_master_key', 'Master key mismatch.', ['status' => 401]);
+		}
+
+		return true; // All good → allow callback
+	}
 	// Register the REST API route for data from plugin to the saas appwplp server 
 
 	public function register_gdpr_dashboard_route() {
@@ -9701,6 +9717,15 @@ class Gdpr_Cookie_Consent_Admin {
 					}
 					return new WP_Error('rest_forbidden', 'Unauthorized access', array('status' => 401));
 				},
+			)
+		);
+		register_rest_route(
+			'gdpr/v2', // Namespace
+			'/delete_activation_for_auto_disconnect', 
+			array(
+				'methods'  => 'POST',
+				'callback' => array($this, 'disconnect_account_request'), // Function to handle the request
+				'permission_callback' => array($this, 'permission_callback_for_delete_activation'),
 			)
 		);
 		register_rest_route(
