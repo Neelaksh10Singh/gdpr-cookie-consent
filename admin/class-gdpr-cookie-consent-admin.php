@@ -9267,6 +9267,7 @@ class Gdpr_Cookie_Consent_Admin {
 			$site_origin = site_url();
 
 			$app_origin = rtrim(GDPR_APP_URL, '/');
+			$app_origin = "http://localhost:5173";
 			$allowed_origins = [
 				$app_origin,
 				$site_origin,
@@ -11370,6 +11371,7 @@ public function gdpr_support_request_handler() {
 		return rest_ensure_response(
 			array(
 				'plan'									   => $plan,
+				'plugin_version'						   => GDPR_COOKIE_CONSENT_VERSION,
 				'monthly_scan'					   		   => $monthly_scan,
 				'monthly_scan_limit'			   		   => $monthly_scan_limit,
 				'total_pages_scanned'		 	   		   => $gdpr_pages_scanned,
