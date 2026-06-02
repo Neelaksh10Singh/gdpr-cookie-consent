@@ -5561,7 +5561,7 @@ Bootstrap CSS for frontend UI
   line-height: var(--text-base-line-height-rem);
 }
 
-.gdprmodal-body {
+#gdprmodal-gdpr-popup .gdprmodal-body {
   position: relative;
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
@@ -6878,6 +6878,24 @@ fieldset:disabled #gdpr-cookie-consent-bar a.btn {
     flex-direction: column-reverse;
   }
 }
+.gdpr-footer-left {
+        width: 65.5%;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-start;
+        margin: 0 !important;
+    }
+    .gdpr-footer-left button {
+        flex: 1;
+    }
+    .gdpr-footer-right {
+        width: 33%;
+        margin: 0 !important;
+    }
+    .gdpr-footer-right button {
+        width: 100%;
+        margin: 0 !important;
+    }
 
 @media (max-width: 779px) {
     .gdprmodal-footer {
