@@ -625,6 +625,7 @@ class Gdpr_Cookie_Consent {
 	 * @return array|mixed
 	 */
 	public static function gdpr_get_default_settings( $key = '' ) {
+		
 		$settings = array(
 			'gdpr_cookie_bar_logo_url_holder'        => '',
 			'animate_speed_hide'                     => '500',
@@ -640,6 +641,174 @@ class Gdpr_Cookie_Consent {
 			'banner_template'                        => 'banner-default',
 			'popup_template'                         => 'popup-default',
 			'widget_template'                        => 'widget-default',
+
+			'cookie_bar_popup_overlay_opacity'        => 50,
+			'cookie_bar_padding'                      => 20,
+			'cookie_bar_horizontal_padding'           => 120,
+			'cookie_bar_vertical_padding'             => 20,
+			'cookie_bar_spacing'                      => 15,
+			'cookie_bar_blur'                         => 0,
+			'cookie_bar_shadow_color'                 => '#000000',
+			'cookie_bar_shadow_size'                  => 5,
+
+			'logo_is_on'                              => false,
+			'default_logo'                            => 'icon1',
+			'use_uploaded_logo'                       => true,
+
+			'bypass_button_is_on'                     => true,
+			'bypass_button_size'                      => 'md',
+			'bypass_button_text_color'                => '#176CAE',
+
+			'heading_is_on'                           => false,
+			'cookie_heading_color'                    => '#000000',
+			'button_readmore_as_button'               => false,
+			'heading_text_size'                       => 20,
+			'heading_text_weight'                     => '700',
+
+			'cookie_text_color'                       => '#000000',
+			'banner_text_alignment'                   => 'justify',
+			'cookie_font_size'                        => 16,
+			'cookie_text_weight'                      => '400',
+
+			'button_font_size'                        => 16,
+			'button_text_weight'                      => '400',
+
+			'button_accept_all_btn_width'             => 'fit',
+			'button_accept_all_btn_min_width'         => 110,
+
+			'button_accept_button_width'              => 'fit',
+			'button_accept_button_min_width'          => 100,
+
+			'button_decline_button_width'             => 'fit',
+			'button_decline_button_min_width'         => 100,
+
+			'button_settings_button_width'            => 'fit',
+			'button_settings_button_min_width'        => 140,
+
+			'banner_layouts'                          => wp_json_encode(
+				array(
+					'c1' => array(
+						'justify'   => 'start',
+						'direction' => 'row',
+					),
+					'c2' => array(
+						'justify'   => 'start',
+						'direction' => 'col',
+					),
+					'c3' => array(
+						'justify'   => 'start',
+						'direction' => 'row',
+					),
+					'c4' => array(
+						'justify'   => 'start',
+						'direction' => 'row',
+					),
+					'c5' => array(
+						'justify'   => 'start',
+						'direction' => 'row',
+					),
+					'c6' => array(
+						'justify'   => 'end',
+						'direction' => 'row',
+					),
+				)
+			),
+
+			'banner_structure'                        => wp_json_encode(
+				array(
+					'c1' => array( 'heading', 'logo' ),
+					'c2' => array( 'bannerText', 'buttonGroup' ),
+					'c5' => array( 'decline', 'settings' ),
+					'c6' => array( 'accept', 'accept_all' ),
+				)
+			),
+
+			'cookie_bar_popup_overlay_opacity1'        => 50,
+			'cookie_bar_padding1'                      => 20,
+			'cookie_bar_horizontal_padding1'           => 120,
+			'cookie_bar_vertical_padding1'             => 20,
+			'cookie_bar_spacing1'                      => 15,
+			'cookie_bar_blur1'                         => 0,
+			'cookie_bar_shadow_color1'                 => '#000000',
+			'cookie_bar_shadow_size1'                  => 5,
+
+			'logo_is_on1'                              => false,
+			'default_logo1'                            => 'icon1',
+			'use_uploaded_logo1'                       => true,
+
+			'bypass_button_is_on1'                     => true,
+			'bypass_button_size1'                      => 'md',
+			'bypass_button_text_color1'                => '#176CAE',
+
+			'heading_is_on1'                           => false,
+			'cookie_heading_color1'                    => '#000000',
+			'button_readmore_as_button1'               => false,
+			'heading_text_size1'                       => 20,
+			'heading_text_weight1'                     => '700',
+
+			'cookie_text_color1'                       => '#000000',
+			'banner_text_alignment1'                   => 'justify',
+			'cookie_font_size1'                        => 16,
+			'cookie_text_weight1'                      => '400',
+
+			'button_font_size1'                        => 16,
+			'button_text_weight1'                      => '400',
+
+			'button_accept_all_btn_width1'             => 'fit',
+			'button_accept_all_btn_min_width1'         => 110,
+
+			'button_accept_button_width1'              => 'fit',
+			'button_accept_button_min_width1'          => 100,
+
+			'button_decline_button_width1'             => 'fit',
+			'button_decline_button_min_width1'         => 100,
+
+			'button_settings_button_width1'            => 'fit',
+			'button_settings_button_min_width1'        => 140,
+
+			'cookie_bar_popup_overlay_opacity2'        => 50,
+			'cookie_bar_padding2'                      => 20,
+			'cookie_bar_horizontal_padding2'           => 120,
+			'cookie_bar_vertical_padding2'             => 20,
+			'cookie_bar_spacing2'                      => 15,
+			'cookie_bar_blur2'                         => 0,
+			'cookie_bar_shadow_color2'                 => '#000000',
+			'cookie_bar_shadow_size2'                  => 5,
+
+			'logo_is_on2'                              => false,
+			'default_logo2'                            => 'icon1',
+			'use_uploaded_logo2'                       => true,
+
+			'bypass_button_is_on2'                     => true,
+			'bypass_button_size2'                      => 'md',
+			'bypass_button_text_color2'                => '#176CAE',
+
+			'heading_is_on2'                           => false,
+			'cookie_heading_color2'                    => '#000000',
+			'button_readmore_as_button2'               => false,
+			'heading_text_size2'                       => 20,
+			'heading_text_weight2'                     => '700',
+
+			'cookie_text_color2'                       => '#000000',
+			'banner_text_alignment2'                   => 'justify',
+			'cookie_font_size2'                        => 16,
+			'cookie_text_weight2'                      => '400',
+
+			'button_font_size2'                        => 16,
+			'button_text_weight2'                      => '400',
+
+			'button_accept_all_btn_width2'             => 'fit',
+			'button_accept_all_btn_min_width2'         => 110,
+
+			'button_accept_button_width2'              => 'fit',
+			'button_accept_button_min_width2'          => 100,
+
+			'button_decline_button_width2'             => 'fit',
+			'button_decline_button_min_width2'         => 100,
+
+			'button_settings_button_width2'            => 'fit',
+			'button_settings_button_min_width2'        => 140,
+
 
 			'button_accept_text'                     => 'Accept',
 			'button_accept_url'                      => '#',

@@ -352,7 +352,7 @@ if ( 'popup' === $the_options['cookie_bar_as'] ) {
 
 <div id="<?php echo esc_html( $the_options['container_id'] ); ?>" class="<?php echo esc_html( $the_options['container_class'] ); ?> <?php echo esc_html( $the_options['theme_class'] ); ?>"  style="<?php echo esc_attr($notice_container_styles); ?>">	
 	<?php if(filter_var( $the_options['bypass_button_is_on' . $suffix] ?? false, FILTER_VALIDATE_BOOLEAN )) { ?>
-	<span id="cookie-banner-cancle-img" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: absolute; top:<?php echo 5 + ((int)$the_options[($ab_testing_enabled === "true" ? 'cookie_bar_spacing' . $chosenBanner : 'cookie_bar_spacing')]) / 2;?>px; right: <?php echo 5 + ((int)$the_options[($ab_testing_enabled === "true" ? 'cookie_bar_spacing' . $chosenBanner : 'cookie_bar_spacing')]) / 2 + ((int)$the_options[($ab_testing_enabled === "true" ? 'cookie_bar_border_radius' . $chosenBanner : 'background_border_radius')]) / 2;?>px; height: 20px; width: 20px; border-radius: 50%; color: <?php echo esc_html($the_options['bypass_button_text_color' . $suffix]);?>;">
+	<span id="cookie-banner-cancle-img" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: absolute; top:<?php echo 5 + ((int)$the_options[($ab_testing_enabled === "true" ? 'cookie_bar_spacing' . $chosenBanner : 'cookie_bar_spacing')]) / 2;?>px; right: <?php echo 5 + ((int)$the_options[($ab_testing_enabled === "true" ? 'cookie_bar_spacing' . $chosenBanner : 'cookie_bar_spacing')]) / 2 + ((int)$the_options[($ab_testing_enabled === "true" ? 'cookie_bar_border_radius' . $chosenBanner : 'background_border_radius')]) / 2;?>px; height: 20px; width: 20px; border-radius: 50%; color: <?php echo esc_html($the_options['bypass_button_text_color' . $suffix]);?>; scale: <?php echo esc_html($the_options['bypass_button_size'. $suffix]) == 'lg' ? '115%' : (esc_html($the_options['bypass_button_size'. $suffix]) == 'sm' ? '85%' : '100%'); ?>;">
 		<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
 			<path fill-rule="evenodd" clip-rule="evenodd" d="M5.29289 5.29289C5.68342 4.90237 6.31658 4.90237 6.70711 5.29289L12 10.5858L17.2929 5.29289C17.6834 4.90237 18.3166 4.90237 18.7071 5.29289C19.0976 5.68342 19.0976 6.31658 18.7071 6.70711L13.4142 12L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L12 13.4142L6.70711 18.7071C6.31658 19.0976 5.68342 19.0976 5.29289 18.7071C4.90237 18.3166 4.90237 17.6834 5.29289 17.2929L10.5858 12L5.29289 6.70711C4.90237 6.31658 4.90237 5.68342 5.29289 5.29289Z" fill="currentColor"/>
 		</svg>
@@ -579,7 +579,7 @@ if ( 'popup' === $the_options['cookie_bar_as'] ) {
 				>	
 					<?php echo isset($the_options["is_dynamic_lang_on"]) && ($the_options["is_dynamic_lang_on"] === "true" || $the_options["is_dynamic_lang_on"] === true || $the_options["is_dynamic_lang_on"] === "1")
 						? esc_html( $cookie_data['dash_button_donotsell_text'] )
-						: esc_html( $the_options['button_donotsell_text1'] ?? '', 'gdpr-cookie-consent' ); 
+						: esc_html( $the_options['button_donotsell_text'] ?? '', 'gdpr-cookie-consent' ); 
 					?>
 				</a>
 			</p>

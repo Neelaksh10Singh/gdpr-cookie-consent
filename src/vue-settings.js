@@ -2999,19 +2999,11 @@ var gen = new Vue({
     computedBackgroundColor() {
       const color = this.ab_testing_enabled
         ? this[`cookie_bar_color${this.active_test_banner_tab}`]
-        : this.gdpr_policy === 'both'
-          ? this.active_default_multiple_legislation === 'gdpr'
-            ? this.multiple_legislation_cookie_bar_color1 
-            : this.multiple_legislation_cookie_bar_color2
-          : this.cookie_bar_color
+        : this.cookie_bar_color
 
       const opacity = this.ab_testing_enabled
         ? this[`cookie_bar_opacity${this.active_test_banner_tab}`]
-        : this.gdpr_policy === 'both'
-          ? this.active_default_multiple_legislation === 'gdpr'
-            ? this.multiple_legislation_cookie_bar_opacity1
-            : this.multiple_legislation_cookie_bar_opacity2
-          : this.cookie_bar_opacity;
+        : this.cookie_bar_opacity;
 
       const finalColor = color + Math.floor(opacity * 255).toString(16).toUpperCase();
       const acceptAllBGColor = this.ab_testing_enabled ? ( this.active_test_banner_tab === 1 ? this.accept_all_background_color1 : this.accept_all_background_color2 ) : this.accept_all_background_color;
@@ -3025,13 +3017,11 @@ var gen = new Vue({
       else if( finalColor.toUpperCase().slice(0, -2) === acceptAllBGColor.toUpperCase() ) {
         if( this.ab_testing_enabled ){
           this.cookieSettingsPopupAccentColor = this.active_test_banner_tab === 1 ? this.accept_all_text_color1 : this.accept_all_text_color2;
-        } else if(this.is_gdpr == true && this.is_ccpa == true){
-          this.cookieSettingsPopupAccentColor = this.accept_all_text_color1;
         } else {
           this.cookieSettingsPopupAccentColor = this.accept_all_text_color;
         }
       } else {
-        this.cookieSettingsPopupAccentColor =  (this.is_gdpr == true && this.is_ccpa == true) ? this.accept_all_background_color1 : acceptAllBGColor;
+        this.cookieSettingsPopupAccentColor =  acceptAllBGColor;
       }
 
       return finalColor;
