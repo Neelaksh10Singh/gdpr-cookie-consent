@@ -11370,6 +11370,7 @@ public function gdpr_support_request_handler() {
 		return rest_ensure_response(
 			array(
 				'plan'									   => $plan,
+				'plugin_version'						   => GDPR_COOKIE_CONSENT_VERSION,
 				'monthly_scan'					   		   => $monthly_scan,
 				'monthly_scan_limit'			   		   => $monthly_scan_limit,
 				'total_pages_scanned'		 	   		   => $gdpr_pages_scanned,
