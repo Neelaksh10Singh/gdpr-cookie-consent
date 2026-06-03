@@ -4328,10 +4328,48 @@ class Gdpr_Cookie_Consent_Admin {
 			}
 			update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
 			update_option( 'wplp_cookie_banner_created_once', 'true' );
+			$this->gdpr_track_wizard_completed('GDPR Wizard completed from plugin');
 			wp_send_json_success( array( 'form_options_saved' => true ) );
 		}
 	}
 
+	public function gdpr_track_wizard_completed($event, $args=array()) {
+		$url     = GDPR_APP_URL . '/wp-json/api/v1/plugin/app_wplp_track_wizard_completed';
+		$user_id = get_current_user_id();
+		$user_email = '';
+		if ( ! empty( $args['user_email'] ) ) {
+			$user_email = sanitize_email( $args['user_email'] );
+		} else {
+			$user_id = get_current_user_id();
+			if ( $user_id ) {
+				$user = get_userdata( $user_id );
+				$user_email = $user ? $user->user_email : null;
+			}
+		}
+
+		$data = array(
+			'event'       => $event,
+			'src'         => 'gdpr-cookie-consent',
+			'site_url'    => site_url(),
+			'email'       => $user_email,
+			'os_name'     => $this->gdpr_get_user_os(),
+			'device_type' => $this->gdpr_get_device_type(),
+			'ip'          => $this->gdpr_get_user_ip(),
+			'country'     => $this->gdpr_get_user_country(),
+			'time'        => time() * 1000,
+			'args'        => $args,
+		);
+ 
+		$response = wp_safe_remote_post(
+			$url,
+			array(
+				'body'    => json_encode( $data ),
+				'headers' => array( 'Content-Type' => 'application/json' ),
+				'method'  => 'POST',
+				'timeout' => 20,
+			)
+		);
+	}
 	/**
 	 * Translator function to convert the public facing side texts
 	 *
@@ -9007,8 +9045,12 @@ class Gdpr_Cookie_Consent_Admin {
 			$is_usage_tracking_allowed = $share_usage_data ? 'true' : 'false';
 			update_option( 'gdpr_usage_tracking_allowed', $is_usage_tracking_allowed );
 		}
+		$user_email = $request->get_param( 'user_email' );
 		if(!empty($cookie_banner_created_once)){
 			update_option('wplp_cookie_banner_created_once', $cookie_banner_created_once);
+			$this->gdpr_track_wizard_completed('GDPR Wizard Completed from SaaS',  array(
+				'user_email' => $user_email,
+			));
 		}
 
 		
