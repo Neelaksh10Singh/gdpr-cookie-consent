@@ -347,11 +347,10 @@ class Gdpr_Cookie_Consent_Admin {
 	}
 
 	public function gdpr_add_banner_builder_settings_once(){
-		error_log('Checking for banner builder settings migration');
 	
 		$installed_version = get_option( 'my_plugin_version', '0.0.0' );
 
-		if ( version_compare( $installed_version, '4.3.1', '<' ) ) {
+		if ( version_compare( $installed_version, '4.3.2', '<' ) ) {
 
 			$the_options    = Gdpr_Cookie_Consent::gdpr_get_settings();
 			$the_options['cookie_bar_popup_overlay_opacity'] = 50;
@@ -477,7 +476,7 @@ class Gdpr_Cookie_Consent_Admin {
 
 			update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
 
-			$plugin_version = defined( 'GDPR_COOKIE_CONSENT_VERSION' ) ? '4.3.1' : '';
+			$plugin_version = defined( 'GDPR_COOKIE_CONSENT_VERSION' ) ? GDPR_COOKIE_CONSENT_VERSION : '';
 			update_option( 'my_plugin_version', $plugin_version );
 		}
 	}
@@ -11370,6 +11369,7 @@ public function gdpr_support_request_handler() {
 		return rest_ensure_response(
 			array(
 				'plan'									   => $plan,
+				'plugin_version'						   => GDPR_COOKIE_CONSENT_VERSION,
 				'monthly_scan'					   		   => $monthly_scan,
 				'monthly_scan_limit'			   		   => $monthly_scan_limit,
 				'total_pages_scanned'		 	   		   => $gdpr_pages_scanned,
