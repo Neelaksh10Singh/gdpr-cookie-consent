@@ -350,7 +350,7 @@ class Gdpr_Cookie_Consent_Admin {
 	
 		$installed_version = get_option( 'my_plugin_version', '0.0.0' );
 
-		if ( version_compare( $installed_version, '4.3.2', '<' ) ) {
+		if ( version_compare( $installed_version, '4.3.3', '<' ) ) {
 
 			$the_options    = Gdpr_Cookie_Consent::gdpr_get_settings();
 			$the_options['cookie_bar_popup_overlay_opacity'] = 50;
