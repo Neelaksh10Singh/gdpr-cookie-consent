@@ -318,7 +318,6 @@ if ( 'popup' === $the_options['cookie_bar_as'] ) {
 
 			case 'accept_all':
 			case 'acceptAll':
-				error_log('rendering accept all button : ' . print_r($the_options['button_accept_all_is_on' . $suffix] , true) . " - " . print_r(filter_var( $the_options['button_accept_all_is_on' . $suffix] , FILTER_VALIDATE_BOOLEAN ), true));
 				if ( filter_var( $the_options['button_accept_all_is_on' . $suffix] , FILTER_VALIDATE_BOOLEAN ) ) : ?>
 					<a id="cookie_action_accept_all" class="<?php echo esc_html( $the_options['button_accept_all_classes'] ); ?>" tabindex="0" aria-label="Accept All"
 						<?php
@@ -626,7 +625,6 @@ if ( 'popup' === $the_options['cookie_bar_as'] ) {
 
 
 <?php
-error_log("Showing");
 if ( ! empty( $the_options['lgpd_notify'] )) {
 	if ( ! empty( $the_options['cookie_data'] ) ) {
 		?>
