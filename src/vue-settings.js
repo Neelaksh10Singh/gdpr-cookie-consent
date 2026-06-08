@@ -3797,7 +3797,6 @@ var gen = new Vue({
     },
     onTemplateChange(value) {
       this.template = value;
-      console.log("Selected template:", value);
       let selectedTemplate
       if(value == "default"){
         selectedTemplate = this.default_template_json;
