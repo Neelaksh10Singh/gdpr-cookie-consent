@@ -4,7 +4,7 @@ Donate link: https://wplegalpages.com/
 Tags: cookie banner, cookie consent, cookie notice, eu cookie law, gdpr
 Requires at least: 3.3.1
 Tested up to: 6.9
-Stable tag: 4.2.4
+Stable tag: 4.3.3
 Requires PHP: 7.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -195,6 +195,60 @@ Yes, the plugin supports multiple languages, ensuring that your cookie consent b
 11.Consent Log table
 
 == Change Log ==
+
+= 4.3.3 =
+* **New:** Added an option in the WPLP SaaS dashboard to directly connect and manage your WordPress website with WP Cookie Consent.
+
+= 4.3.2 =
+* What's New
+    * **Drag & Drop Cookie Banner Builder:** Introduced an intuitive drag-and-drop builder, offering ultimate design flexibility. You can now easily customize layouts, rearrange elements, and match the banner perfectly with your brand identity without needing any code.
+* Improvements
+    * **CCPA Revisit Consent Option:** Added a dedicated revisit consent feature for the CCPA banner. Users can now easily recall, change, or update their preferences at any time to remain fully compliant with regulatory standards.
+* Bug Fixes
+    * General Maintenance: Minor bug fixes and performance improvements under the hood to ensure smoother operation and better compatibility
+
+= 4.3.1 =
+* Improvements*
+    * Improved auto-generate banner logic for better compatibility and more consistent banner setup experience.
+    * Added option to anonymize IP addresses after consent is provided for improved GDPR compliance.
+* Bug Fixes
+    * Fixed inconsistent credit settings behavior between the plugin and SaaS dashboard.
+    * Fixed Save Changes button being clickable inside Script Blocker even when Safe Mode was enabled.
+    * Other minor bugfixes and improvements.
+
+= 4.3.0 =
+* Fixed minor bugs.
+* Fixed minor issue related to custom CSS section.
+* Fixed minor issue with banner close icon (was not compatible with some themes).
+* Enhanced Cookie Settings, Script Blocker persistence, and SaaS configuration behavior.
+* Minor UI changes.
+
+= 4.2.9 =
+* New Features
+    * Added a Gutenberg block to automatically display the scanned cookies table on the Cookie Policy page, making updates seamless and dynamic.
+    * Introduced an option to show “Revoke Consent” as an icon, improving visibility and user accessibility.
+    * Added Reject and Accept All buttons in the Cookie Settings popup to align with GDPR requirements.
+* Improvements
+    * Refactored the Cookie Scanner script for better performance and reliability.
+
+= 4.2.8 =
+* Fixed script blocker conflicts affecting Elementor youtube embeds.
+* Fixed import/export settings sync issues between plugin and SaaS.
+* General bug fixes and performance improvements.
+
+= 4.2.7 =
+* Bug Fixes
+    * Fixed an issue where invalid JSON uploads (including unsupported formats like CSV or malformed JSON files) did not trigger an appropriate error message during import.
+    * Fixed a translation issue where cookie settings popup content was not correctly translated in Preview mode.
+
+= 4.2.6 =
+* Added WP Cookie Consent features to SaaS: **Schedule Scan** and **Restore to Default**.
+* Implemented support for **IAB TCF v2.3** compliance.
+
+= 4.2.5 =
+* Improved performance with IAB TCF enabled: Resolved an issue where enabling IAB TCF caused slow loading and impacted overall website performance.
+* Fixed Cookie Settings Export/Import (SaaS Dashboard): Addressed a bug where exporting and importing cookie settings was not functioning correctly within the SaaS dashboard.
+* Resolved Sidebar Widget Saving Issue: Fixed a conflict where sidebar widgets failed to save when WP Legal Pages was used alongside popular WordPress themes.
 
 = 4.2.4 =
 * Bug fixes and Improvements.
@@ -774,6 +828,60 @@ Yes, the plugin supports multiple languages, ensuring that your cookie consent b
 * Initial version
 
 == Upgrade Notice ==
+
+= 4.3.3 =
+* **New:** Added an option in the WPLP SaaS dashboard to directly connect and manage your WordPress website with WP Cookie Consent.
+
+= 4.3.2 =
+* What's New
+    * **Drag & Drop Cookie Banner Builder:** Introduced an intuitive drag-and-drop builder, offering ultimate design flexibility. You can now easily customize layouts, rearrange elements, and match the banner perfectly with your brand identity without needing any code.
+* Improvements
+    * **CCPA Revisit Consent Option:** Added a dedicated revisit consent feature for the CCPA banner. Users can now easily recall, change, or update their preferences at any time to remain fully compliant with regulatory standards.
+* Bug Fixes
+    * General Maintenance: Minor bug fixes and performance improvements under the hood to ensure smoother operation and better compatibility
+
+= 4.3.1 =
+* Improvements*
+    * Improved auto-generate banner logic for better compatibility and more consistent banner setup experience.
+    * Added option to anonymize IP addresses after consent is provided for improved GDPR compliance.
+* Bug Fixes
+    * Fixed inconsistent credit settings behavior between the plugin and SaaS dashboard.
+    * Fixed Save Changes button being clickable inside Script Blocker even when Safe Mode was enabled.
+    * Other minor bugfixes and improvements.
+
+= 4.3.0 =
+* Fixed minor bugs.
+* Fixed minor issue related to custom CSS section.
+* Fixed minor issue with banner close icon (was not compatible with some themes).
+* Enhanced Cookie Settings, Script Blocker persistence, and SaaS configuration behavior.
+* Minor UI changes.
+
+= 4.2.9 =
+* New Features
+    * Added a Gutenberg block to automatically display the scanned cookies table on the Cookie Policy page, making updates seamless and dynamic.
+    * Introduced an option to show “Revoke Consent” as an icon, improving visibility and user accessibility.
+    * Added Reject and Accept All buttons in the Cookie Settings popup to align with GDPR requirements.
+* Improvements
+    * Refactored the Cookie Scanner script for better performance and reliability.
+
+= 4.2.8 =
+* Fixed script blocker conflicts affecting Elementor youtube embeds.
+* Fixed import/export settings sync issues between plugin and SaaS.
+* General bug fixes and performance improvements.
+
+= 4.2.7 =
+* Bug Fixes
+    * Fixed an issue where invalid JSON uploads (including unsupported formats like CSV or malformed JSON files) did not trigger an appropriate error message during import.
+    * Fixed a translation issue where cookie settings popup content was not correctly translated in Preview mode.
+
+= 4.2.6 =
+* Added WP Cookie Consent features to SaaS: **Schedule Scan** and **Restore to Default**.
+* Implemented support for **IAB TCF v2.3** compliance.
+
+= 4.2.5 =
+* Improved performance with IAB TCF enabled: Resolved an issue where enabling IAB TCF caused slow loading and impacted overall website performance.
+* Fixed Cookie Settings Export/Import (SaaS Dashboard): Addressed a bug where exporting and importing cookie settings was not functioning correctly within the SaaS dashboard.
+* Resolved Sidebar Widget Saving Issue: Fixed a conflict where sidebar widgets failed to save when WP Legal Pages was used alongside popular WordPress themes.
 
 = 4.2.4 =
 * Bug fixes and Improvements.

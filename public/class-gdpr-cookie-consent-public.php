@@ -576,16 +576,16 @@ class Gdpr_Cookie_Consent_Public {
 
 			// Fetch Youtube category
 			//$total_results = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM ' . $wpdb->prefix . 'wpl_cookie_scripts WHERE `script_key`=%s', array( $value['script_key'] ) ), ARRAY_A ); // db call ok; no-cache ok.
-$selected_script_category = $wpdb->get_var(
-    $wpdb->prepare(
-        "SELECT cat.gdpr_cookie_category_name
-         FROM {$wpdb->prefix}wpl_cookie_scripts AS script
-         JOIN {$wpdb->prefix}gdpr_cookie_scan_categories AS cat
-           ON script.script_category = cat.id_gdpr_cookie_category
-         WHERE script.script_title = %s",
-        'Youtube Embed'
-    )
-);
+			$selected_script_category = $wpdb->get_var(
+			    $wpdb->prepare(
+			        "SELECT cat.gdpr_cookie_category_name
+			         FROM `{$wpdb->prefix}wpl_cookie_scripts` AS script
+			         JOIN `{$wpdb->prefix}gdpr_cookie_scan_categories` AS cat
+			           ON script.script_category = cat.id_gdpr_cookie_category
+			         WHERE script.script_title = %s",
+			        'Youtube Embed'
+			    )
+			);
 
 			wp_localize_script(
 				$this->plugin_name,
@@ -728,6 +728,8 @@ $selected_script_category = $wpdb->get_var(
 			$the_options['head_lgpd']                 = $head_lgpd;
 			$the_options['version']                   = $this->version;
 			$the_options['show_again_container_id']   = $this->gdprcookieconsent_remove_hash( $the_options['show_again_div_id'] );
+			$the_options['ccpa_show_again_container_id']   = $this->gdprcookieconsent_remove_hash( $the_options['ccpa_show_again_div_id'] );
+
 			$the_options['container_id']              = $this->gdprcookieconsent_remove_hash( $the_options['notify_div_id'] );
 			$the_options['button_accept_action_id']   = $this->gdprcookieconsent_remove_hash( $the_options['button_accept_action'] );
 			$the_options['button_readmore_action_id'] = $this->gdprcookieconsent_remove_hash( $the_options['button_readmore_action'] );
@@ -958,8 +960,10 @@ $selected_script_category = $wpdb->get_var(
 				$cookie_data['dash_button_cancel_text'] = $the_options['button_cancel_text'];
 				if( $ab_options['ab_testing_enabled'] === true || $ab_options['ab_testing_enabled'] === 'true' ) {
 					$cookie_data['dash_show_again_text'] = $the_options['show_again_text' . $chosenBanner];
+					$cookie_data['ccpa_dash_show_again_text'] = $the_options['ccpa_show_again_text' . $chosenBanner];
 				} else {
 					$cookie_data['dash_show_again_text'] = $the_options['show_again_text'];
+					$cookie_data['ccpa_dash_show_again_text'] = $the_options['ccpa_show_again_text'];
 				}
 				$cookie_data['dash_optout_text'] = $the_options['optout_text'];
 				$cookie_data['dash_notify_message_iabtcf'] = $the_options['notify_message'];
@@ -978,7 +982,7 @@ $selected_script_category = $wpdb->get_var(
 				$the_options['cookie_data']       = $cookie_data;
 
 				// language translation based on the selected language for the public facing.
-				if ( isset( $the_options['lang_selected'] ) && isset( $the_options['gdpr_current_language'] ) && in_array( $the_options['lang_selected'], $this->supported_languages )  && $the_options['gdpr_current_language'] !== $the_options['lang_selected']) {
+				if ( isset( $the_options['lang_selected'] )  && in_array( $the_options['lang_selected'], $this->supported_languages ) ) {
 
 					// Load and decode translations from JSON file.
 					$translations_file = get_site_url() . '/wp-content/plugins/gdpr-cookie-consent/public/translations/public-translations.json';
@@ -997,34 +1001,6 @@ $selected_script_category = $wpdb->get_var(
 							'type',
 							'cookies_not_found',
 							'consent_notice',
-							'dash_notify_message_eprivacy',
-					'dash_notify_message_lgpd',
-					'dash_button_readmore_text',
-					'dash_button_accept_text',
-					'dash_button_accept_all_text',
-					'dash_button_decline_text',
-					'dash_about_message',
-					'dash_about_message_iabtcf',
-					'dash_about_message_lgpd',
-					'dash_notify_message',
-					'dash_notify_message_iabtcf',
-					'dash_button_settings_text',
-					'dash_notify_message_ccpa',
-					'dash_button_donotsell_text',
-					'dash_button_confirm_text',
-					'dash_button_cancel_text',
-					'dash_show_again_text',
-					'dash_optout_text',
-					'gdpr_cookie_category_description_necessary',
-					'gdpr_cookie_category_name_necessary',
-					'gdpr_cookie_category_description_analytics',
-					'gdpr_cookie_category_name_analytics',
-					'gdpr_cookie_category_description_marketing',
-					'gdpr_cookie_category_description_preference',
-					'gdpr_cookie_category_description_unclassified',
-					'gdpr_cookie_category_name_marketing',
-					'gdpr_cookie_category_name_preference',
-					'gdpr_cookie_category_name_unclassified',
 						);
 
 					// Determine the target language based on the POST value.
@@ -1082,6 +1058,7 @@ $selected_script_category = $wpdb->get_var(
 				$cookie_data['dash_button_confirm_text'] = $the_options['button_confirm_text'];
 				$cookie_data['dash_button_cancel_text'] = $the_options['button_cancel_text'];
 				$cookie_data['dash_show_again_text'] = $the_options['show_again_text'];
+				$cookie_data['ccpa_dash_show_again_text'] = $the_options['ccpa_show_again_text'];
 				$cookie_data['dash_optout_text'] = $the_options['optout_text'];
 				$cookie_data['dash_notify_message_iabtcf'] = $the_options['notify_message'];
 				$cookie_data['dash_about_message_iabtcf']  = $the_options['about_message'];
@@ -1105,9 +1082,10 @@ $selected_script_category = $wpdb->get_var(
 						$flag = false;
 						if (strpos($supported_language, $value) !== false) {
 							$flag = true;
-							$translations_file = get_site_url() . '/wp-content/plugins/gdpr-cookie-consent/public/translations/public-translations.json';
-							$translations      = wp_remote_get( $translations_file );
-							$translations      = json_decode( wp_remote_retrieve_body( $translations ), true );
+
+							$translations_file = plugin_dir_path(__FILE__) . 'translations/public-translations.json';
+							$translations = json_decode(file_get_contents($translations_file), true);
+
 							// Define an array of text keys to translate.
 							$text_keys_to_translate = array(
 								'about',
@@ -1138,6 +1116,7 @@ $selected_script_category = $wpdb->get_var(
 								'dash_button_confirm_text',
 								'dash_button_cancel_text',
 								'dash_show_again_text',
+								'ccpa_dash_show_again_text',
 								'dash_optout_text',
 								'gdpr_cookie_category_description_necessary',
 								'gdpr_cookie_category_name_necessary',
@@ -1194,7 +1173,7 @@ $selected_script_category = $wpdb->get_var(
 						
 			$template_object = json_decode($the_options['selected_template_json'], true);			
 			// include plugin_dir_path( __FILE__ ) . 'templates/default.php';
-			include plugin_dir_path(__FILE__) . 'templates/cookie-notice.php';
+			include_once plugin_dir_path(__FILE__) . 'templates/cookie-notice.php';
 			?>
 			<style>
 				.gdpr_messagebar_detail .category-group .category-item .description-container .group-toggle .checkbox input:checked+label,
@@ -1272,6 +1251,42 @@ $selected_script_category = $wpdb->get_var(
 			if ( $the_options['consent_forward'] !== true ) {
 				$the_options['select_sites'] = null;
 			}
+
+			$gdpr_monthly_page_views = get_option('wpl_monthly_page_views', 0);
+			$settings = new GDPR_Cookie_Consent_Settings();
+			$api_user_plan     = $settings->get_plan();
+			$gdpr_monthly_page_views_percent = 0;
+			if ( 'free' === $api_user_plan ) { 
+				$gdpr_monthly_page_views_percent = ( ( $gdpr_monthly_page_views ) / 20000 ) * 100;
+			} else if ( '3sites' === $api_user_plan ) {
+				$gdpr_monthly_page_views_percent = ( ( $gdpr_monthly_page_views ) / 100000 ) * 100;
+			}
+
+
+			global $wpdb;
+			$youtube_category = array( 'slug' => 'preferences', 'name' => 'Preferences' );
+					
+			$youtube_script = $wpdb->get_row(
+	    		"SELECT script_category FROM `{$wpdb->prefix}wpl_cookie_scripts`
+	    		 WHERE script_key = 'youtube_embed' AND script_status = 1 
+	    		 LIMIT 1"
+			);
+			
+			if ( $youtube_script ) {
+			    $category = $wpdb->get_row( $wpdb->prepare(
+			        "SELECT gdpr_cookie_category_slug, gdpr_cookie_category_name 
+			         FROM `{$wpdb->prefix}gdpr_cookie_scan_categories` 
+			         WHERE id_gdpr_cookie_category = %d",
+			        $youtube_script->script_category
+			    ));
+			    if ( $category ) {
+			        $youtube_category = array(
+			            'slug' => $category->gdpr_cookie_category_slug,
+			            'name' => $category->gdpr_cookie_category_name,
+			        );
+			    }
+			}
+
 			$cookies_list_data = array(
 				'gdpr_cookies_list'                 		=> wp_json_encode( $categories_json_data),
 				'gdpr_cookiebar_settings'          		 	=> wp_json_encode( Gdpr_Cookie_Consent::gdpr_get_json_settings() ),
@@ -1280,6 +1295,8 @@ $selected_script_category = $wpdb->get_var(
 				'gdpr_consent_renew' 						=> $the_options['ip_and_consent_renew'],
 				'gdpr_user_ip'           					=> $user_ip,
 				'gdpr_do_not_track'      		    		=> $the_options['do_not_track_on'],
+				'ip_anonymization_on'                 		=> $the_options['ip_anonymization_on'],
+				'ip_masking_level'                          => $the_options['ip_masking_level'],
 				'gdpr_select_pages'       					=> $the_options['select_pages'],
 				'gdpr_select_sites'      					=> $the_options['select_sites'],
 				'consent_forwarding'      					=> $the_options['consent_forward'],
@@ -1289,20 +1306,74 @@ $selected_script_category = $wpdb->get_var(
 				'button_revoke_consent_background_color1'	=> $the_options['button_revoke_consent_background_color1'],
 				'button_revoke_consent_text_color2' 		=> $the_options['button_revoke_consent_text_color2'],
 				'button_revoke_consent_background_color2'	=> $the_options['button_revoke_consent_background_color2'],
+				'ccpa_button_revoke_consent_text_color' 			=> $the_options['ccpa_button_revoke_consent_text_color'],
+				'ccpa_button_revoke_consent_background_color'	=> $the_options['ccpa_button_revoke_consent_background_color'],
+				'ccpa_button_revoke_consent_text_color1' 		=> $the_options['ccpa_button_revoke_consent_text_color1'],
+				'ccpa_button_revoke_consent_background_color1'	=> $the_options['ccpa_button_revoke_consent_background_color1'],
+				'ccpa_button_revoke_consent_text_color2' 		=> $the_options['ccpa_button_revoke_consent_text_color2'],
+				'ccpa_button_revoke_consent_background_color2'	=> $the_options['ccpa_button_revoke_consent_background_color2'],
 				'chosenBanner'								=> $chosenBanner,
 				'is_iabtcf_on'                              => $the_options['is_iabtcf_on'],
 				'is_gcm_on'									=> $this->convert_boolean($the_options['is_gcm_on']),
 				'is_gcm_debug_on'							=> isset($the_options['is_gcm_debug_mode']) ? $this->convert_boolean($the_options['is_gcm_debug_mode']) : false,
 				'vendor_data'	                            => Gdpr_Cookie_Consent::gdpr_get_all_vendors(),
 				'cookieSettingsPopupAccentColor'	        => strtoupper(substr($finalColor, 0, -2)) === strtoupper($acceptAllBGColor) ? $the_options['button_accept_all_link_color'] : $acceptAllBGColor,
-				'template_parts' 	                        => $the_options['template_parts']
-        
+				'template_parts' 	                        => $the_options['template_parts'],
+				'gdpr_monthly_page_views_percent'			=> $gdpr_monthly_page_views_percent,
+				'youtube_embed_category'					=> $youtube_category
 			);
 
 
 			wp_localize_script( $this->plugin_name, 'gdpr_cookies_obj', $cookies_list_data );
 		}
 	}
+
+	/**
+	 * Anonymizes an IP address based on the configured masking level.
+	 *
+	 * IPv4 masking:
+	 *   Level 1 → 192.168.100.xxx
+	 *   Level 2 → 192.168.xxx.xxx  (Recommended)
+	 *   Level 3 → 192.xxx.xxx.xxx
+	 *   Full    → xxx.xxx.xxx.xxx
+	 *
+	 * @param string $ip    The raw IP address.
+	 * @param int|string $level  Masking level: 1, 2, 3, or 'full'.
+	 * @return string The anonymized IP address.
+	 */
+	public function wpl_anonymize_ip( $ip, $level ) {
+		if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+			// IPv4
+			$parts = explode( '.', $ip );
+			switch ( $level ) {
+				case 1:
+					$parts[3] = 'xxx';
+					break;
+				case 2:
+					$parts[2] = 'xxx';
+					$parts[3] = 'xxx';
+					break;
+				case 3:
+					$parts[1] = 'xxx';
+					$parts[2] = 'xxx';
+					$parts[3] = 'xxx';
+					break;
+				case 'full':
+					$parts = array( 'xxx', 'xxx', 'xxx', 'xxx' );
+					break;
+				default:
+					// Fallback to level 2 (recommended) if unexpected value
+					$parts[2] = 'xxx';
+					$parts[3] = 'xxx';
+					break;
+			}
+			return implode( '.', $parts );
+		}
+
+		// If IP is invalid/unknown, return ip as it is
+		return $ip;
+	}
+
 	/**
 	 * Returns IP address of the user for consent log.
 	 *
@@ -1340,6 +1411,19 @@ $selected_script_category = $wpdb->get_var(
 			$ipaddress = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
 		} else {
 			$ipaddress = 'UNKNOWN';
+		}
+
+	
+		if ( class_exists( 'Gdpr_Cookie_Consent' ) ) {
+			$the_options = Gdpr_Cookie_Consent::gdpr_get_settings();
+		}
+
+		$anonymization_enabled = isset( $the_options['ip_anonymization_on'] )
+    		&& ( $the_options['ip_anonymization_on'] === true || $the_options['ip_anonymization_on'] === 1 || $the_options['ip_anonymization_on'] === '1' || $the_options['ip_anonymization_on'] === 'true' );
+
+		if ( $anonymization_enabled && ! empty( $ipaddress ) && $ipaddress !== 'UNKNOWN' ) {
+			$level     = isset( $the_options['ip_masking_level'] ) ? $the_options['ip_masking_level'] : 2;
+			$ipaddress = $this->wpl_anonymize_ip( $ipaddress, $level );
 		}
 		return esc_html($ipaddress);
 	}
