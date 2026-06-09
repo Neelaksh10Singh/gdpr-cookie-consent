@@ -5284,6 +5284,8 @@ class Gdpr_Cookie_Consent_Admin {
 					)
 				) : "This website uses cookies to improve your experience. We'll assume you're ok with this, but you can opt-out if you wish.";
 				$the_options['about_message']                        = isset( $_POST['about_message_field'] ) ? sanitize_text_field( wp_unslash( $_POST['about_message_field'] ) ) : "Cookies are small text files that can be used by websites to make a user's experience more efficient. The law states that we can store cookies on your device if they are strictly necessary for the operation of this site. For all other types of cookies we need your permission. This site uses different types of cookies. Some cookies are placed by third party services that appear on our pages.";
+				$the_options['gcm_about_message'] = isset($_POST['gcm_about_message_field']) ? sanitize_text_field(wp_unslash($_POST['gcm_about_message_field'])) : "For more information on how Google's third party cookies operate and handle your data, see: ";
+				$the_options['gcm_privacy_policy_text'] = isset($_POST['gcm_privacy_policy_text_field']) ? sanitize_text_field(wp_unslash($_POST['gcm_privacy_policy_text_field'])) : "Google's Privacy Policy";
 			}
 			$the_options['notify_message_lgpd'] = isset( $_POST['notify_message_lgpd_field'] ) ? wp_kses(
 				wp_unslash( $_POST['notify_message_lgpd_field'] ),
@@ -6324,6 +6326,8 @@ class Gdpr_Cookie_Consent_Admin {
 					'dash_about_message',
 					'dash_about_message_iabtcf',
 					'dash_about_message_lgpd',
+					'dash_gcm_about_message',
+					"dash_gcm_privacy_policy_text",
 					'dash_notify_message',
 					'dash_notify_message_iabtcf',
 					'dash_button_settings_text',
@@ -11540,6 +11544,8 @@ public function gdpr_support_request_handler() {
 				'bar_heading_text'                         => $the_options['bar_heading_text'],
 				'notify_message'                           => $the_options['notify_message'],
 				'about_message'                            => $the_options['about_message'],
+				'gcm_about_message'                        => $the_options['gcm_about_message'],
+				"gcm_privacy_policy_text"			   	   => $the_options['gcm_privacy_policy_text'],
 				// ccpa.
 				'notify_message_ccpa'                      => $the_options['notify_message_ccpa'],
 				'optout_text'                              => $the_options['optout_text'],
@@ -12847,6 +12853,8 @@ public function gdpr_support_request_handler() {
 			'dash_button_accept_all_text',
 			'dash_button_decline_text',
 			'dash_about_message',
+			'dash_gcm_about_message',
+    		'dash_gcm_privacy_policy_text', 
 			'dash_about_message_iabtcf',
 			'dash_about_message_lgpd',
 			'dash_notify_message',
@@ -12967,6 +12975,8 @@ public function gdpr_support_request_handler() {
 					'optout_text'							=> $new_options['optout_text'],
 					'cookies_categories'                    => $translated_category_names,
 					'category_descriptions'					=> $translated_category_descriptions,
+					'gcm_about_message'         			=> $new_options['gcm_about_message'],
+            		'gcm_privacy_policy_text'   			=> $new_options['gcm_privacy_policy_text'],
 					'buffer_messages'                       => array(
 																	'iab'     => array(
 																		'notify_message' => $this->change_option_language( 'dash_notify_message_iabtcf', $target_language ),
