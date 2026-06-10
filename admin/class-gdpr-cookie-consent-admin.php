@@ -9428,7 +9428,6 @@ class Gdpr_Cookie_Consent_Admin {
 	}
 
 	public function permission_callback_for_react_app(WP_REST_Request $request) {
-		return true;
 		$this->settings = new GDPR_Cookie_Consent_Settings();
 
 		$master_key = $this->settings->get('api','token');		
