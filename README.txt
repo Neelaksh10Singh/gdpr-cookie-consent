@@ -197,11 +197,12 @@ Yes, the plugin supports multiple languages, ensuring that your cookie consent b
 == Change Log ==
 
 = 4.3.4 =
-* Fixed an issue where Cookie Banner text translations were not applied when Google Consent Mode (GCM) was enabled.
-* Minor improvement to banner preview visibility on SaaS settings.
+* Minor bugfixes and improvements
 
 = 4.3.3 =
 * **New:** Added an option in the WPLP SaaS dashboard to directly connect and manage your WordPress website with WP Cookie Consent.
+* Fixed an issue where Cookie Banner text translations were not applied when Google Consent Mode (GCM) was enabled.
+* Minor improvement to banner preview visibility on SaaS settings.
 
 = 4.3.2 =
 * What's New
@@ -834,11 +835,12 @@ Yes, the plugin supports multiple languages, ensuring that your cookie consent b
 == Upgrade Notice ==
 
 = 4.3.4 =
-* Fixed an issue where Cookie Banner text translations were not applied when Google Consent Mode (GCM) was enabled.
-* Minor improvement to banner preview visibility on SaaS settings.
+* Minor bugfixes and improvements
 
 = 4.3.3 =
 * **New:** Added an option in the WPLP SaaS dashboard to directly connect and manage your WordPress website with WP Cookie Consent.
+* Fixed an issue where Cookie Banner text translations were not applied when Google Consent Mode (GCM) was enabled.
+* Minor improvement to banner preview visibility on SaaS settings.
 
 = 4.3.2 =
 * What's New
