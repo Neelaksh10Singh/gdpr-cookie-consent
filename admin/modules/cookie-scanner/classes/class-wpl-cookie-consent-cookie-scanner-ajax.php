@@ -139,7 +139,7 @@ class Gdpr_Cookie_Consent_Cookie_Scanner_Ajax extends Gdpr_Cookie_Consent_Cookie
 			wp_die( esc_attr__( 'You do not have sufficient permission to perform this operation', 'gdpr-cookie-consent' ) );
 		}
 
-		$response = $this->gdpr_start_cookie_scanning();
+		$response = $this->gdpr_start_cookie_scanning(-1);
 
 		$out = array(
 			'success' => $response['status'] === 'success' ? true : false,
@@ -163,7 +163,7 @@ class Gdpr_Cookie_Consent_Cookie_Scanner_Ajax extends Gdpr_Cookie_Consent_Cookie
 		);
 	}
 
-	public function gdpr_start_cookie_scanning( ) {
+	public function gdpr_start_cookie_scanning( $maxLen ) {
 		if(get_option('gdpr_scanning_action_hash')){
 			return array(
 				'status'  => 'error',
@@ -214,7 +214,9 @@ class Gdpr_Cookie_Consent_Cookie_Scanner_Ajax extends Gdpr_Cookie_Consent_Cookie
 				} 
 			}
 		}
+		if($maxLen !== -1) $pages_array = array_slice($pages_array, 0, $maxLen);
 		array_push($pages_array, get_home_url());
+
 		$scan_limit     = get_transient( 'gdpr_monthly_scan_limit_exhausted' );
 		$scan_limit_int = (int) $scan_limit; 
 		if(false === $scan_limit){

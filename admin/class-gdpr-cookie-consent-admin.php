@@ -9802,6 +9802,36 @@ class Gdpr_Cookie_Consent_Admin {
 
 		register_rest_route(
 			'wplp-react-gdpr/v1',
+			'/mini_cookie_scan',
+			array(
+				'methods'  => 'POST',
+				'callback' => array( $this, 'gdpr_start_mini_cookie_scan' ),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
+			)
+		);
+
+		register_rest_route(
+			'wplp-react-gdpr/v1',
+			'/mini_cookie_scan_results',
+			array(
+				'methods'  => 'POST',
+				'callback' => array( $this, 'gdpr_fetch_mini_cookie_scan_results' ),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
+			)
+		);
+
+		register_rest_route(
+			'wplp-react-gdpr/v1',
+			'/save_compliance_wizard_settings',
+			array(
+				'methods'  => 'POST',
+				'callback' => array( $this, 'gdpr_save_compliance_wizard_settings' ),
+				'permission_callback' => array($this, 'permission_callback_for_react_app'),
+			)
+		);
+
+		register_rest_route(
+			'wplp-react-gdpr/v1',
 			'/translate_text',
 			array(
 				'methods'  => 'POST',
@@ -12997,7 +13027,35 @@ public function gdpr_support_request_handler() {
 		require_once plugin_dir_path( __DIR__ ) . 'admin/modules/cookie-scanner/classes/class-wpl-cookie-consent-cookie-scanner-ajax.php';
 		$cookies_scan = new Gdpr_Cookie_Consent_Cookie_Scanner_Ajax();
 
-		$response = $cookies_scan->gdpr_start_cookie_scanning();
+		$response = $cookies_scan->gdpr_start_cookie_scanning(-1);
+
+		$out = array(
+			'success' => $response['status'] === 'success' ? true : false,
+			'data'    => array(
+				'status'  => $response['status'],
+				'message' => $response['message'],
+			),
+		);
+
+		if ( isset( $response['error'] ) ) {
+			$out['data']['error'] = $response['error'];
+		}
+
+		if ( isset( $response['server_response'] ) ) {
+			$out['data']['server_response'] = $response['server_response'];
+		}
+
+		return new WP_REST_Response(
+			$out,
+			$response['code']
+		);
+	}
+	
+	public function gdpr_start_mini_cookie_scan( WP_REST_Request $request ) {
+		require_once plugin_dir_path( __DIR__ ) . 'admin/modules/cookie-scanner/classes/class-wpl-cookie-consent-cookie-scanner-ajax.php';
+		$cookies_scan = new Gdpr_Cookie_Consent_Cookie_Scanner_Ajax();
+
+		$response = $cookies_scan->gdpr_start_cookie_scanning(5);
 
 		$out = array(
 			'success' => $response['status'] === 'success' ? true : false,
@@ -13021,10 +13079,171 @@ public function gdpr_support_request_handler() {
 		);
 	}
 
+	public function gdpr_fetch_mini_cookie_scan_results ( WP_REST_Request $request ){
+		$scan_in_progress = get_option( 'gdpr_scanning_action_hash' ) ? true : false;
+
+		if($scan_in_progress){
+			return new WP_REST_Response(
+				array(
+					'message' => 'Scannign in Progress'
+				),
+				200
+			);
+		}
+		global $wpdb;
+
+		$cookies_table = $wpdb->prefix . 'wpl_cookie_scan_cookies';
+		$total_cookies = (int) $wpdb->get_var(
+			"SELECT COUNT(*) FROM `{$cookies_table}`"
+		);
+
+		return new WP_REST_Response(
+			array(
+				'message' => 'Scanning Completed',
+				'number_of_cookies' => $total_cookies
+			),
+			200
+		);
+	}
+
+	public function gdpr_save_compliance_wizard_settings ( WP_REST_Request $request ){
+		$save_object = $request->get_param('save_object') ?: null;
+		$geo_target_object = $request->get_param('geo_target_object') ?: null;
+		$iabtcfVendorData = $request->get_param('iabtcfVendorData') ?: null;
+		$translate_text = false;
+
+		if(!empty($iabtcfVendorData)){
+			$iabtcfVendorData = json_decode($iabtcfVendorData);
+			update_option(GDPR_COOKIE_CONSENT_SETTINGS_VENDOR, $iabtcfVendorData);
+		}
+
+		$the_options = Gdpr_Cookie_Consent::gdpr_get_settings();
+
+		if($save_object['lang_selected'] !== $the_options['lang_selected']){
+			$translate_text = true;
+		}
+		$the_options = array_merge($the_options, $save_object);
+
+		if ( isset( $the_options['cookie_usage_for'] ) ) {
+			switch ( $the_options['cookie_usage_for'] ) {
+				case 'both':
+				case 'gdpr':
+				case 'lgpd':
+				case 'eprivacy':
+					update_option( 'wpl_bypass_script_blocker', 0 );
+					break;
+				case 'ccpa':
+					update_option( 'wpl_bypass_script_blocker', 1 );
+					break;
+			}
+		}
+
+		if(!empty($geo_target_object) && is_array($geo_target_object)){
+
+			$the_options['select_countries'] = isset( $geo_target_object['is_gdpr_selected_countries'] ) ? $geo_target_object['is_gdpr_selected_countries'] : '';
+			$the_options['select_countries_ccpa'] = isset( $geo_target_object['is_ccpa_selected_countries'] ) ? $geo_target_object['is_ccpa_selected_countries'] : '';
+
+			if ( isset( $geo_target_object['is_gdpr_worldwide_on'] ) && ($the_options['cookie_usage_for'] === 'gdpr' || $the_options['cookie_usage_for'] === 'both') ) {
+				if ( filter_var( $the_options['is_worldwide_on'], FILTER_VALIDATE_BOOLEAN ) !==  filter_var( $geo_target_object['is_gdpr_worldwide_on'], FILTER_VALIDATE_BOOLEAN ) ) {
+					$is_maxmind_turned_on = filter_var( $geo_target_object['is_gdpr_worldwide_on'], FILTER_VALIDATE_BOOLEAN ) ? 'Turned Off' : 'Turned On';
+					$data_args = array(
+						'Status' => 'Maxmind ' . $is_maxmind_turned_on,
+					);
+					$this->gdpr_send_shared_usage_data( 'GCC Maxmind Status', $data_args );
+				}
+				if ( !$geo_target_object['is_gdpr_worldwide_on'] ) {
+					$the_options['is_worldwide_on'] = 'false';
+				} else {
+					if(!$the_options['is_worldwide_on']){
+						$this->disable_auto_update_maxminddb();
+					}
+					$the_options['is_worldwide_on'] = 'true';
+				}
+			}
+
+			if ( isset( $geo_target_object['is_ccpa_worldwide_on'] ) && ($the_options['cookie_usage_for'] === 'ccpa' || $the_options['cookie_usage_for'] === 'both') ) {
+				if ( filter_var( $the_options['is_worldwide_on_ccpa'], FILTER_VALIDATE_BOOLEAN ) !==  filter_var( $geo_target_object['is_ccpa_worldwide_on'], FILTER_VALIDATE_BOOLEAN ) ) {
+					$is_maxmind_turned_on = filter_var( $geo_target_object['is_ccpa_worldwide_on'], FILTER_VALIDATE_BOOLEAN ) ? 'Turned Off' : 'Turned On';
+					$data_args = array(
+						'Status' => 'Maxmind ' . $is_maxmind_turned_on,
+					);
+					$this->gdpr_send_shared_usage_data( 'GCC Maxmind Status', $data_args );
+				}
+				if ( !$geo_target_object['is_ccpa_worldwide_on'] ) {
+					$the_options['is_worldwide_on_ccpa'] = 'false';
+				} else {
+					if(!$the_options['is_worldwide_on_ccpa']){
+						$this->disable_auto_update_maxminddb();
+					}
+					$the_options['is_worldwide_on_ccpa'] = 'true';
+				}
+			}
+
+			if ( isset( $geo_target_object['is_gdpr_eu_on'] ) ) {
+				if ( !$geo_target_object['is_gdpr_eu_on'] ) {
+					$the_options['is_eu_on'] = 'false';
+				} else {
+					if(!$the_options['is_eu_on'] ){
+						$this->auto_update_maxminddb();
+						$this->download_maxminddb();
+					}
+					$the_options['is_eu_on'] = 'true';
+				}
+			}
+
+			if ( isset( $geo_target_object['is_ccpa_us_on'] ) ) {
+				if ( !$geo_target_object['is_ccpa_us_on'] ) {
+					$the_options['is_ccpa_on'] = 'false';
+				} else {
+					if(!$the_options['is_ccpa_on'] ){
+						$this->auto_update_maxminddb();
+						$this->download_maxminddb();
+					}
+					$the_options['is_ccpa_on'] = 'true';
+				}
+			}
+
+			if ( isset( $geo_target_object['is_gdpr_select_countries_on'] ) ) {
+				if ( !$geo_target_object['is_gdpr_select_countries_on'] ) {
+					$the_options['is_selectedCountry_on'] = 'false';
+				} else {
+					if(!$the_options['is_selectedCountry_on']){
+						$this->auto_update_maxminddb();
+						$this->download_maxminddb();
+					}
+					$the_options['is_selectedCountry_on'] = 'true';
+				}
+			}
+
+			if ( isset( $geo_target_object['is_ccpa_select_countries_on'] ) ) {
+				if ( !$geo_target_object['is_ccpa_select_countries_on'] ) {
+					$the_options['is_selectedCountry_on_ccpa'] = 'false';
+				} else {
+					if(!$the_options['is_selectedCountry_on_ccpa']){
+						$this->auto_update_maxminddb();
+						$this->download_maxminddb();
+					}
+					$the_options['is_selectedCountry_on_ccpa'] = 'true';
+				}
+			}
+		}
+
+		if($translate_text){
+			$the_options = $this->changeLanguage($the_options);
+		}
+
+		update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
+		
+		return [
+			'success' => true,
+			'accessed' => true
+		];
+	}
+
 	public function gdpr_cron_run_scan() {
 	    require_once plugin_dir_path( __DIR__ ) . 'admin/modules/cookie-scanner/classes/class-wpl-cookie-consent-cookie-scanner-ajax.php';
 	    $cookies_scan = new Gdpr_Cookie_Consent_Cookie_Scanner_Ajax();
-	    $cookies_scan->gdpr_start_cookie_scanning();
+	    $cookies_scan->gdpr_start_cookie_scanning(-1);
 		
 	
 	    $schedule_data = get_option( 'gdpr_scan_schedule_data', [] );
