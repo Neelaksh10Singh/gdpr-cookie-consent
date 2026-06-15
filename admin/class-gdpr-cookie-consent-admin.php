@@ -13240,6 +13240,15 @@ public function gdpr_support_request_handler() {
 		}
 
 		update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
+
+		$compliance_wizard_completed = $request->get_param( 'complianceWizardCompleted' );
+
+		if ( null !== $compliance_wizard_completed ) {
+			update_option(
+				'wplp_compliance_wizard_completed',
+				$compliance_wizard_completed
+			);
+		}
 		
 		return [
 			'success' => true,
