@@ -36,8 +36,10 @@ $api_user_plan     = $this->settings->get_plan();
 
 $free_trial_data = get_option( 'wplp_free_trial_data', [] );
 
-$is_free_trial_active = ! empty( $free_trial_data['isTrialActive'] ) && time() < ( $free_trial_data['localExpiry'] ?? 0 );
-$trialEndsIn          = $is_free_trial_active ? ceil( ( $free_trial_data['localExpiry'] - time() ) / DAY_IN_SECONDS ) : 0;
+$local_expiry = (int) ( $free_trial_data['localExpiry'] ?? 0 );
+
+$is_free_trial_active = ! empty( $free_trial_data['isTrialActive'] ) && time() < $local_expiry;
+$trialEndsIn          = $is_free_trial_active ? ceil( ( $local_expiry - time() ) / DAY_IN_SECONDS ) : 0;
 $trialStartDate       = $free_trial_data['trialStartDate'] ?? '';
 $trialEndDate         = $free_trial_data['trialEndDate'] ?? '';
 /*
