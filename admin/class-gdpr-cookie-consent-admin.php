@@ -8399,7 +8399,7 @@ class Gdpr_Cookie_Consent_Admin {
 				'monthly_page_views'			   => $gdpr_monthly_page_views,
 				'consent_log_data' 				   => $result['logs'],
 				'cookie_banner_created_once'       => get_option('wplp_cookie_banner_created_once'),
-				'complianceWizardCompleted'	   	   => get_option('wplp_compliance_wizard_completed') ?? false,
+				'complianceWizardCompleterd'	   => get_option('wplp_compliance_wizard_completed') ?? false,
 			)
 		);
 	}
