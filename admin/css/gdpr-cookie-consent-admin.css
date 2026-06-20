@@ -10432,8 +10432,29 @@ div#gdpr-scan-history {
 }
 
 .wplp-compliance-cookie-consent-tab-admin.open-tab + .gdpr-sub-tabs {
-  display: flex;
-  max-height: 500px;
+    display: flex;
+    max-height: 330px;
+    overflow-y: auto;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #d1d5db transparent; /* Firefox */
+}
+
+/* Chrome, Edge, Safari */
+.wplp-compliance-cookie-consent-tab-admin.open-tab + .gdpr-sub-tabs::-webkit-scrollbar {
+    width: 6px;
+}
+
+.wplp-compliance-cookie-consent-tab-admin.open-tab + .gdpr-sub-tabs::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.wplp-compliance-cookie-consent-tab-admin.open-tab + .gdpr-sub-tabs::-webkit-scrollbar-thumb {
+    background: #d1d5db; /* light gray */
+    border-radius: 10px;
+}
+
+.wplp-compliance-cookie-consent-tab-admin.open-tab + .gdpr-sub-tabs::-webkit-scrollbar-thumb:hover {
+    background: #bfc4cb;
 }
 
 .wplp-compliance-main
