@@ -8399,6 +8399,7 @@ class Gdpr_Cookie_Consent_Admin {
 				'monthly_page_views'			   => $gdpr_monthly_page_views,
 				'consent_log_data' 				   => $result['logs'],
 				'cookie_banner_created_once'       => get_option('wplp_cookie_banner_created_once'),
+				'complianceWizardCompleted'	   	   => get_option('wplp_compliance_wizard_completed') ?? false,
 			)
 		);
 	}
@@ -13113,6 +13114,194 @@ public function gdpr_support_request_handler() {
 		);
 	}
 
+	/**
+	 * Resolves the live template style array for a given React-sent template
+	 * name ('light', 'dark', 'minimal' - any case), pulling directly from the
+	 * real data sources instead of a hardcoded copy:
+	 *
+	 *   'light'   -> get_option( 'gdpr_default_template_object' )
+	 *   'dark'    -> $this->templates_json['dark']
+	 *   'minimal' -> $this->templates_json['bold']
+	 *
+	 * Keeping this as a thin resolver (rather than duplicating values) means it
+	 * never drifts from the canonical template data.
+	 */
+	private function gdpr_get_template_style_map( $template_name ) {
+
+		$normalized = strtolower( trim( (string) $template_name ) );
+
+		$name_map = array(
+			'light'   => 'default',
+			'dark'    => 'dark',
+			'minimal' => 'bold',
+		);
+
+		$resolved_key = isset( $name_map[ $normalized ] ) ? $name_map[ $normalized ] : 'default';
+
+		if ( $resolved_key === 'default' ) {
+			$template = get_option( 'gdpr_default_template_object' );
+		} else {
+			$template = isset( $this->templates_json[ $resolved_key ] ) ? $this->templates_json[ $resolved_key ] : get_option( 'gdpr_default_template_object' );
+		}
+
+		// Defensive fallback in case the option/array entry is missing entirely.
+		if ( empty( $template ) || ! is_array( $template ) ) {
+			$template = get_option( 'gdpr_default_template_object' );
+		}
+
+		return $template;
+	}
+
+
+	/**
+	 * Applies a template's style map onto $the_options for both banner 1 (suffix '1'),
+	 * banner 2 (suffix '2'), and the multiple-legislation banners (suffix 'ml1'/just '1'/'2'
+	 * for the multiple_legislation_* keys), mirroring onTemplateChange's bulk overwrite.
+	 */
+	private function gdpr_apply_template_to_options( array $the_options, $template_name ) {
+
+		$map = $this->gdpr_get_template_style_map( $template_name );
+
+		$styles    = $map['styles'];
+		$accept    = $map['accept_button'];
+		$decline   = $map['decline_button'];
+		$settings  = $map['settings_button'];
+		$acceptAll = $map['accept_all_button'];
+		$readmore  = $map['readmore_button'];
+		$optOut    = $map['opt_out_button'];
+		$revoke    = $map['revoke_consent_button'];
+
+		$suffixes = array( '', '1', '2' );
+
+		foreach ( $suffixes as $suffix ) {
+
+			// Cookie bar body / background settings.
+			if ( $suffix === '' ) {
+				$the_options['background']              = $styles['background-color'];
+				$the_options['opacity']                  = $styles['opacity'];
+				$the_options['cookie_text_color']        = $styles['color'];
+				$the_options['cookie_heading_color']     = $styles['color'];
+				$the_options['background_border_style']  = $styles['border-style'];
+				$the_options['background_border_width']  = $styles['border-width'];
+				$the_options['background_border_color']  = $styles['border-color'];
+				$the_options['background_border_radius'] = $styles['border-radius'];
+				$the_options['font_family']              = $styles['font-family'];
+			} else {
+				$the_options[ 'cookie_bar_color' . $suffix ]         = $styles['background-color'];
+				$the_options[ 'cookie_bar_opacity' . $suffix ]       = $styles['opacity'];
+				$the_options[ 'cookie_text_color' . $suffix ]        = $styles['color'];
+				$the_options[ 'border_style' . $suffix ]             = $styles['border-style'];
+				$the_options[ 'cookie_bar_border_width' . $suffix ]  = $styles['border-width'];
+				$the_options[ 'cookie_border_color' . $suffix ]      = $styles['border-color'];
+				$the_options[ 'cookie_bar_border_radius' . $suffix ] = $styles['border-radius'];
+				$the_options[ 'cookie_font' . $suffix ]              = $styles['font-family'];
+			}
+
+			// Accept All button.
+			$the_options[ 'button_accept_all_is_on' . $suffix ]                = $acceptAll['is_on'];
+			$the_options[ 'button_accept_all_button_color' . $suffix ]         = $acceptAll['background-color'];
+			$the_options[ 'button_accept_all_as_button' . $suffix ]            = true;
+			$the_options[ 'button_accept_all_link_color' . $suffix ]           = $acceptAll['color'];
+			$the_options[ 'button_accept_all_btn_border_style' . $suffix ]     = $acceptAll['border-style'];
+			$the_options[ 'button_accept_all_btn_border_color' . $suffix ]     = $acceptAll['border-color'];
+			$the_options[ 'button_accept_all_btn_border_width' . $suffix ]     = $acceptAll['border-width'];
+			$the_options[ 'button_accept_all_btn_border_radius' . $suffix ]    = $acceptAll['border-radius'];
+			$the_options[ 'button_accept_all_btn_opacity' . $suffix ]          = $acceptAll['opacity'];
+
+			// Accept button.
+			$the_options[ 'button_accept_is_on' . $suffix ]                = $accept['is_on'];
+			$the_options[ 'button_accept_button_color' . $suffix ]         = $accept['background-color'];
+			$the_options[ 'button_accept_as_button' . $suffix ]            = true;
+			$the_options[ 'button_accept_link_color' . $suffix ]           = $accept['color'];
+			$the_options[ 'button_accept_button_border_style' . $suffix ]  = $accept['border-style'];
+			$the_options[ 'button_accept_button_border_color' . $suffix ]  = $accept['border-color'];
+			$the_options[ 'button_accept_button_border_width' . $suffix ]  = $accept['border-width'];
+			$the_options[ 'button_accept_button_border_radius' . $suffix ] = $accept['border-radius'];
+			$the_options[ 'button_accept_button_opacity' . $suffix ]       = $accept['opacity'];
+
+			// Decline button.
+			$the_options[ 'button_decline_is_on' . $suffix ]                = $decline['is_on'];
+			$the_options[ 'button_decline_button_color' . $suffix ]         = $decline['background-color'];
+			$the_options[ 'button_decline_as_button' . $suffix ]            = true;
+			$the_options[ 'button_decline_link_color' . $suffix ]           = $decline['color'];
+			$the_options[ 'button_decline_button_border_style' . $suffix ]  = $decline['border-style'];
+			$the_options[ 'button_decline_button_border_color' . $suffix ]  = $decline['border-color'];
+			$the_options[ 'button_decline_button_border_width' . $suffix ]  = $decline['border-width'];
+			$the_options[ 'button_decline_button_border_radius' . $suffix ] = $decline['border-radius'];
+			$the_options[ 'button_decline_button_opacity' . $suffix ]       = $decline['opacity'];
+
+			// Settings button.
+			$the_options[ 'button_settings_is_on' . $suffix ]                = $settings['is_on'];
+			$the_options[ 'button_settings_button_color' . $suffix ]         = $settings['background-color'];
+			$the_options[ 'button_settings_as_button' . $suffix ]            = true;
+			$the_options[ 'button_settings_link_color' . $suffix ]           = $settings['color'];
+			$the_options[ 'button_settings_button_border_style' . $suffix ]  = $settings['border-style'];
+			$the_options[ 'button_settings_button_border_color' . $suffix ]  = $settings['border-color'];
+			$the_options[ 'button_settings_button_border_width' . $suffix ]  = $settings['border-width'];
+			$the_options[ 'button_settings_button_border_radius' . $suffix ] = $settings['border-radius'];
+			$the_options[ 'button_settings_button_opacity' . $suffix ]       = $settings['opacity'];
+
+			// Readmore button.
+			$the_options[ 'button_readmore_button_color' . $suffix ]        = $readmore['background-color'];
+			$the_options[ 'button_readmore_link_color' . $suffix ]          = $readmore['color'];
+			$the_options[ 'button_readmore_button_border_style' . $suffix ] = $readmore['border-style'];
+			$the_options[ 'button_readmore_button_border_color' . $suffix ] = $readmore['border-color'];
+			$the_options[ 'button_readmore_button_border_width' . $suffix ] = $readmore['border-width'];
+			$the_options[ 'button_readmore_button_border_radius' . $suffix ] = $readmore['border-radius'];
+			$the_options[ 'button_readmore_button_opacity' . $suffix ]      = $readmore['opacity'];
+
+			// Revoke consent (GDPR "show again").
+			$the_options[ 'button_revoke_consent_text_color' . $suffix ]       = $revoke['color'];
+			$the_options[ 'button_revoke_consent_background_color' . $suffix ] = $revoke['background-color'];
+
+			// Revoke consent (CCPA "show again").
+			$the_options[ 'ccpa_button_revoke_consent_text_color' . $suffix ]       = $revoke['color'];
+			$the_options[ 'ccpa_button_revoke_consent_background_color' . $suffix ] = $revoke['background-color'];
+
+			// Opt out / Do Not Sell link color.
+			$the_options[ 'button_donotsell_link_color' . $suffix ] = $optOut['color'];
+
+			// Confirm / Cancel buttons (CCPA dialog) mirror accept_all / decline per the JS reducer.
+			$the_options[ 'button_confirm_link_color' . $suffix ]           = $acceptAll['color'];
+			$the_options[ 'button_confirm_button_color' . $suffix ]         = $acceptAll['background-color'];
+			$the_options[ 'button_confirm_button_border_style' . $suffix ]  = $acceptAll['border-style'];
+			$the_options[ 'button_confirm_button_border_color' . $suffix ]  = $acceptAll['border-color'];
+			$the_options[ 'button_confirm_button_opacity' . $suffix ]       = $acceptAll['opacity'];
+			$the_options[ 'button_confirm_button_border_width' . $suffix ]  = $acceptAll['border-width'];
+			$the_options[ 'button_confirm_button_border_radius' . $suffix ] = $acceptAll['border-radius'];
+
+			$the_options[ 'button_cancel_link_color' . $suffix ]           = $decline['color'];
+			$the_options[ 'button_cancel_button_color' . $suffix ]         = $decline['background-color'];
+			$the_options[ 'button_cancel_button_border_style' . $suffix ]  = $decline['border-style'];
+			$the_options[ 'button_cancel_button_border_color' . $suffix ]  = $decline['border-color'];
+			$the_options[ 'button_cancel_button_opacity' . $suffix ]       = $decline['opacity'];
+			$the_options[ 'button_cancel_button_border_width' . $suffix ]  = $decline['border-width'];
+			$the_options[ 'button_cancel_button_border_radius' . $suffix ] = $decline['border-radius'];
+		}
+
+		// Multiple legislation banners (GDPR=1, CCPA=2 within the multiple_legislation_* keys).
+		$the_options['multiple_legislation_cookie_bar_color1']         = $styles['background-color'];
+		$the_options['multiple_legislation_cookie_bar_opacity1']       = $styles['opacity'];
+		$the_options['multiple_legislation_cookie_text_color1']        = $styles['color'];
+		$the_options['multiple_legislation_border_style1']             = $styles['border-style'];
+		$the_options['multiple_legislation_cookie_bar_border_width1']  = $styles['border-width'];
+		$the_options['multiple_legislation_cookie_border_color1']      = $styles['border-color'];
+		$the_options['multiple_legislation_cookie_bar_border_radius1'] = $styles['border-radius'];
+		$the_options['multiple_legislation_cookie_font1']              = $styles['font-family'];
+
+		$the_options['multiple_legislation_cookie_bar_color2']         = $styles['background-color'];
+		$the_options['multiple_legislation_cookie_bar_opacity2']       = $styles['opacity'];
+		$the_options['multiple_legislation_cookie_text_color2']        = $styles['color'];
+		$the_options['multiple_legislation_border_style2']             = $styles['border-style'];
+		$the_options['multiple_legislation_cookie_bar_border_width2']  = $styles['border-width'];
+		$the_options['multiple_legislation_cookie_border_color2']      = $styles['border-color'];
+		$the_options['multiple_legislation_cookie_bar_border_radius2'] = $styles['border-radius'];
+		$the_options['multiple_legislation_cookie_font2']              = $styles['font-family'];
+
+		return $the_options;
+	}
+
+
 	public function gdpr_save_compliance_wizard_settings ( WP_REST_Request $request ){
 		$save_object = $request->get_param('save_object') ?: null;
 		$geo_target_object = $request->get_param('geo_target_object') ?: null;
@@ -13129,7 +13318,7 @@ public function gdpr_support_request_handler() {
 		if($save_object['lang_selected'] !== $the_options['lang_selected']){
 			$translate_text = true;
 		}
-		$the_options = array_merge($the_options, $save_object);
+		$the_options = array_merge($the_options, $save_object ?? []);
 
 		if ( isset( $the_options['cookie_usage_for'] ) ) {
 			switch ( $the_options['cookie_usage_for'] ) {
@@ -13143,6 +13332,10 @@ public function gdpr_support_request_handler() {
 					update_option( 'wpl_bypass_script_blocker', 1 );
 					break;
 			}
+		}
+
+		if ( isset( $the_options['template'] ) ) {
+			$the_options = $this->gdpr_apply_template_to_options( $the_options, $the_options['template'] );
 		}
 
 		if(!empty($geo_target_object) && is_array($geo_target_object)){
@@ -13240,6 +13433,15 @@ public function gdpr_support_request_handler() {
 		}
 
 		update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
+
+		$compliance_wizard_completed = $request->get_param( 'complianceWizardCompleted' );
+
+		if ( null !== $compliance_wizard_completed ) {
+			update_option(
+				'wplp_compliance_wizard_completed',
+				$compliance_wizard_completed
+			);
+		}
 		
 		return [
 			'success' => true,
