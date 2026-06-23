@@ -1793,12 +1793,13 @@ banner.style.display = "none";
           }
           $("#gdpr-ccpa-gdprmodal").gdprmodal("show");
           setTimeout(function () {
-              const backdrop = document.querySelector(".gdprmodal-backdrop");
-              const modal = document.querySelector("#gdpr-ccpa-gdprmodal");
-              if (backdrop && modal && backdrop.parentElement !== modal.parentElement) {
-                  modal.parentElement.insertBefore(backdrop, modal);
-              }
-          }, 0);
+            const backdrops = document.querySelectorAll(".gdprmodal-backdrop");
+            const backdrop = backdrops[backdrops.length - 1]; // newest backdrop
+            const modal = document.querySelector("#gdpr-ccpa-gdprmodal");
+            if (backdrop && modal) {
+                modal.parentElement.insertBefore(backdrop, modal);
+            }
+        }, 0);
         } else if (button_action == "ccpa_close") {
           GDPR.displayHeader();
         } else if (button_action == "cancel") {
@@ -2979,13 +2980,14 @@ banner.style.display = "none";
             }, banner_delay);
           } else {
             $("#gdpr-popup").gdprmodal("show");
-             setTimeout(function () {
-                    const backdrop = document.querySelector(".gdprmodal-backdrop");
-                    const modal = document.querySelector("#gdpr-popup");
-                    if (backdrop && modal && backdrop.parentElement !== modal.parentElement) {
-                        modal.parentElement.insertBefore(backdrop, modal);
-                    }
-                }, 0);
+            setTimeout(function () {
+              const backdrops = document.querySelectorAll(".gdprmodal-backdrop");
+              const backdrop = backdrops[backdrops.length - 1];
+              const modal = document.querySelector("#gdpr-popup");
+              if (backdrop && modal) {
+                  modal.parentElement.insertBefore(backdrop, modal);
+              }
+          }, 0);
           }
         }
       }
