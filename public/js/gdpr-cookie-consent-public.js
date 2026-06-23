@@ -1465,6 +1465,11 @@ banner.style.display = "none";
                     script.textContent = scriptContent;
                     document.body.appendChild(script);
                 }
+                function executeFooterScript(scriptContent) {
+                  var script = document.createElement("script");
+                  script.textContent = scriptContent;
+                  document.body.appendChild(script);
+                }
                 if (response.data.header_scripts) {
                     var tempDiv = document.createElement("div");
                     tempDiv.innerHTML = response.data.header_scripts;
@@ -1481,6 +1486,14 @@ banner.style.display = "none";
                         executeBodyScript(oldScript.innerHTML);
                     });
                 }
+                //Inject footer scripts
+                if (response.data.footer_scripts) {
+                  var tempDiv = document.createElement("div");
+                  tempDiv.innerHTML = response.data.footer_scripts;
+                  tempDiv.querySelectorAll("script").forEach(function (oldScript) {
+                      executeFooterScript(oldScript.innerHTML);
+                  });
+              }
               },
           });
           // Dispatch appropriate events based on settings
@@ -1594,6 +1607,12 @@ banner.style.display = "none";
                     script.textContent = scriptContent;
                     document.body.appendChild(script);
                 }
+
+                function executeFooterScript(scriptContent) {
+                  var script = document.createElement("script");
+                  script.textContent = scriptContent;
+                  document.body.appendChild(script);
+                }
                 if (response.data.header_scripts) {
                     var tempDiv = document.createElement("div");
                     tempDiv.innerHTML = response.data.header_scripts;
@@ -1609,6 +1628,14 @@ banner.style.display = "none";
                     tempDiv.querySelectorAll("script").forEach(function (oldScript) {
                         executeBodyScript(oldScript.innerHTML);
                     });
+                }
+                //Inject footer scripts
+                if (response.data.footer_scripts) {
+                  var tempDiv = document.createElement("div");
+                  tempDiv.innerHTML = response.data.footer_scripts;
+                  tempDiv.querySelectorAll("script").forEach(function (oldScript) {
+                      executeFooterScript(oldScript.innerHTML);
+                  });
                 }
               },
           });
