@@ -479,6 +479,15 @@ class Gdpr_Cookie_Consent_Admin {
 			$plugin_version = defined( 'GDPR_COOKIE_CONSENT_VERSION' ) ? GDPR_COOKIE_CONSENT_VERSION : '';
 			update_option( 'my_plugin_version', $plugin_version );
 		}
+
+		if ( version_compare( $installed_version, '4.3.5', '<' ) ) {
+			if (get_option('gdpr_no_of_page_scan', 0) > 0 ) {
+				update_option( 'wplp_compliance_wizard_completed', true );
+			}
+
+			$plugin_version = defined( 'GDPR_COOKIE_CONSENT_VERSION' ) ? GDPR_COOKIE_CONSENT_VERSION : '';
+			update_option( 'my_plugin_version', $plugin_version );
+		}
 	}
 
 
@@ -8399,7 +8408,7 @@ class Gdpr_Cookie_Consent_Admin {
 				'monthly_page_views'			   => $gdpr_monthly_page_views,
 				'consent_log_data' 				   => $result['logs'],
 				'cookie_banner_created_once'       => get_option('wplp_cookie_banner_created_once'),
-				'complianceWizardCompleterd'	   => get_option('wplp_compliance_wizard_completed') ?? false,
+				'complianceWizardCompleted'	   => get_option('wplp_compliance_wizard_completed') ?? false,
 			)
 		);
 	}
