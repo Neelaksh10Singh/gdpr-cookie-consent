@@ -153,7 +153,7 @@ GDPR_CCPA_COOKIE_EXPIRE =
 
     // Log results to the console.
     if (defaultPresent == -1) {
-      console.log("Debug: The default consent is missing. Make sure you have turned on support GCM, have atleast one default consent value set.");
+      console.log("Debug: The default consent is missing. Make sure you have turned on support GCM, have atleast one default consent value set. Check documentation at: https://wplegalpages.com/docs/wp-cookie-consent/how-to-guides/implementing-google-consent-mode-using-wp-cookie-consent");
     } else {
       console.log("Debug: The default consent successfully set to - ", window.dataLayer[defaultPresent][2]);
     }
@@ -161,11 +161,15 @@ GDPR_CCPA_COOKIE_EXPIRE =
 		if (updatePresent != -1) {
 		  console.log("Debug: The consent successfully updated to - ", window.dataLayer[updatePresent][2]);
 		}
+    if (firstTag == -1) {
+		  console.log("Debug: GTM seems to be missing on your site. Check if GTM is installed correctly. ");
+		}
     if(defaultPresent != -1 && firstTag != -1 && defaultPresent < firstTag){
       console.log("Debug: Default consent was set in correct order.")
     }
     else{
-      console.log("Debug: The default consent was not set in correct order. Make sure you have installed Google tag using scripts in script blocker section and GCM is turned on.")
+      console.log("Debug: The default consent was not set in correct order. Make sure everything is setup corretly.")
+      console.log("Debug: If Google Tag Gateway is enabled on your website, you don't need to change anything. Just run Google Consent Mode in Advanced Mode. Check documentation at : https://wplegalpages.com/docs/wplp-docs/guides/google-tag-gateway-and-google-consent-mode-in-wplp-cookie-consent")
     }
   }
 
