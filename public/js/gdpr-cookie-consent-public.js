@@ -1711,6 +1711,14 @@ banner.style.display = "none";
             $("#gdpr-popup").gdprmodal("hide");
           }
           GDPR.show_again_elm.slideUp(GDPR.settings.animate_speed_hide);
+            setTimeout(function() {
+                const backdrop = document.querySelector(".gdprmodal-backdrop");
+                const modal = document.querySelector(".gdprmodal");
+                
+                if (backdrop && modal && backdrop.parentElement !== modal.parentElement) {
+                    modal.parentElement.insertBefore(backdrop, modal);
+                }
+            }, 0);
         } else if (button_action == "close") {
             var law = GDPR.settings.cookie_usage_for;
 
@@ -1788,6 +1796,14 @@ banner.style.display = "none";
             GDPR.hideHeader();
           }
           $("#gdpr-ccpa-gdprmodal").gdprmodal("show");
+          setTimeout(function () {
+            const backdrops = document.querySelectorAll(".gdprmodal-backdrop");
+            const backdrop = backdrops[backdrops.length - 1]; // newest backdrop
+            const modal = document.querySelector("#gdpr-ccpa-gdprmodal");
+            if (backdrop && modal) {
+                modal.parentElement.insertBefore(backdrop, modal);
+            }
+        }, 0);
         } else if (button_action == "ccpa_close") {
           GDPR.displayHeader();
         } else if (button_action == "cancel") {
@@ -1968,6 +1984,18 @@ banner.style.display = "none";
               }
             
               $("#gdpr-gdprmodal").gdprmodal("show");
+              setTimeout(function () {
+                const backdrop = document.querySelector(".gdprmodal-backdrop");
+                const modal = document.querySelector("#gdpr-gdprmodal");
+
+                if (
+                    backdrop &&
+                    modal &&
+                    backdrop.parentElement !== modal.parentElement
+                ) {
+                    modal.parentElement.insertBefore(backdrop, modal);
+                }
+            }, 0);
               return false;
           }
           multiple_legislation_current_banner = "gdpr";
@@ -2017,6 +2045,13 @@ banner.style.display = "none";
         } else {
             $("#gdpr-ccpa-gdprmodal").gdprmodal("show");
         }
+        setTimeout(function () {
+          const backdrop = document.querySelector(".gdprmodal-backdrop");
+          const modal = document.querySelector("#gdpr-ccpa-gdprmodal");
+          if (backdrop && modal && backdrop.parentElement !== modal.parentElement) {
+              modal.parentElement.insertBefore(backdrop, modal);
+          }
+      }, 0);
     });
 
       jQuery(document).on(
@@ -2939,9 +2974,24 @@ banner.style.display = "none";
             var banner_delay = this.settings.auto_banner_initialize_delay;
             setTimeout(function () {
               $("#gdpr-popup").gdprmodal("show");
+               setTimeout(function () {
+                    const backdrop = document.querySelector(".gdprmodal-backdrop");
+                    const modal = document.querySelector("#gdpr-popup");
+                    if (backdrop && modal && backdrop.parentElement !== modal.parentElement) {
+                        modal.parentElement.insertBefore(backdrop, modal);
+                    }
+                }, 0);
             }, banner_delay);
           } else {
             $("#gdpr-popup").gdprmodal("show");
+            setTimeout(function () {
+              const backdrops = document.querySelectorAll(".gdprmodal-backdrop");
+              const backdrop = backdrops[backdrops.length - 1];
+              const modal = document.querySelector("#gdpr-popup");
+              if (backdrop && modal) {
+                  modal.parentElement.insertBefore(backdrop, modal);
+              }
+          }, 0);
           }
         }
       }
