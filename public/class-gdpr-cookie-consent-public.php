@@ -1542,11 +1542,12 @@ class Gdpr_Cookie_Consent_Public {
 		if($the_options['is_script_blocker_on'] && 'yes' === $viewed_cookie){
 			$header_scripts = isset($the_options['header_scripts']) ? "\r\n" . wp_unslash($the_options['header_scripts']) . "\r\n" : '';
 			$body_scripts = isset($the_options['body_scripts']) ? "\r\n" . wp_unslash($the_options['body_scripts']) . "\r\n" : '';
-			
+			$footer_scripts = isset($the_options['footer_scripts']) ? "\r\n" . wp_unslash($the_options['footer_scripts']) . "\r\n" : '';
 			// Return JSON response
 			wp_send_json_success([
 				'header_scripts' => $header_scripts,
 				'body_scripts'   => $body_scripts,
+				'footer_scripts' => $footer_scripts,
 			]);
 		}
 		else{
