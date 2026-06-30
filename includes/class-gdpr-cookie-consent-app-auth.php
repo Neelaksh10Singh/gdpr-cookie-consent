@@ -67,7 +67,6 @@ class GDPR_Cookie_Consent_App_Auth {
 			add_action( 'wp_ajax_gdpr_cookie_consent_app_delete_auth', array( $this, 'delete_app_auth' ) );
 			add_action( 'wp_ajax_wpl_cookie_scanner_view_capabilities', array( $this, 'wpl_cookie_scanner_view_capabilities' ) );
 			add_action( 'wp_ajax_gdpr_save_free_trial_data', array( $this, 'save_free_trial_data' ) );
-			add_action( 'wp_ajax_wplp_update_free_pan', array($this, 'wplp_update_free_pan'));
 		}
 	}
 
@@ -300,17 +299,6 @@ class GDPR_Cookie_Consent_App_Auth {
 		}
 	}
 
-	public function wplp_update_free_pan () {
-		check_ajax_referer( 'gdpr-cookie-consent', '_ajax_nonce' );
-
-		
-
-		wp_send_json_success(
-			array(
-				'url' => 'https://testingapp.wplegalpages.com/pricing',
-			)
-		);
-	}
 
 	/**
 	 * Get the full URL to an API endpoint by passing the path.

@@ -521,8 +521,6 @@ jQuery(document).ready(function () {
       window.location.href = pluginsPageURL;
       location.reload();
     }); 
-    $("#wplp_free_trial_upgrade_button").on("click", wplpFreeToProUpgrade);
-    $("#wplp_free_trial_upgrade_button_gdpr").on("click", wplpFreeToProUpgrade); 
   });
   // connection overlay in compliance settings.
   jQuery(document).ready(function () {
@@ -774,66 +772,6 @@ jQuery(document).ready(function () {
    * Store the Authentication Data
    * @param {*} data
    */
-
-  function wplpFreeToProUpgrade(){
-
-    var spinner = jQuery('<div class="gdpr-spinner"></div>');
-
-    // Append spinner to .gdpr-cookie-consent-connect-api-container div.
-
-    var container = jQuery(".gdpr-cookie-consent-connect-api-container");
-    container.css("position", "relative"); // Ensure container has relative positioning.
-    container.append(spinner);
-
-    
-    jQuery
-      .ajax({
-        url: gdpr_localize_data.ajaxurl,
-        type: "POST",
-        data: {
-          action: "wplp_update_free_pan",
-          _ajax_nonce: gdpr_localize_data._ajax_nonce,
-        },
-        beforeSend: function () {
-          // Show spinner before AJAX call starts
-          spinner.show();
-        },
-        complete: function () {
-          // Hide spinner after AJAX call completes
-          spinner.hide();
-        },
-      })
-      .done(function (response) {
-        // Get the width and height of the viewport
-        var viewportWidth = window.innerWidth;
-        var viewportHeight = window.innerHeight;
-
-        // Set the dimensions of the popup
-        var popupWidth = 1260;
-        var popupHeight = 740;
-
-        // Calculate the position to center the popup
-        var leftPosition = (viewportWidth - popupWidth) / 2;
-        var topPosition = (viewportHeight - popupHeight) / 2;
-        // Open the popup window at the calculated position
-        var e = window.open(
-          response.data.url,
-          "_blank",
-          "location=no,width=" +
-            popupWidth +
-            ",height=" +
-            popupHeight +
-            ",left=" +
-            leftPosition +
-            ",top=" +
-            topPosition +
-            ",scrollbars=0"
-        );
-        if (null == e) {
-          console.log("error while opening the popup window");
-        }
-      }); 
-  }
   function gdprPaidAuth(event) {
     // Prevent the default action of the event.
     event.preventDefault();

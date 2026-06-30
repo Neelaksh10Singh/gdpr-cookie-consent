@@ -425,7 +425,7 @@ $site_domain = wp_parse_url($site_url, PHP_URL_HOST);
 							        </svg>
 							    </button>
 							<?php else: ?>
-								<button id="wplp_free_trial_upgrade_button_gdpr" class="primary-button" >
+								<button id="wplp_free_trial_upgrade_button_gdpr" class="primary-button" onclick="window.open('https://app.wplegalpages.com/pricing/', '_blank', 'noopener,noreferrer')">
 									<span>Upgrade</span>
 									<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 										<path d="M17.5 2.5V1.5H18.5V2.5H17.5ZM9.87377 11.5404C9.48325 11.931 8.85008 11.931 8.45956 11.5404C8.06904 11.1499 8.06904 10.5168 8.45956 10.1262L9.16667 10.8333L9.87377 11.5404ZM17.5 9.16667H16.5V2.5H17.5H18.5V9.16667H17.5ZM17.5 2.5V3.5H10.8333V2.5V1.5H17.5V2.5ZM17.5 2.5L18.2071 3.20711L9.87377 11.5404L9.16667 10.8333L8.45956 10.1262L16.7929 1.79289L17.5 2.5Z" fill="white"/>
