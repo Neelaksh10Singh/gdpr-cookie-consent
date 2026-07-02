@@ -1238,7 +1238,8 @@ class Gdpr_Cookie_Consent_Public {
 			$currentid                     = get_current_blog_id();
 			$the_options['select_sites']   = is_array( $the_options['select_sites'] ) ? $the_options['select_sites'] : array();
 			$the_options['select_sites'][] = $currentid;
-
+			$abTesting = $ab_options['ab_testing_enabled'] === true || $ab_options['ab_testing_enabled'] === 'true';
+	
 			$color = $abTesting
 				? $the_options['cookie_bar_color' . $chosenBanner]
 				: $the_options['background'];
