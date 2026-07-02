@@ -8128,6 +8128,18 @@ class Gdpr_Cookie_Consent_Admin {
 	 * Function to save the scan schedule
 	 */
 	public function gdpr_cookie_consent_ajax_save_schedule_scan() {
+		// Verify Nonce.
+		if ( ! check_ajax_referer( 'wpl_save_script_nonce', '_wpnonce', false ) ) {
+			wp_send_json_error(
+				array( 'message' => 'Security Check Failed, Unauthorized access' ),
+				403
+			);
+		}
+
+		// Capability check
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'Forbidden', 403 );
+		}
 		$schedule_data = array(
 			'schedule_scan_as' => sanitize_text_field($_POST['schedule_scan_as']),
 			'schedule_scan_date' => sanitize_text_field($_POST['schedule_scan_date']),
