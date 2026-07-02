@@ -3142,7 +3142,6 @@ banner.style.display = "none";
                 if (c_cookie["name"] === "consent_version") {
                   continue; // Skip the consent_version cookie as it is Unclassified
                 }
-                console.log("new here; ", c_cookie["name"]);
                 GDPR_Cookie.erase(c_cookie["name"]);
               }
             }
