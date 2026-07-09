@@ -11573,6 +11573,7 @@ public function gdpr_support_request_handler() {
 				'is_iabtcf_on'                             => $this->convert_boolean( $the_options['is_iabtcf_on'] ),
 				'is_gacm_on'                               => $this->convert_boolean( $the_options['is_gacm_on'] ),
 				'is_gcm_on'                                => $this->convert_boolean( $the_options['is_gcm_on'] ),
+				'gtm_id'								   => $the_options['gtm_id'],
 				'gcm_defaults'                             => $the_options['gcm_defaults'],
 				'gcm_wait_for_update_duration'             => absint( $the_options['gcm_wait_for_update_duration'] ),
 				'is_gcm_url_passthrough'                   => $this->convert_boolean( $the_options['is_gcm_url_passthrough'] ),
