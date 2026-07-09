@@ -10903,8 +10903,14 @@ public function gdpr_support_request_handler() {
 		
 		global $wcam_lib_gdpr;
 
-		$data        = $payload['response'];
-		$no_of_scans = $payload['no_of_scans'] ?? '';
+		$data        	= $payload['response'];
+		$no_of_scans 	= $payload['no_of_scans'] ?? '';
+		$is_free_trial 	= $payload['is_free_trial'] ?? 0;
+
+
+		if ( $is_free_trial === 0 || $is_free_trial === '0' || $is_free_trial === false || $is_free_trial === 'false' ) {
+			delete_option( 'wplp_free_trial_data' );
+		}
 
 		if ( $no_of_scans !== '' ) {
 			update_option( 'gdpr_no_of_page_scan', $no_of_scans );
