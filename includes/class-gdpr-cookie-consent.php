@@ -303,6 +303,7 @@ class Gdpr_Cookie_Consent {
 		 * Load public modules.
 		 */
 		$plugin_public->public_modules();
+		//$is_bb_editing = isset( $_GET['fl_builder'] ) || isset( $_GET['fl_builder_ui'] );
 		if ( self::is_request( 'frontend' ) ) {
 			$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 			$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );

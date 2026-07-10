@@ -58,6 +58,10 @@ GDPR_CCPA_COOKIE_EXPIRE =
    * practising this, we should strive to set a better example in our own work.
    */
 
+  // Check if the current window is not the top-level window  -- if the banner is loaded in iframe then don't show the banner - for editing page
+    if ( window.self !== window.top ) {
+          return;
+    }
   var GDPR_Cookie = {
     set: function (name, value, days) {
       var expires = "";
