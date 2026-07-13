@@ -9348,7 +9348,6 @@ class Gdpr_Cookie_Consent_Admin {
 			$site_origin = site_url();
 
 			$app_origin = rtrim(GDPR_APP_URL, '/');
-			$app_origin = "http://localhost:5173";
 			$allowed_origins = [
 				$app_origin,
 				$site_origin,
@@ -9464,7 +9463,6 @@ class Gdpr_Cookie_Consent_Admin {
 	}
 
 	public function permission_callback_for_react_app(WP_REST_Request $request) {
-		return true;
 		$this->settings = new GDPR_Cookie_Consent_Settings();
 
 		$master_key = $this->settings->get('api','token');		
