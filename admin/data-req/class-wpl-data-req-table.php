@@ -266,7 +266,7 @@ class WPL_Data_Req_Table extends WP_List_Table {
 		if ( ! current_user_can( 'manage_options' ) ) {
 		    wp_die( 'Unauthorized request.' );
 		}
-
+		check_admin_referer( 'bulk-' . $this->_args['plural'] );
 		$ids = isset( $_GET['user_id'] ) ? $_GET['user_id'] : false;
 		$action = $this->current_action();
 		if ( ! $action ) {
