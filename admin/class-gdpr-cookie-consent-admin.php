@@ -4963,11 +4963,11 @@ class Gdpr_Cookie_Consent_Admin {
 	}
 
 
-	public function add_every_minute_cron_schedule( $schedules ) {
-        if ( ! isset( $schedules['every_minute'] ) ) {
-            $schedules['every_minute'] = array(
-                'interval' => 60,
-                'display'  => __( 'Every Minute','gdpr-cookie-consent' ),
+	public function add_scan_cron_schedule( $schedules ) {
+        if ( ! isset( $schedules['every_15_seconds'] ) ) {
+            $schedules['every_15_seconds'] = array(
+                'interval' => 15,
+                'display'  => __( 'Every 15 Seconds','gdpr-cookie-consent' ),
             );
         }
         return $schedules;
