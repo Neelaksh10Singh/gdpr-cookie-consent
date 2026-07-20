@@ -2776,6 +2776,7 @@ input[type="search"]:focus {
   margin: 0 auto;
 }
 .gdpr_messagebar_content_preview.banner-msg-content-preview, .gdpr_messagebar_content_preview.popup-msg-content-preview {
+.gdpr_messagebar_content_preview.banner-msg-content-preview, .gdpr_messagebar_content_preview.popup-msg-content-preview {
   padding: 1.5rem;
 }
 .gdpr_messagebar_content_preview .gdpr_preview {
@@ -3123,6 +3124,15 @@ input[type="search"]:focus {
 }
 /* Banner Dark */
 /* For Banner */
+.banner-dark_preview #cookie_action_reject_preview {
+  float: right !important;
+}
+.widget-dark_preview #cookie_action_reject_preview {
+  float: right !important;
+}
+.popup-dark_preview #cookie_action_reject_preview {
+  float: right !important;
+}
 .banner-dark_preview {
   box-shadow: rgb(38, 38, 38) 0px 0px 8px !important;
 }
@@ -9366,6 +9376,7 @@ input.vs__search {
   font-size: 12px !important;
 }
 .ab-testing-results .vertical-line {
+  height: 350px;
   border-left: 1px solid rgb(221, 221, 221);
   width: 0;
 }
@@ -9399,6 +9410,10 @@ input.vs__search {
   background: white;
   border-radius: 6px;
   padding: 7px 15px;
+}
+.ab-banner-set-default:hover{
+  border: 1px solid #6686ad;
+  color: #6686ad;
 }
 .ab-banner {
   padding: 1px;
