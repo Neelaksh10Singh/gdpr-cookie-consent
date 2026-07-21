@@ -204,16 +204,16 @@ Yes. The plugin is translation-ready and works with popular multilingual plugins
 == Screenshots ==
 
 1. Dashboard
-2. Wizard Section1
-3. Wizard Section2
+2. All sites
+3. Cookie Insights
 4. Cookie Setting
-5. Banner buttons Customization
-6. Create Custom Cookie
+5. Google Consent Mode
+6. Script Blocker
 7. Cookie Scanning and Discovered Cookies
-8. Scan History
-9. Script Blocker
-10.A-B testing
-11.Consent Log table
+8. Cookie Banner Settings
+9. Banner Configurator
+10. Banner Builder Tool
+11. Consent Log table
 
 == Change Log ==
 
