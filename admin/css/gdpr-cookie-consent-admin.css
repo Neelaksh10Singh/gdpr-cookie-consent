@@ -9771,6 +9771,7 @@ div#gdpr-scan-history {
 
 #gdpr-cookie-consent-settings-app .notice-container  .notice-content-body .notice-buttons-wrapper {
   display: flex;
+  align-items: center;
 }
 #gdpr-cookie-consent-settings-app .notice-container .notice-content-body .notice-buttons-wrapper a{
   display: flex;

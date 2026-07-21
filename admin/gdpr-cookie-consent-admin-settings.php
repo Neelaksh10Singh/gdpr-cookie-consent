@@ -313,7 +313,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 			'padding-inline': show_cookie_as == 'banner' ? this[`cookie_bar_horizontal_padding${active_test_banner_tab}`] + 'px' : undefined,
 			'padding-block': show_cookie_as == 'banner' ? this[`cookie_bar_vertical_padding${active_test_banner_tab}`] + 'px' : undefined,
 			'gap': this[`cookie_bar_spacing${active_test_banner_tab}`] + 'px',
-			'backdrop-filter': cookie_bar_blur > 0 ? `blur(${this[`cookie_bar_blur${active_test_banner_tab}`]}px)` : undefined,
+			'backdrop-filter': cookie_bar_blur > 0 ? `blur(${this[`cookie_bar_blur${active_test_banner_tab}`] * 20}px)` : undefined,
 			'box-shadow': `${this[`cookie_bar_shadow_size${active_test_banner_tab}`]}px ${this[`cookie_bar_shadow_size${active_test_banner_tab}`]}px ${this[`cookie_bar_shadow_size${active_test_banner_tab}`]*2}px ${this[`cookie_bar_shadow_color${active_test_banner_tab}`]}${Math.floor(0.5 * 255).toString(16).toUpperCase()}`
 		  }"
 		>
@@ -388,7 +388,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 							<span :style="{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_lgpd" v-html ="lgpd_message"></span>
 							<span :style="{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_ccpa && gdpr_policy !== 'both'" v-html ="ccpa_message"></span>
 							<span :style="{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_eprivacy" v-html ="eprivacy_message"></span>
-							<a v-if="this[`button_readmore_is_on${active_test_banner_tab}`]" :style="{ 
+							<a v-if="this[`button_readmore_is_on${active_test_banner_tab}`] && (!is_ccpa || gdpr_policy === 'both')" :style="{ 
 								'font-family': this[`cookie_font${active_test_banner_tab}`],
 								'color':this[`button_readmore_link_color${active_test_banner_tab}`],
 								'cursor':'pointer',
@@ -442,7 +442,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 				'padding-inline': show_cookie_as == 'banner' ? cookie_bar_horizontal_padding + 'px' : undefined,
 				'padding-block': show_cookie_as == 'banner' ? cookie_bar_vertical_padding + 'px' : undefined,
 				'gap': cookie_bar_spacing + 'px',
-				'backdrop-filter': cookie_bar_blur > 0 ? `blur(${cookie_bar_blur}px)` : undefined,
+				'backdrop-filter': cookie_bar_blur > 0 ? `blur(${cookie_bar_blur * 20}px)` : undefined,
 				'box-shadow': `${cookie_bar_shadow_size}px ${cookie_bar_shadow_size}px ${cookie_bar_shadow_size*2}px ${cookie_bar_shadow_color}${Math.floor(0.5 * 255).toString(16).toUpperCase()}`
 			}"
 		>
@@ -497,7 +497,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 						<span :style="{'font-family': cookie_font}" v-show="is_lgpd" v-html ="lgpd_message"></span>
 						<span :style="{'font-family': cookie_font}" v-show="is_ccpa && gdpr_policy !== 'both'" v-html ="ccpa_message"></span>
 						<span :style="{'font-family': cookie_font}" v-show="is_eprivacy" v-html ="eprivacy_message"></span>
-						<a v-if="button_readmore_is_on" :style="{ 
+						<a v-if="button_readmore_is_on && (!is_ccpa || gdpr_policy === 'both')" :style="{ 
 							'font-family': cookie_font,
 							'color':button_readmore_link_color,
 							'cursor':'pointer',

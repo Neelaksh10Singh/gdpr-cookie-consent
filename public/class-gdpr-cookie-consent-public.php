@@ -934,7 +934,7 @@ class Gdpr_Cookie_Consent_Public {
 					if ( $cookie['category_id'] === $category['id_gdpr_cookie_category'] ) {
 						++$total;
 						$temp[]                = $cookie;
-						$cookie['description'] = str_replace( '"', '\"', $cookie['description'] );
+						$cookie['description'] = str_replace('"', '\"', $cookie['description'] ?? '');
 						$json_temp[]           = $cookie;
 					}
 				}

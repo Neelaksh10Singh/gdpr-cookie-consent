@@ -71,7 +71,10 @@ if ( ! defined( 'ABSPATH' ) ) {
           : `${cookie_bar_border_radius}px`,
 			'border-color': ab_testing_enabled 
           ? this[`cookie_border_color${active_test_banner_tab}`] 
-          : cookie_border_color
+          : cookie_border_color,
+         'backdrop-filter': cookie_bar_blur > 0 
+          ? `blur(${cookie_bar_blur * 20}px)` 
+          : undefined,
          }">
             <div class="gdprmodal-header">
                <span  type="button" class="cookie-settings-popup-close-ccpa" data-dismiss="gdprmodal" data-gdpr_action="close" :style="{ 'border': 'none', 'display':'inline-flex','justify-content': 'center', 'align-items': 'center', 'height':'20px', 'width': '20px', 'position': 'absolute', 'top': ab_testing_enabled ? (parseInt(this[`cookie_bar_border_radius${active_test_banner_tab}`])/3 + 10) + 'px' : (parseInt(cookie_bar_border_radius)/3 + 10) + 'px' , 'right': ab_testing_enabled ? (parseInt(this[`cookie_bar_border_radius${active_test_banner_tab}`])/3 + 10) + 'px' : (parseInt(cookie_bar_border_radius)/3 + 10) + 'px' , 'border-radius': '50%', 'color': cookieSettingsPopupAccentColor, 'background-color': 'transparent' }">
@@ -155,7 +158,10 @@ if ( ! defined( 'ABSPATH' ) ) {
           : `${cookie_bar_border_radius}px`,
 			'border-color': ab_testing_enabled 
           ? this[`cookie_border_color${active_test_banner_tab}`] 
-          : cookie_border_color
+          : cookie_border_color,
+         'backdrop-filter': cookie_bar_blur > 0 
+          ? `blur(${cookie_bar_blur * 20}px)` 
+          : undefined,
          }">
 			<div class="gdprmodal-header">
             <span  type="button" class="cookie-settings-popup-close" data-dismiss="gdprmodal" data-gdpr_action="close" :style="{ 'border': 'none', 'display':'inline-flex','justify-content': 'center', 'align-items': 'center', 'height':'20px', 'width': '20px', 'position': 'absolute', 'top': ab_testing_enabled ? (parseInt(this[`cookie_bar_border_radius${active_test_banner_tab}`])/3 + 10) + 'px' : (parseInt(cookie_bar_border_radius)/3 + 10) + 'px' , 'right': ab_testing_enabled ? (parseInt(this[`cookie_bar_border_radius${active_test_banner_tab}`])/3 + 10) + 'px' : (parseInt(cookie_bar_border_radius)/3 + 10) + 'px' , 'border-radius': '50%', 'color': cookieSettingsPopupAccentColor, 'background-color': 'transparent' }">
