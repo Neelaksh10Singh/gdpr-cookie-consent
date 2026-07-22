@@ -3,17 +3,19 @@ Contributors: wplegalpages
 Donate link: https://wplegalpages.com/
 Tags: cookie consent, cookie banner, consent management, cookie scanner, script blocking
 Requires at least: 3.3.1
-Tested up to: 6.9.4
+Tested up to: 7.0.2
 Stable tag: 4.3.7
 Requires PHP: 7.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
+Trusted by 30,000+ WordPress sites · IAB Europe TCF v2.3 Registered · Google Certified CMP Partner · Setup in under 5 minutes, no coding required · No traffic caps or visitor-based pricing.
+
 == Description ==
 
 Trusted by 30,000+ WordPress sites · IAB Europe TCF v2.3 Registered · Google Certified CMP Partner · Setup in under 5 minutes, no coding required · No traffic caps or visitor-based pricing.
 
-[WPLP Cookie Consent](https://wplegalpages.com/?utm_source=wordpress.org&utm_medium=wpcookieconsentplugin&utm_campaign=readme) is a free WordPress cookie consent plugin that adds a customizable cookie banner, blocks third-party scripts until visitors consent, and keeps your cookie disclosures accurate with a built-in cookie scanner. Help meet GDPR, CCPA/CPRA, ePrivacy, UK GDPR, LGPD, POPIA, PIPEDA and other global privacy law requirements - with consent records stored on your own site, not a third-party dashboard.
+[WPLP Cookie Consent](https://wplegalpages.com/cookie-consent/?utm_source=+wordpress.org&utm_medium=referral+&utm_campaign=wpcookieconsent) is a free WordPress cookie consent plugin that adds a customizable cookie banner, blocks third-party scripts until visitors consent, and keeps your cookie disclosures accurate with a built-in cookie scanner. Help meet GDPR, CCPA/CPRA, ePrivacy, UK GDPR, LGPD, POPIA, PIPEDA and other global privacy law requirements - with consent records stored on your own site, not a third-party dashboard.
 
 WPLP Cookie Consent is the core consent management module of the [WPLP Compliance Platform](https://wplegalpages.com/?utm_source=+wordpress.org&utm_medium=referral+&utm_campaign=wpcookieconsent), the same platform that also powers WPLP's legal policy generators. Cookie consent and legal documentation are built on one connected system, so your cookie banner, cookie scan results, and cookie policy page all stay in sync instead of living in separate, disconnected tools.
 
@@ -45,7 +47,33 @@ Most cookie consent platforms are hosted SaaS tools that charge by pageviews or 
 
 You get real compliance tooling - cookie scanning, script blocking, and consent logging in the free plugin, with no per-visitor pricing and no third-party dashboard to depend on.
 
-== Customizable Cookie Consent Banner ==
+== ✅ Why Choose WPLP Cookie Consent ==
+
+- [Built-in cookie scanner](https://wplegalpages.com/cookie-consent/?utm_source=+wordpress.org&utm_medium=referral+&utm_campaign=wpcookieconsent) – automatically detects cookies and third-party scripts running on your site, no manual auditing required
+
+- Automatic script & content blocking – stops Google Analytics, Meta/Facebook Pixel, Google Ads, Microsoft Clarity, TikTok Pixel, LinkedIn Insight Tag, and social embeds from loading until a visitor consents
+
+- [Google Consent Mode v2](https://wplegalpages.com/cookie-consent/wplp-compliance-platform-supports-google-consent-mode/?utm_source=+wordpress.org&utm_medium=referral+&utm_campaign=wpcookieconsent) – keep Google Ads and Analytics working correctly while respecting visitor consent signals
+
+- Consent logging – stores consent status, category, and timestamp for audit-ready records, kept on your own WordPress database
+
+- Drag & drop banner builder – match your brand with custom colors, layouts, fonts, and button text, no CSS required
+
+- Free tier includes real compliance tools – cookie scanning and script blocking aren't locked behind a paywall
+
+- No visitor-based limits – no traffic caps, pageview limits, or per-visitor pricing
+
+- WP Consent API support – shares visitor consent state with compatible WordPress plugins
+
+== ⚖️ Why Choose WPLP Cookie Consent Over a SaaS CMP ==
+
+Most cookie consent platforms are hosted SaaS tools that charge by pageviews or monthly visitors and keep your consent records on their servers. WPLP Cookie Consent works differently: it runs entirely inside WordPress, stores every consent record in your own database, and never caps how much traffic your site gets.
+
+You get real compliance tooling - cookie scanning, script blocking, and consent logging in the free plugin, with no per-visitor pricing and no third-party dashboard to depend on.
+
+== 📄 Features ==
+
+= Customizable Cookie Consent Banner =
 
 Configure a cookie banner that matches your site's design and your specific consent requirements:
 
@@ -65,7 +93,7 @@ Configure a cookie banner that matches your site's design and your specific cons
 
 - CCPA / CPRA "Do Not Sell or Share My Personal Information" opt-out link for California visitors
 
-== Cookie Scanning and Detection ==
+= Cookie Scanning and Detection =
 
 A built-in cookie scanner automatically detects cookies and third-party services running on your website, so your disclosures stay accurate as your site evolves. The scanner helps you:
 
@@ -77,7 +105,7 @@ A built-in cookie scanner automatically detects cookies and third-party services
 
 - Scan results feed directly into your cookie policy and consent configuration, so what you disclose always reflects what's actually running on your site.
 
-== Automatic Script and Content Blocking ==
+= Automatic Script and Content Blocking =
 
 The plugin prevents non-essential third-party scripts from loading until a visitor gives consent, covering:
 
@@ -89,7 +117,7 @@ The plugin prevents non-essential third-party scripts from loading until a visit
 
 Script blocking works whether scripts are added directly, through another plugin, or via a tag manager. Google Consent Mode v2 is supported out of the box, so Google services can adjust their behavior automatically based on visitor consent signals.
 
-== Premium Features ==
+== ⭐ Premium Features ==
 
 Unlock advanced consent management by upgrading to a WPLP premium plan:
 
@@ -105,7 +133,7 @@ Unlock advanced consent management by upgrading to a WPLP premium plan:
 
 - Priority premium support
 
-== Free vs Premium ==
+== 🆓 Free vs Premium ==
 
 Everything you need to run compliant cookie consent is in the free plugin, there is no locked-down "lite" experience.
 
@@ -113,7 +141,7 @@ Free plugin includes: customizable cookie banner, built-in cookie scanner, autom
 
 Premium adds: geo-targeted regional banners, IAB TCF v2.3 framework, A/B testing for banners, and priority support.
 
-== Supported Privacy Laws & Regulations ==
+== 🛡️ Supported Privacy Laws & Regulations ==
 
 WPLP Cookie Consent helps you build a cookie consent workflow aligned with major privacy laws around the world, including:
 
@@ -131,7 +159,7 @@ WPLP Cookie Consent helps you build a cookie consent workflow aligned with major
 
 Laws and requirements vary by jurisdiction and change over time. Consult a legal professional to confirm what applies to your website.
 
-== Who Uses WPLP Cookie Consent ==
+== 👥 Who Uses WPLP Cookie Consent ==
 
 - Bloggers & publishers: running Google Analytics, AdSense, or affiliate tracking
 
@@ -145,7 +173,7 @@ Laws and requirements vary by jurisdiction and change over time. Consult a legal
 
 - Multilingual & global sites: needing region-specific banners and translated consent text
 
-== Setup and Compatibility ==
+== ⚙️ Setup and Compatibility ==
 
 - Guided setup wizard for fast configuration
 
@@ -157,7 +185,7 @@ Laws and requirements vary by jurisdiction and change over time. Consult a legal
 
 - Translation-ready and compatible with popular multilingual plugins (WPML, Polylang)
 
-== Documentation & Support ==
+== 📚 Documentation & Support ==
 
 Need help getting started? Our documentation covers everything from setup to troubleshooting.
 
@@ -169,7 +197,7 @@ Need help getting started? Our documentation covers everything from setup to tro
 
 - [FAQs](https://wplegalpages.com/docs/wplp-docs/troubleshooting-and-support/faqs/?utm_source=+wordpress.org&utm_medium=referral+&utm_campaign=wpcookieconsent): Find answers to frequently asked questions and troubleshooting tips.
 
-For questions related to features or compatibility, you can [contact the WPLP Legal Pages support team](https://wplegalpages.com/contact-us/?utm_source=wordpress.org&utm_medium=wpcookieconsentplugin&utm_campaign=readme).
+For questions related to features or compatibility, you can [contact the WPLP Legal Pages support team](https://wplegalpages.com/contact-us/?utm_source=+wordpress.org&utm_medium=referral+&utm_campaign=wpcookieconsent).
 
 == Frequently Asked Questions ==
 
@@ -200,16 +228,16 @@ Yes. The plugin is translation-ready and works with popular multilingual plugins
 == Screenshots ==
 
 1. Dashboard
-2. Wizard Section1
-3. Wizard Section2
+2. All sites
+3. Cookie Insights
 4. Cookie Setting
-5. Banner buttons Customization
-6. Create Custom Cookie
+5. Google Consent Mode
+6. Script Blocker
 7. Cookie Scanning and Discovered Cookies
-8. Scan History
-9. Script Blocker
-10.A-B testing
-11.Consent Log table
+8. Cookie Banner Settings
+9. Banner Configurator
+10. Banner Builder Tool
+11. Consent Log table
 
 == Change Log ==
 
