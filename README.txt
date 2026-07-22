@@ -221,7 +221,7 @@ Yes. The plugin is translation-ready and works with popular multilingual plugins
 * **Improvements**
     * Improved cookie scanning reliability for better detection and scan completion.
 * **Bug Fixes**
-    * Fixed a security vulnerability reported by Wordfence.
+    * Strengthened the codebase
     * Fixed an issue where the cookie banner remained visible while editing pages with Beaver Builder.
     * Fixed the script execution order after Accept All consent to ensure scripts load correctly.
     * Fixed an issue where the Cookie Banner logo was not displayed correctly.
@@ -890,7 +890,7 @@ Yes. The plugin is translation-ready and works with popular multilingual plugins
 * **Improvements**
     * Improved cookie scanning reliability for better detection and scan completion.
 * **Bug Fixes**
-    * Fixed a security vulnerability reported by Wordfence.
+    * Strengthened the codebase
     * Fixed an issue where the cookie banner remained visible while editing pages with Beaver Builder.
     * Fixed the script execution order after Accept All consent to ensure scripts load correctly.
     * Fixed an issue where the Cookie Banner logo was not displayed correctly.
