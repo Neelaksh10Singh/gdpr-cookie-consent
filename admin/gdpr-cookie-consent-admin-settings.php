@@ -2438,10 +2438,10 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 							</c-modal></div>
 							<!-- Confirm button -->
 							<c-row v-show="is_ccpa">
-								<c-col class="col-sm-32"><div id="gdpr-cookie-consent-settings-cookie-notice"><?php esc_html_e( 'Confirm Button', 'gdpr-cookie-consent' ); ?></div></c-col>
+								<c-col class="col-sm-32"><div id="gdpr-cookie-consent-settings-cookie-notice"><?php esc_html_e( 'Save Preferences Button', 'gdpr-cookie-consent' ); ?></div></c-col>
 							</c-row>
 							<c-row v-show="is_ccpa">
-								<c-col class="col-sm-8"><label><?php esc_attr_e( 'Confirm Button Settings', 'gdpr-cookie-consent' ); ?></label></c-col>
+								<c-col class="col-sm-8"><label><?php esc_attr_e( 'Save Preferences Button Settings', 'gdpr-cookie-consent' ); ?></label></c-col>
 								<c-col class="col-sm-4" v-show="is_ccpa">
 									<c-button class="gdpr-configure-button" @click="confirm_button_popup=true">
 										<span>
@@ -2459,7 +2459,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 									:centered="centered"
 								>
 								<div class="optout-settings-tittle-bar">
-									<div class="optout-setting-tittle"><?php esc_attr_e( 'Confirm Button', 'gdpr-cookie-consent' ); ?></div>
+									<div class="optout-setting-tittle"><?php esc_attr_e( 'Save Preferences Button', 'gdpr-cookie-consent' ); ?></div>
 									<img  @click="confirm_button_popup=false" class="add-new-entry-img" src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL ) . 'admin/images/cancel.svg'; ?>" alt="Add new entry logo">
 								</div>
 								<div class="optout-settings-main-container">
@@ -3818,10 +3818,10 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 										</c-row>
 
 									<c-card  v-show="is_ccpa">
-								<c-card-header class="gdpr-cookie-consent-design-subheading"><?php esc_html_e( 'Confirm Button', 'gdpr-cookie-consent' ); ?></c-card-header>
+								<c-card-header class="gdpr-cookie-consent-design-subheading"><?php esc_html_e( 'Save Prefernces Button', 'gdpr-cookie-consent' ); ?></c-card-header>
 								<c-card-body>
 									<c-row>
-										<c-col class="col-sm-4"><label><?php esc_attr_e( 'Confirm Button Settings', 'gdpr-cookie-consent' ); ?></label></c-col>
+										<c-col class="col-sm-4"><label><?php esc_attr_e( 'Save Prefernces Button Settings', 'gdpr-cookie-consent' ); ?></label></c-col>
 										<c-col class="col-sm-8">
 											<c-button class="gdpr-configure-button" @click="confirm_button_popup=true">
 												<span>
@@ -3833,14 +3833,14 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 									</c-row>
 									<div class="opt-out-link-container">
 									<c-modal
-										title="Confirm Button"
+										title="Save Prefernces Button"
 										:show.sync="confirm_button_popup"
 										size="lg"
 										:close-on-backdrop="closeOnBackdrop"
 										:centered="centered"
 									>
 									<div class="optout-settings-tittle-bar">
-											<div class="optout-setting-tittle"><?php esc_attr_e( 'Confirm Button', 'gdpr-cookie-consent' ); ?></div>
+											<div class="optout-setting-tittle"><?php esc_attr_e( 'Save Prefernces Button', 'gdpr-cookie-consent' ); ?></div>
 											<img @click="confirm_button_popup=false" class="add-new-entry-img" src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL ) . 'admin/images/cancel.svg'; ?>" alt="Add new entry logo">
 											</div>
 										<c-row class="gdpr-label-row">
@@ -5090,10 +5090,10 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 						</c-card-body>
 					</c-card>
 					<c-card  v-show="is_ccpa">
-						<c-card-header class="gdpr-cookie-consent-design-subheading"><?php esc_html_e( 'Confirm Button', 'gdpr-cookie-consent' ); ?></c-card-header>
+						<c-card-header class="gdpr-cookie-consent-design-subheading"><?php esc_html_e( 'Save Prefernces Button', 'gdpr-cookie-consent' ); ?></c-card-header>
 						<c-card-body>
 							<c-row>
-								<c-col class="col-sm-4"><label><?php esc_attr_e( 'Confirm Button Settings', 'gdpr-cookie-consent' ); ?></label></c-col>
+								<c-col class="col-sm-4"><label><?php esc_attr_e( 'Save Prefernces Button Settings', 'gdpr-cookie-consent' ); ?></label></c-col>
 								<c-col class="col-sm-8">
 									<c-button class="gdpr-configure-button" @click="confirm_button_popup1=true">
 										<span>
@@ -5105,14 +5105,14 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 							</c-row>
 							<div class="opt-out-link-container">
 							<c-modal
-								title="Confirm Button"
+								title="Save Prefernces Button"
 								:show.sync="confirm_button_popup1"
 								size="lg"
 								:close-on-backdrop="closeOnBackdrop"
 								:centered="centered"
 							>
 							<div class="optout-settings-tittle-bar">
-									<div class="optout-setting-tittle"><?php esc_attr_e( 'Confirm Button', 'gdpr-cookie-consent' ); ?></div>
+									<div class="optout-setting-tittle"><?php esc_attr_e( 'Save Prefernces Button', 'gdpr-cookie-consent' ); ?></div>
 									<img @click="confirm_button_popup1=false" class="add-new-entry-img" src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL ) . 'admin/images/cancel.svg'; ?>" alt="Add new entry logo">
 									</div>
 								<c-row class="gdpr-label-row">
@@ -6381,10 +6381,10 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 						</c-card-body>
 					</c-card>
 					<c-card  v-show="is_ccpa">
-						<c-card-header class="gdpr-cookie-consent-design-subheading"><?php esc_html_e( 'Confirm Button', 'gdpr-cookie-consent' ); ?></c-card-header>
+						<c-card-header class="gdpr-cookie-consent-design-subheading"><?php esc_html_e( 'Save Prefernces Button', 'gdpr-cookie-consent' ); ?></c-card-header>
 						<c-card-body>
 							<c-row>
-								<c-col class="col-sm-4"><label><?php esc_attr_e( 'Confirm Button Settings', 'gdpr-cookie-consent' ); ?></label></c-col>
+								<c-col class="col-sm-4"><label><?php esc_attr_e( 'Save Prefernces Button Settings', 'gdpr-cookie-consent' ); ?></label></c-col>
 								<c-col class="col-sm-8">
 									<c-button class="gdpr-configure-button" @click="confirm_button_popup2=true">
 										<span>
@@ -6396,14 +6396,14 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 							</c-row>
 							<div class="opt-out-link-container">
 							<c-modal
-								title="Confirm Button"
+								title="Save Prefernces Button"
 								:show.sync="confirm_button_popup2"
 								size="lg"
 								:close-on-backdrop="closeOnBackdrop"
 								:centered="centered"
 							>
 							<div class="optout-settings-tittle-bar">
-									<div class="optout-setting-tittle"><?php esc_attr_e( 'Confirm Button', 'gdpr-cookie-consent' ); ?></div>
+									<div class="optout-setting-tittle"><?php esc_attr_e( 'Save Prefernces Button', 'gdpr-cookie-consent' ); ?></div>
 									<img @click="confirm_button_popup2=false" class="add-new-entry-img" src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL ) . 'admin/images/cancel.svg'; ?>" alt="Add new entry logo">
 									</div>
 								<c-row class="gdpr-label-row">
