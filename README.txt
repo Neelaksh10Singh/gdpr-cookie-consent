@@ -4,7 +4,7 @@ Donate link: https://wplegalpages.com/
 Tags: cookie consent, cookie banner, consent management, cookie scanner, script blocking
 Requires at least: 3.3.1
 Tested up to: 7.0.2
-Stable tag: 4.3.7
+Stable tag: 4.3.8
 Requires PHP: 7.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -217,6 +217,14 @@ Yes. The plugin is translation-ready and works with popular multilingual plugins
 
 == Change Log ==
 
+= 4.3.8 =
+* **Improvements**
+    * Improved cookie scanning reliability for better detection and scan completion.
+* **Bug Fixes**
+    * Strengthened the codebase
+    * Fixed an issue where the cookie banner remained visible while editing pages with Beaver Builder.
+    * Fixed the script execution order after Accept All consent to ensure scripts load correctly.
+    * Fixed an issue where the Cookie Banner logo was not displayed correctly.
 
 = 4.3.7 =
 * **New**
@@ -877,6 +885,16 @@ Yes. The plugin is translation-ready and works with popular multilingual plugins
 * Initial version
 
 == Upgrade Notice ==
+
+= 4.3.8 =
+* **Improvements**
+    * Improved cookie scanning reliability for better detection and scan completion.
+* **Bug Fixes**
+    * Strengthened the codebase
+    * Fixed an issue where the cookie banner remained visible while editing pages with Beaver Builder.
+    * Fixed the script execution order after Accept All consent to ensure scripts load correctly.
+    * Fixed an issue where the Cookie Banner logo was not displayed correctly.
+
 
 = 4.3.7 =
 * **New**
