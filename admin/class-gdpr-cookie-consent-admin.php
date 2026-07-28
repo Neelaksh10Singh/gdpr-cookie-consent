@@ -5937,6 +5937,28 @@ class Gdpr_Cookie_Consent_Admin {
 	}
 
 	/**
+	 * Ajax callback for eabling cookie banner.
+	 */
+	public function gdpr_enable_banner() {
+		check_ajax_referer( 'gdpr_enable_banner_nonce', '_wpnonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error();
+		}
+		$the_options = Gdpr_Cookie_Consent::gdpr_get_settings();
+		if ( ! filter_var( $the_options['is_on'], FILTER_VALIDATE_BOOLEAN ) ) {
+			$this->gdpr_send_shared_usage_data(
+				'GCC Banner Status',
+				array(
+					'Status' => 'Cookie Banner Turned On',
+				)
+			);
+		}
+		$the_options['is_on'] = 'true';
+		update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
+		wp_send_json_success();
+	}
+	
+	/**
 	 * Ajax callback to save advanced settings.
 	 */
 	public function gdpr_cookie_consent_ajax_save_advanced_settings() {
@@ -7627,6 +7649,7 @@ class Gdpr_Cookie_Consent_Admin {
 				'is_iabtcf_on'               => $the_options['is_iabtcf_on'],
 				'cookie_bar_as'			     => $the_options['cookie_bar_as'],
 				'button_settings_as_popup'	 =>$the_options['button_settings_as_popup'],
+				'enable_banner_nonce'        => wp_create_nonce( 'gdpr_enable_banner_nonce'),
 			)
 		);
 		?>
