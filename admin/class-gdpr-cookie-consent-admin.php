@@ -4957,6 +4957,14 @@ class Gdpr_Cookie_Consent_Admin {
 	 * Ajax callback for gcm region form.
 	 */
 	public function gdpr_cookie_consent_ajax_save_gcm_region(){
+		
+		if ( ! check_ajax_referer( 'wpl_save_script_nonce', '_wpnonce', false ) ) {
+			wp_send_json_error( 'Invalid nonce', 403 );
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'Unauthorized', 403 );
+		}
+
 		$the_options    = Gdpr_Cookie_Consent::gdpr_get_settings();
 		$the_options['gcm_defaults'] = json_encode(json_decode(stripslashes($_POST['regionArray'])));
 		update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
