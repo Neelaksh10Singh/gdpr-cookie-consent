@@ -4409,7 +4409,7 @@ body.toplevel_page_gdpr-cookie-consent #wpcontent {
   align-items: flex-start;
   min-height: 44px;
   position: sticky;
-  top: 12px;
+  top: 33px;
   z-index: 99;
 }
 .gdpr-cookie-consent-admin-tabs-section.wplp-tabs-horizontal-top {
@@ -4783,7 +4783,7 @@ gdpr-cookie-consent-admin-tab-content {
   width: 40px;
   height: 40px;
   animation: spin 1s linear infinite;
-  z-index: 9999; /* Ensure the spinner is above other elements */
+  z-index: 99999; /* Ensure the spinner is above other elements */
 }
 
 @keyframes spin {
@@ -10302,7 +10302,6 @@ div#gdpr-scan-history {
   border: 1px solid #E6EDF6;
   border-radius: 6px;
   background-color: white;
-  width: 274px;
   align-items: flex-start;
   position: sticky;
   top: 51px;
@@ -10332,21 +10331,6 @@ div#gdpr-scan-history {
   height: auto;
 }
 
-.wplp-compliance-main
-  .gdpr-cookie-consent-admin-tabs-section
-  .gdpr-cookie-consent-admin-tabs
-  > a:first-of-type .wplp-admin-tab-link-content {
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-}
-
-.wplp-compliance-main
-  .gdpr-cookie-consent-admin-tabs-section
-  .gdpr-cookie-consent-admin-tabs
-  > a:last-of-type .wplp-admin-tab-link-content {
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
-}
 
 
 .wplp-compliance-main
@@ -10355,6 +10339,7 @@ div#gdpr-scan-history {
   .gdpr-admin-tab-link
   .wplp-admin-tab-link-content {
   display: flex;
+  gap: 10px;
   flex-direction: row;
   padding: 16px 20px;
   border: none;
@@ -11402,11 +11387,12 @@ div#gdpr-scan-history {
 .wplp-compliance-main-wrapper #gdpr-before-mount {
   position:fixed;
 	top:0;
-	left:160px;
+	right:0;
 	width:100%;
-	height:100vh;
+  height: 100%;
+	max-height:100vh;
 	background:#fff;
-	z-index:9999;
+	z-index:99999;
 	display:flex;
 	align-items:center;
 	justify-content:center;
@@ -12223,15 +12209,6 @@ div#gdpr-scan-history {
 .horizontal > * {
     flex: 1;
     min-width: 0;
-}
-.current-status-container.first-step::after {
-  content: '';
-  right: -25px;
-  position: absolute;
-  top: -8px;
-  bottom: -8px;
-  width: 1px;
-  background-color: #D4D4D8;
 }
 .whats-next-container{
 	width: 50%;

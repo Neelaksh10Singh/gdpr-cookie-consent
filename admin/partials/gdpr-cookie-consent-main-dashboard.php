@@ -232,7 +232,7 @@ $total_steps = 2;
 							</div>
 						</a>
 						<!-- Cookie Consent Plugin tab  -->
-						<a href="?page=gdpr-cookie-consent" class="gdpr-admin-tab-link gdpr-cookie-consent-tab">
+						<a href="?page=gdpr-cookie-consent#cookie_settings" class="gdpr-admin-tab-link gdpr-cookie-consent-tab">
 							<div class="wplp-admin-tab-link-content wplp-compliance-cookie-consent-tab">
 								<div class="gdpr-admin-main-tab wplp-admin-tab-link-left">
 									<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -628,7 +628,7 @@ $total_steps = 2;
 																</div>
 																<p>
 																	<?php esc_html_e(
-																		'Great! Your website is already displaying a cookie consent banner.',
+																		'Great! Your website is now displaying a cookie consent banner to visitors.',
 																		'gdpr-cookie-consent'
 																	); ?>
 																</p>
@@ -668,26 +668,10 @@ $total_steps = 2;
 														<div>
 															<h3><?php esc_html_e("Current Status", "wplegalpages")?></h3>
 															<p style="color:#026C3C;font-weight:500;font-size:16px;"><?php esc_html_e("Cookie Banner is Active", "wplegalpages")?></p>
-															<p style="padding-top:8px"><?php esc_html_e("Your website is protected with a GDPR/CCPA compliant cookie banner", "wplegalpages")?></p>
+															<p style="padding-top:8px"><?php esc_html_e("Your website is protected with a GDPR compliant cookie banner", "wplegalpages")?></p>
 														</div>
 													</div>
-													<div class="whats-next-container">
-															<p style="margin-bottom:0;font-weight:600"><?php esc_html_e("What's next?", "wplegalpages")?></p>
-															<p style="max-width:450px;"><?php esc_html_e("Connect your website to unlock cookie scanning, consent logs and advanced compliance features.", "wplegalpages")?></p>
-															<div class="compliance-buttons">
-																<button
-																	type="button"
-																	class="compliance-new-connect-btn first-step"
-																	onClick="window.location.href='<?php echo esc_url( admin_url( 'admin.php?page=gdpr-cookie-consent#cookie_settings#gdpr_design' ) ); ?>';"
-																	>
-																	<?php esc_html_e( 'Customize Banner', 'wplegalpages' ); ?>
-																	<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-																		<path d="M20 10V4H14M20 4L12 12" stroke="#026C3C"/>
-																		<path d="M11 5H7C5.89543 5 5 5.89543 5 7V17C5 18.1046 5.89543 19 7 19H17C18.1046 19 19 18.1046 19 17V13" stroke="#026C3C" stroke-linecap="round"/>
-																	</svg>
-																</button>
-															</div>
-														</div>
+													
 												</div>
 												<?php else: ?>
 													<div class="horizontal">
@@ -1360,9 +1344,9 @@ $total_steps = 2;
 								<?php require_once plugin_dir_path( __FILE__ ) . 'gdpr-dashboard-tab-template.php'; ?>
 							</div>
 							<!-- create cookie content  -->
-							<div class="gdpr-cookie-consent-admin-create-cookie-content gdpr-cookie-consent-admin-tab-content" id="create_cookie_banner">
-								<?php require_once plugin_dir_path( __FILE__ ) . 'gdpr-create-cookie-banner-tab-template.php'; ?>
-							</div>
+							<!-- <div class="gdpr-cookie-consent-admin-create-cookie-content gdpr-cookie-consent-admin-tab-content" id="create_cookie_banner">
+								<?php //require_once plugin_dir_path( __FILE__ ) . 'gdpr-create-cookie-banner-tab-template.php'; ?>
+							</div> -->
 							<!-- cookie settings content -->
 							<div class="gdpr-cookie-consent-admin-cookie-settings-content gdpr-cookie-consent-admin-tab-content" id="cookie_settings">
 								<?php require_once plugin_dir_path( __FILE__ ) . 'gdpr-cookie-settings-tab-template.php'; ?>
