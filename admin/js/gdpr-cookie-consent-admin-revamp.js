@@ -132,8 +132,7 @@ jQuery(document).ready(function () {
 
 
     }
-
-  if (jQuery('.gdpr-cookie-consent-tab').hasClass('active-tab')){
+  if (jQuery('.gdpr-cookie-consent-tab').hasClass('active-tab') || window.location.href.includes('gdpr-cookie-consent')){
     jQuery('.gdpr-cookie-consent-admin-dashboard-tab').removeClass('active-tab');
   }
 
@@ -1291,7 +1290,7 @@ jQuery(document).ready(function () {
           var baseURL = window.location.origin;
       // Construct the URL for plugins.php
       var dashboardpageurl =
-        baseURL + "/wp-admin/admin.php?page=gdpr-cookie-consent";
+        baseURL + "/wp-admin/admin.php?page=gdpr-cookie-consent#cookie_settings";
       
            var $clickedButton = $(this); // Reference to the clicked button
   
