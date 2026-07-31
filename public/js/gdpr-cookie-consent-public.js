@@ -426,10 +426,6 @@ GDPR_CCPA_COOKIE_EXPIRE =
         }
         // log the consent of user
         GDPR.logConsent(button_action);
-
-        // hide the show again button
-        $("#gdpr-cookie-consent-show-again").addClass("hide_show_again_dnt");
-        $("#ccpa-cookie-consent-show-again").addClass("hide_show_again_dnt"); //check this
       }
 
       if (

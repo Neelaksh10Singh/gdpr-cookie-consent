@@ -27,6 +27,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	$allVendorsFlag = false;	//flag for all vendors toggle button
 	$allFeaturesFlag = false;
 
+	function gdpr_is_gpc_honored( $the_options ) {
+		$gpc_header = isset( $_SERVER['HTTP_SEC_GPC'] ) ? $_SERVER['HTTP_SEC_GPC'] : '';
+		$dnt_header = isset( $_SERVER['HTTP_DNT'] ) ? $_SERVER['HTTP_DNT'] : '';
+
+		$browser_gpc = ( $gpc_header === '1' );
+		$browser_dnt = ( $dnt_header === '1' );
+
+		$gdpr_do_not_track_setting = $the_options['do_not_track_on'];
+
+		return ( $gdpr_do_not_track_setting == 'true' && ( $browser_gpc || $browser_dnt ) );
+	}
+
     $top_value = ( $ab_options['ab_testing_enabled'] === true || $ab_options['ab_testing_enabled'] === 'true') ? intval( $the_options[ 'cookie_bar_border_radius' . $chosenBanner ] ) / 3 + 10 : intval($the_options['background_border_radius']) / 3 + 10;
 
 	$abTesting = $ab_options['ab_testing_enabled'] === true || $ab_options['ab_testing_enabled'] === 'true';
@@ -833,6 +845,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 						<?php } ?>
 						<?php endif; ?>
+
+						<?php if ( gdpr_is_gpc_honored( $the_options ) ) : ?>
+							<p class="gdpr-gpc-site-honored" style="border-bottom: 1px solid <?php echo esc_html( $cookieSettingsPopupAccentColor ); ?>;">	
+								<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M9 0C13.9706 0 18 4.02944 18 9C18 13.9706 13.9706 18 9 18C4.02944 18 0 13.9706 0 9C0 4.02944 4.02944 0 9 0ZM7.93262 10.5176L5.70703 8.29297L4.29297 9.70703L8.06738 13.4814L8.76855 12.6406L13.7686 6.64062L12.2314 5.35938L7.93262 10.5176Z" fill="currentColor"/>
+								</svg>
+								<span style="color: <?php echo esc_html($the_options['cookie_text_color']); ?>;"><?php esc_html_e( 'The GPC signal is honored.', 'gdpr-cookie-consent' ); ?></span>
+							</p>
+						<?php endif; ?>
 					</div>
 				</div>
 			</div>
@@ -1028,6 +1049,15 @@ if( $the_options['cookie_usage_for'] === "ccpa" || $the_options['cookie_usage_fo
 						<?php echo esc_html( $cookie_data['dash_button_donotsell_text'] ) ?>
 					</span>
 				</div>
+
+				<?php if ( gdpr_is_gpc_honored( $the_options ) ) : ?>
+					<p class="gdpr-gpc-site-honored" style="border-bottom: 1px solid <?php echo esc_html( $cookieSettingsPopupAccentColor ); ?>;border-topfD: 1px solid <?php echo esc_html( $cookieSettingsPopupAccentColor ); ?>;">	
+						<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M9 0C13.9706 0 18 4.02944 18 9C18 13.9706 13.9706 18 9 18C4.02944 18 0 13.9706 0 9C0 4.02944 4.02944 0 9 0ZM7.93262 10.5176L5.70703 8.29297L4.29297 9.70703L8.06738 13.4814L8.76855 12.6406L13.7686 6.64062L12.2314 5.35938L7.93262 10.5176Z" fill="currentColor"/>
+						</svg>
+						<span style="color: <?php echo esc_html($the_options['cookie_text_color']); ?>;"><?php esc_html_e( 'The GPC signal is honored.', 'gdpr-cookie-consent' ); ?></span>
+					</p>
+				<?php endif; ?>
 			</div>
 			
 			<div class="gdprmodal-footer" style="--popup_accent_color: <?php echo esc_html( '#' . ltrim($cookieSettingsPopupAccentColor, '#') ); ?>;">

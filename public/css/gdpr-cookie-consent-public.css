@@ -283,9 +283,30 @@
 #gdpr-ccpa-gdprmodal .gdprmodal-content {
   padding: 1rem 2rem;
   text-align: center;
-  height: 290px;
+  height: 350px;
   box-sizing: border-box;
 	width:680px;
+}
+
+#gdpr-ccpa-gdprmodal 
+.gdprmodal-content
+.gdprmodal-body
+.gdpr-gpc-site-honored {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 15px 0;
+}
+
+.gdprmodal-body
+.gdpr-details-content
+.gdpr-groups-container
+.gdpr-gpc-site-honored {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0px 20px;
+  padding: 15px 0;
 }
 
 #gdpr-ccpa-gdprmodal .gdprmodal-content .gdpr_action_button{
@@ -1099,11 +1120,22 @@ Bootstrap CSS for frontend UI
   position: relative;
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
-  height: 530px;
+  max-height: 560px;
   overflow-y: scroll;
   scrollbar-width: thin;
 
   transition: height 0.3s ease;
+}
+
+.gdprmodal-body
+.gdpr-details-content
+.gdpr-groups-container
+.gdpr-gpc-site-honored {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0px 20px;
+  padding: 15px 0;
 }
 
 .gdprmodal-footer {
