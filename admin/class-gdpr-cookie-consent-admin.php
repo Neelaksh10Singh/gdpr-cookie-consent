@@ -7560,24 +7560,14 @@ class Gdpr_Cookie_Consent_Admin {
 		$is_legalpages_installed     = isset( $installed_plugins['wplegalpages/wplegalpages.php'] ) ? true : false;
 		?>
 		<div class="gdpr-install-activate-screen">
-			<img id="gdpr-install-activate-img"src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL ) . 'admin/images/legal-pages-install-banner.jpg'; ?>" alt="WPLP Cookie Consent Logo">
-			<div class="gdpr-popup-container">
-			<p class="gdpr-plugin-install-activation-text">
-			<?php esc_html_e( 'WPLP Legal Pages is currently inactive. Please install and activate the plugin to start generating your legal documents.', 'gdpr-cookie-consent' ); ?>
-			</p>
-								<?php 
+			<?php 
 				if(!$is_legalpages_installed) { ?>
-				<a style="width:26%;" href="<?php echo esc_url($legalpages_install_url); ?>">
-					<button id="gdpr-install-activate-btn"><?php esc_html_e('Install Now','gdpr-cookie-consent') ?></button>
-				</a> 
-				<?php }
-				else { 
-					?>
-					<a style="width:26%;" href="<?php echo esc_url($legalpages_activation_url); ?>">
-					<button id="gdpr-install-activate-btn"><?php esc_html_e('Activate Now','gdpr-cookie-consent') ?></button>
-					</a> 
-				<?php } ?>
-       		 </div>
+				<a href="<?php echo esc_url($legalpages_install_url); ?>"><img id="gdpr-install-activate-img"src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL ) . 'admin/images/install-legal-pages-banner-wplp.svg'; ?>" alt="WPLP Cookie Consent Logo"></a>
+			<?php }
+			else { 
+				?>
+				<a href="<?php echo esc_url($legalpages_activation_url); ?>"><img id="gdpr-install-activate-img"src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL ) . 'admin/images/activate-legal-pages-banner-wplp.svg'; ?>" alt="WPLP Cookie Consent Logo"></a>
+			<?php } ?>
 		</div>
 	<?php } 
 

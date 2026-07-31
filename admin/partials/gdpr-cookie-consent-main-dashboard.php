@@ -1178,7 +1178,7 @@ $total_steps = 2;
 																class="customize-banner-btn gdpr-lp-card"
 																onclick="window.location.href='<?php echo esc_url(
 																$is_banner_active
-																	? admin_url( 'admin.php?page=gdpr-cookie-consent#cookie_settings#gdpr_design' )
+																	? admin_url( 'admin.php?page=gdpr-cookie-consent#cookie_settings' )
 																	: admin_url( 'admin.php?page=gdpr-cookie-consent#cookie_settings#general' )
 															); ?>';">
 																<?php if ( $is_banner_active ) : ?>
