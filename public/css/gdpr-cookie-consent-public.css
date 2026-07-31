@@ -307,6 +307,7 @@
   position: absolute;
   font-size: 10px;
   bottom: 12px;
+  gap: 4px;
 }
 .gdprmodal-dialog .gdprmodal-footer .powered-by-credits {
   font-size: 10px;
