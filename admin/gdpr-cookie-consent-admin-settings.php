@@ -388,7 +388,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 							<span :style="{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_lgpd" v-html ="lgpd_message"></span>
 							<span :style="{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_ccpa && gdpr_policy !== 'both'" v-html ="ccpa_message"></span>
 							<span :style="{'font-family': this[`cookie_font${active_test_banner_tab}`]}" v-show="is_eprivacy" v-html ="eprivacy_message"></span>
-							<a v-if="this[`button_readmore_is_on${active_test_banner_tab}`] && (!is_ccpa || gdpr_policy === 'both')" :style="{ 
+							<a v-if="this[`button_readmore_is_on${active_test_banner_tab}`] && gdpr_policy !== 'ccpa'" :style="{ 
 								'font-family': this[`cookie_font${active_test_banner_tab}`],
 								'color':this[`button_readmore_link_color${active_test_banner_tab}`],
 								'cursor':'pointer',
@@ -497,7 +497,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 						<span :style="{'font-family': cookie_font}" v-show="is_lgpd" v-html ="lgpd_message"></span>
 						<span :style="{'font-family': cookie_font}" v-show="is_ccpa && gdpr_policy !== 'both'" v-html ="ccpa_message"></span>
 						<span :style="{'font-family': cookie_font}" v-show="is_eprivacy" v-html ="eprivacy_message"></span>
-						<a v-if="button_readmore_is_on && (!is_ccpa || gdpr_policy === 'both')" :style="{ 
+						<a v-if="button_readmore_is_on && gdpr_policy !== 'ccpa'" :style="{ 
 							'font-family': cookie_font,
 							'color':button_readmore_link_color,
 							'cursor':'pointer',
