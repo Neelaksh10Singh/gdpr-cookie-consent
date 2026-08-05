@@ -309,7 +309,6 @@
 
 #gdpr-ccpa-gdprmodal 
 .gdprmodal-content
-.gdprmodal-body
 .gdpr-gpc-site-honored {
   display: flex;
   align-items: center;
@@ -317,15 +316,13 @@
   padding: 15px 0;
 }
 
-.gdprmodal-body
-.gdpr-details-content
-.gdpr-groups-container
 .gdpr-gpc-site-honored {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: 0px 20px;
-  padding: 15px 0;
+  margin: 0 0 0 0 ;
+  padding: 0;
+  width: 100%;
 }
 
 #gdpr-ccpa-gdprmodal .gdprmodal-content .gdpr_action_button{
@@ -343,6 +340,14 @@
 #gdpr-ccpa-gdprmodal .gdprmodal-footer {
   border: unset;
   flex-direction: column;
+  gap: 6px;
+}
+.gdprmodal-footer {
+  flex-direction: column;
+}
+.gdprmodal-footer .gdpr-footer-buttons{
+  display: flex;
+  width: 100%;
   gap: 6px;
 }
 #gdpr-ccpa-gdprmodal .gdprmodal-dialog .gdprmodal-footer .powered-by-credits {
@@ -1400,7 +1405,7 @@ Bootstrap CSS for frontend UI
 }
 .gdpr_messagebar_detail .gdprmodal-dialog .gdprmodal-footer {
   justify-content: space-between;
-  padding: 16px 0;
+  padding: 8px 0;
   padding-bottom: 0;
   border: unset;
 }
