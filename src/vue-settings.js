@@ -796,16 +796,16 @@ var gen = new Vue({
         : "inherit",
       cookie_bar_padding: settings_obj.the_options.hasOwnProperty("cookie_bar_padding")
         ? settings_obj.the_options["cookie_bar_padding"]
-        : "20",
+        : "14",
       cookie_bar_horizontal_padding: settings_obj.the_options.hasOwnProperty("cookie_bar_horizontal_padding")
         ? settings_obj.the_options["cookie_bar_horizontal_padding"]
-        : "120",
+        : "30",
       cookie_bar_vertical_padding: settings_obj.the_options.hasOwnProperty("cookie_bar_vertical_padding")
         ? settings_obj.the_options["cookie_bar_vertical_padding"]
-        : "20",
+        : "14",
       cookie_bar_spacing: settings_obj.the_options.hasOwnProperty("cookie_bar_spacing")
         ? settings_obj.the_options["cookie_bar_spacing"]
-        : "15",
+        : "5",
       cookie_bar_blur: settings_obj.the_options.hasOwnProperty("cookie_bar_blur")
         ? settings_obj.the_options["cookie_bar_blur"]
         : "0",
@@ -873,16 +873,16 @@ var gen = new Vue({
       visible_c6_items: visibleC6Items,
       cookie_bar_padding1: settings_obj.the_options.hasOwnProperty("cookie_bar_padding1")
         ? settings_obj.the_options["cookie_bar_padding1"]
-        : "20",
+        : "14",
       cookie_bar_horizontal_padding1: settings_obj.the_options.hasOwnProperty("cookie_bar_horizontal_padding1")
         ? settings_obj.the_options["cookie_bar_horizontal_padding1"]
-        : "120",
+        : "30",
       cookie_bar_vertical_padding1: settings_obj.the_options.hasOwnProperty("cookie_bar_vertical_padding1")
         ? settings_obj.the_options["cookie_bar_vertical_padding1"]
-        : "20",
+        : "14",
       cookie_bar_spacing1: settings_obj.the_options.hasOwnProperty("cookie_bar_spacing1")
         ? settings_obj.the_options["cookie_bar_spacing1"]
-        : "15",
+        : "5",
       cookie_bar_blur1: settings_obj.the_options.hasOwnProperty("cookie_bar_blur1")
         ? settings_obj.the_options["cookie_bar_blur1"]
         : "0",
@@ -947,16 +947,16 @@ var gen = new Vue({
       visible_c6_items1: visibleC6Items1,
       cookie_bar_padding2: settings_obj.the_options.hasOwnProperty("cookie_bar_padding2")
         ? settings_obj.the_options["cookie_bar_padding2"]
-        : "20",
+        : "14",
       cookie_bar_horizontal_padding2: settings_obj.the_options.hasOwnProperty("cookie_bar_horizontal_padding2")
         ? settings_obj.the_options["cookie_bar_horizontal_padding2"]
-        : "120",
+        : "30",
       cookie_bar_vertical_padding2: settings_obj.the_options.hasOwnProperty("cookie_bar_vertical_padding2")
         ? settings_obj.the_options["cookie_bar_vertical_padding2"]
-        : "20",
+        : "14",
       cookie_bar_spacing2: settings_obj.the_options.hasOwnProperty("cookie_bar_spacing2")
         ? settings_obj.the_options["cookie_bar_spacing2"]
-        : "15",
+        : "5",
       cookie_bar_blur2: settings_obj.the_options.hasOwnProperty("cookie_bar_blur2")
         ? settings_obj.the_options["cookie_bar_blur2"]
         : "0",
@@ -2603,7 +2603,7 @@ var gen = new Vue({
         : [],
       template: settings_obj.the_options.hasOwnProperty("template")
         ? settings_obj.the_options["template"]
-        : "default",
+        : "new_default",
       cookie_accept_all_on:
         settings_obj.the_options.hasOwnProperty("button_accept_all_is_on") &&
         (true === settings_obj.the_options["button_accept_all_is_on"] ||
@@ -3808,8 +3808,9 @@ var gen = new Vue({
     },
     onTemplateChange(value) {
       this.template = value;
+      console.log(value);
       let selectedTemplate
-      if(value == "default"){
+      if(value == "new_default"){
         selectedTemplate = this.default_template_json;
       }
       else{
@@ -3821,6 +3822,7 @@ var gen = new Vue({
       this.cookie_bar_color =                       selectedTemplate['styles']['background-color'];
       this.cookie_bar_opacity =                     selectedTemplate['styles']['opacity'];
       this.cookie_text_color =                      selectedTemplate['styles']['color'];
+      this.cookie_heading_color =                   selectedTemplate['styles']['color'];
       this.border_style =                           selectedTemplate['styles']['border-style'];
       this.cookie_bar_border_width =                selectedTemplate['styles']['border-width'].substring(0, selectedTemplate['styles']['border-width'].length - 2);
       this.cookie_border_color =                    selectedTemplate['styles']['border-color'];
@@ -3879,6 +3881,7 @@ var gen = new Vue({
       this.cookie_bar_color1 =                       selectedTemplate['styles']['background-color'];
       this.cookie_bar_opacity1 =                     selectedTemplate['styles']['opacity'];
       this.cookie_text_color1 =                      selectedTemplate['styles']['color'];
+      this.cookie_heading_color1 =                   selectedTemplate['styles']['color'];
       this.border_style1 =                           selectedTemplate['styles']['border-style'];
       this.cookie_bar_border_width1 =                selectedTemplate['styles']['border-width'].substring(0, selectedTemplate['styles']['border-width'].length - 2);
       this.cookie_border_color1 =                    selectedTemplate['styles']['border-color'];
@@ -3935,6 +3938,7 @@ var gen = new Vue({
       this.cookie_bar_color2 =                       selectedTemplate['styles']['background-color'];
       this.cookie_bar_opacity2 =                     selectedTemplate['styles']['opacity'];
       this.cookie_text_color2 =                      selectedTemplate['styles']['color'];
+      this.cookie_heading_color2 =                   selectedTemplate['styles']['color'];
       this.border_style2 =                           selectedTemplate['styles']['border-style'];
       this.cookie_bar_border_width2 =                selectedTemplate['styles']['border-width'].substring(0, selectedTemplate['styles']['border-width'].length - 2);
       this.cookie_border_color2 =                    selectedTemplate['styles']['border-color'];
@@ -4377,7 +4381,7 @@ var gen = new Vue({
       this.ab_testing_auto = false;
       this.ab_testing_period = "30";
       this.gacm_key = "";
-      this.template = "default";
+      this.template = "new_default";
       this.accept_text = "Accept";
       this.accept_url = "#";
       this.accept_action = "#cookie_action_close_header";
@@ -7516,7 +7520,7 @@ var app = new Vue({
       onPrg: 0,
       template: settings_obj.the_options.hasOwnProperty("template")
         ? settings_obj.the_options["template"]
-        : "default",
+        : "new_default",
       cookie_accept_all_on:
         settings_obj.the_options.hasOwnProperty("button_accept_all_is_on") &&
         (true === settings_obj.the_options["button_accept_all_is_on"] ||
@@ -8313,6 +8317,7 @@ var app = new Vue({
       this.banner_preview_is_on = false;
     },
     onTemplateChange(value) {
+      console.log(value);
       this.template = value;
       const selectedTemplate = this.json_templates[value];
       this.cookie_bar_color =                       selectedTemplate['styles']['background-color'];
@@ -8735,7 +8740,7 @@ var app = new Vue({
       this.border_style = "none";
       this.cookie_border_color = "#ffffff";
       this.cookie_bar_border_radius = "0";
-      this.template = "default";
+      this.template = "new_default";
       this.accept_text = "Accept";
       this.accept_url = "#";
       this.accept_action = "#cookie_action_close_header";
@@ -11310,7 +11315,7 @@ var adv = new Vue({
         : [],
       template: settings_obj.the_options.hasOwnProperty("template")
         ? settings_obj.the_options["template"]
-        : "default",
+        : "new_default",
       cookie_accept_all_on:
         settings_obj.the_options.hasOwnProperty("button_accept_all_is_on") &&
         (true === settings_obj.the_options["button_accept_all_is_on"] ||
@@ -12073,7 +12078,7 @@ var adv = new Vue({
       this.ab_testing_auto = false;
       this.ab_testing_period = "30";
       this.gacm_key = "";
-      this.template = "default";
+      this.template = "new_default";
       this.accept_text = "Accept";
       this.accept_url = "#";
       this.accept_action = "#cookie_action_close_header";
@@ -12289,6 +12294,7 @@ var adv = new Vue({
       this.cookie_bar_color =                       selectedTemplate['styles']['background-color'];
       this.cookie_bar_opacity =                     selectedTemplate['styles']['opacity'];
       this.cookie_text_color =                      selectedTemplate['styles']['color'];
+      this.cookie_heading_color =                   selectedTemplate['styles']['color'];
       this.border_style =                           selectedTemplate['styles']['border-style'];
       this.cookie_bar_border_width =                selectedTemplate['styles']['border-width'].substring(0, selectedTemplate['styles']['border-width'].length - 2);
       this.cookie_border_color =                    selectedTemplate['styles']['border-color'];
@@ -12345,6 +12351,7 @@ var adv = new Vue({
       this.cookie_bar_color1 =                       selectedTemplate['styles']['background-color'];
       this.cookie_bar_opacity1 =                     selectedTemplate['styles']['opacity'];
       this.cookie_text_color1 =                      selectedTemplate['styles']['color'];
+      this.cookie_heading_color1 =                   selectedTemplate['styles']['color'];
       this.border_style1 =                           selectedTemplate['styles']['border-style'];
       this.cookie_bar_border_width1 =                selectedTemplate['styles']['border-width'].substring(0, selectedTemplate['styles']['border-width'].length - 2);
       this.cookie_border_color1 =                    selectedTemplate['styles']['border-color'];
@@ -12391,6 +12398,7 @@ var adv = new Vue({
       this.cookie_bar_color2 =                       selectedTemplate['styles']['background-color'];
       this.cookie_bar_opacity2 =                     selectedTemplate['styles']['opacity'];
       this.cookie_text_color2 =                      selectedTemplate['styles']['color'];
+      this.cookie_heading_color2 =                   selectedTemplate['styles']['color'];
       this.border_style2 =                           selectedTemplate['styles']['border-style'];
       this.cookie_bar_border_width2 =                selectedTemplate['styles']['border-width'].substring(0, selectedTemplate['styles']['border-width'].length - 2);
       this.cookie_border_color2 =                    selectedTemplate['styles']['border-color'];
