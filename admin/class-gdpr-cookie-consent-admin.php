@@ -354,10 +354,10 @@ class Gdpr_Cookie_Consent_Admin {
 
 			$the_options    = Gdpr_Cookie_Consent::gdpr_get_settings();
 			$the_options['cookie_bar_popup_overlay_opacity'] = 50;
-			$the_options['cookie_bar_padding'] = 20;
-			$the_options['cookie_bar_horizontal_padding'] = 120;
-			$the_options['cookie_bar_vertical_padding'] = 20;
-			$the_options['cookie_bar_spacing'] = 15;
+			$the_options['cookie_bar_padding'] = 14;
+			$the_options['cookie_bar_horizontal_padding'] = 30;
+			$the_options['cookie_bar_vertical_padding'] = 14;
+			$the_options['cookie_bar_spacing'] = 5;
 			$the_options['cookie_bar_blur'] = 0;
 			$the_options['cookie_bar_shadow_color'] = '#000000';
 			$the_options['cookie_bar_shadow_size'] = 5;
@@ -387,16 +387,16 @@ class Gdpr_Cookie_Consent_Admin {
 			$the_options['button_text_weight'] = '400';
 			
 			$the_options['button_accept_all_btn_width'] = $the_options['template'] === 'blue_full' ? 'full' : 'fit';
-			$the_options['button_accept_all_btn_min_width'] = ($the_options['template'] === 'default' || $the_options['template'] === 'dark') ? 110 : ($the_options['template'] === 'blue_center_column' ? 280 : 140);
+			$the_options['button_accept_all_btn_min_width'] = $the_options['template'] === 'new_default' ? 132 : (($the_options['template'] === 'default' || $the_options['template'] === 'dark') ? 110 : ($the_options['template'] === 'blue_center_column' ? 280 : 140));
 
 			$the_options['button_accept_button_width'] = $the_options['template'] === 'blue_full' ? 'full' : 'fit';
-			$the_options['button_accept_button_min_width'] = ($the_options['template'] === 'default' || $the_options['template'] === 'dark') ? 100 : ($the_options['template'] === 'blue_center_column' ? 280 : 140);
+			$the_options['button_accept_button_min_width'] = $the_options['template'] === 'new_default' ? 132 : (($the_options['template'] === 'default' || $the_options['template'] === 'dark') ? 100 : ($the_options['template'] === 'blue_center_column' ? 280 : 140));
 
 			$the_options['button_decline_button_width'] = $the_options['template'] === 'blue_full' ? 'full' : 'fit';
-			$the_options['button_decline_button_min_width'] = ($the_options['template'] === 'default' || $the_options['template'] === 'dark') ? 100 : 140;
+			$the_options['button_decline_button_min_width'] = $the_options['template'] === 'new_default' ? 132 : (($the_options['template'] === 'default' || $the_options['template'] === 'dark') ? 100 : 140);
 
 			$the_options['button_settings_button_width'] = $the_options['template'] === 'blue_full' ? 'full' : 'fit';
-			$the_options['button_settings_button_min_width'] = 140;
+			$the_options['button_settings_button_min_width'] = $the_options['template'] === 'new_default' ? 132 : 140;
 
 
 			$the_options['banner_layouts'] = wp_json_encode(
@@ -418,11 +418,11 @@ class Gdpr_Cookie_Consent_Admin {
 						'direction' => ($the_options['template'] === 'almond' || $the_options['template'] === 'gray' || $the_options['template'] === 'gray_pink' || $the_options['template'] === 'blue_center_column' || $the_options['template'] === 'bold' || $the_options['template'] === 'blue_split') ? 'col' : 'row',
 					),
 					'c5' => array(
-						'justify'   => ($the_options['template'] === 'default' || $the_options['template'] === 'dark' || $the_options['template'] === 'blue_full') ? 'start' : 'center',
+						'justify'   => ($the_options['template'] === 'default' || $the_options['template'] === 'new_default' || $the_options['template'] === 'dark' || $the_options['template'] === 'blue_full') ? 'start' : 'center',
 						'direction' => 'row',
 					),
 					'c6' => array(
-						'justify'   => ($the_options['template'] === 'default' || $the_options['template'] === 'dark' || $the_options['template'] === 'blue_full') ? 'end' : 'center',
+						'justify'   => ($the_options['template'] === 'default' || $the_options['template'] === 'new_default' || $the_options['template'] === 'dark' || $the_options['template'] === 'blue_full') ? 'end' : 'center',
 						'direction' => 'row',
 					),
 				)
@@ -431,6 +431,10 @@ class Gdpr_Cookie_Consent_Admin {
 			$c6_buttons = array();
 			$c1_content = array( 'logo', 'heading' );
 			switch($the_options['template']){
+				case 'new_default':
+					$c5_buttons = array( 'settings', 'accept', 'decline', 'accept_all' );
+					$c6_buttons = array();
+					break;
 				case 'default':
 				case 'dark':
 				case 'blue_center_column':
@@ -551,7 +555,7 @@ class Gdpr_Cookie_Consent_Admin {
 			if (strpos($template, $prefix) === 0) {
 				$original_key = substr($template, strlen($prefix));
 				$mapped_templates = [
-					'default'           => 'default',
+					'default'           => 'new_default',
 					'almond_column'     => 'almond',
 					'navy_blue_center'  => 'blue_center',
 					'gray_column'       => 'gray_pink',
@@ -603,14 +607,14 @@ class Gdpr_Cookie_Consent_Admin {
 				if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
 					$json_data = wp_remote_retrieve_body($response);
 					$this -> templates_json = json_decode($json_data, true);
-					if(!isset($the_options['selected_template_json']) || json_decode($the_options['selected_template_json'], true)['name'] != $the_options['template']) $the_options['selected_template_json'] = ($the_options['template'] == 'default' ? json_encode(get_option('gdpr_default_template_object')) : json_encode($this -> templates_json[$the_options['template']]));
+					if(!isset($the_options['selected_template_json']) || json_decode($the_options['selected_template_json'], true)['name'] != $the_options['template']) $the_options['selected_template_json'] = ($the_options['template'] == 'new_default' ? json_encode(get_option('gdpr_default_template_object')) : json_encode($this -> templates_json[$the_options['template']]));
 				} else {
 					$this -> templates_json = []; // Fallback in case of error
 					if(!isset($the_options['selected_template_json']) || json_decode($the_options['selected_template_json'], true)['name'] != $the_options['template']) $the_options['selected_template_json'] = json_encode([]);
 				}
 			}
 			else{
-				if($the_options['template'] == 'default'){
+				if($the_options['template'] == 'new_default'){
 					$the_options['selected_template_json'] = json_encode(get_option('gdpr_default_template_object'));
 				}
 				else{
@@ -2289,7 +2293,7 @@ class Gdpr_Cookie_Consent_Admin {
 			$prev_gdpr_option['button_1_text']              = 'Accept';
 			$prev_gdpr_option['notify_message']             = addslashes( 'We use cookies to optimize your experience, analyze traffic, and personalize ads. Please choose whether you accept our use of non-essential cookies.' );
 			$prev_gdpr_option['opacity']                    = '1';
-			$prev_gdpr_option['template']                   = 'default';
+			$prev_gdpr_option['template']                   = 'new_default';
 			$prev_gdpr_option['banner_template']            = 'banner-default';
 			$prev_gdpr_option['popup_template']             = 'popup-default';
 			$prev_gdpr_option['widget_template']            = 'widget-default';
@@ -5001,7 +5005,7 @@ class Gdpr_Cookie_Consent_Admin {
 			$reset_auto_generated = isset($_POST['reset_auto_generated']) ? sanitize_text_field($_POST['reset_auto_generated']) : '0';
 			$is_template_changed = isset($_POST['is_template_changed']) ? sanitize_text_field($_POST['is_template_changed']) : '0';
 			$auto_generated_banner = isset($_POST['auto_generated_banner']) ? sanitize_text_field($_POST['auto_generated_banner']) : '0';
-			$template = isset($_POST['gdpr-template']) ? sanitize_text_field($_POST['gdpr-template']) : 'default';
+			$template = isset($_POST['gdpr-template']) ? sanitize_text_field($_POST['gdpr-template']) : 'new_default';
 			// Check if the value of the A/B testing period has changed
 			if ($current_ab_testing_value !== $updated_ab_testing_value) {
 
@@ -5820,8 +5824,332 @@ class Gdpr_Cookie_Consent_Admin {
 				if ( 'none' !== $template && $saved_options['template'] !== $template ) {
 					
 					$the_options['template']                     = $template;
-					if($template != "default"  && isset($this->templates_json[$template])) $the_options['selected_template_json'] 		 = json_encode($this->templates_json[$template]);
+					if($template != "new_default"  && isset($this->templates_json[$template])) $the_options['selected_template_json'] 		 = json_encode($this->templates_json[$template]);
 					else $the_options['selected_template_json'] 							 = json_encode(get_option('gdpr_default_template_object'));
+
+
+
+					$banner_layouts = json_decode($the_options['banner_layouts'], true);
+					$banner_structure = json_decode($the_options['banner_structure'], true);
+					if ( ! is_array( $banner_layouts ) ) {
+						$banner_layouts = array();
+					}
+					if ( ! is_array( $banner_structure ) ) {
+						$banner_structure = array();
+					}
+
+					if ( 'new_default' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c5'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'end', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'settings', 'accept', 'decline', 'accept_all' );
+						$banner_structure['c6'] = array();
+				
+						$the_options['button_accept_all_btn_min_width']  =  132;
+						$the_options['button_accept_all_btn_min_width1']  =  132;
+						$the_options['button_accept_all_btn_min_width2']  =  132;
+						$the_options['button_accept_button_min_width']   =  132;
+						$the_options['button_accept_button_min_width1']   =  132;
+						$the_options['button_accept_button_min_width2']   =  132;
+						$the_options['button_decline_button_min_width']  =  132;
+						$the_options['button_decline_button_min_width1']  =  132;
+						$the_options['button_decline_button_min_width2']  =  132;
+						$the_options['button_settings_button_min_width'] =  132;
+						$the_options['button_settings_button_min_width1'] =  132;
+						$the_options['button_settings_button_min_width2'] =  132;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+				
+						$the_options['cookie_bar_padding']            =  14;
+						$the_options['cookie_bar_padding1']            =  14;
+						$the_options['cookie_bar_padding2']            =  14;
+						$the_options['cookie_bar_horizontal_padding'] =  30;
+						$the_options['cookie_bar_horizontal_padding1'] =  30;
+						$the_options['cookie_bar_horizontal_padding2'] =  30;
+						$the_options['cookie_bar_vertical_padding']   =  14;
+						$the_options['cookie_bar_vertical_padding1']   =  14;
+						$the_options['cookie_bar_vertical_padding2']   =  14;
+						$the_options['cookie_bar_spacing']            =  5;
+						$the_options['cookie_bar_spacing1']            =  5;
+						$the_options['cookie_bar_spacing2']            =  5;
+				
+					} elseif ( 'dark' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c5'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'end', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'decline', 'settings' );
+						$banner_structure['c6'] = array( 'accept', 'accept_all' );
+				
+						$the_options['button_accept_all_btn_min_width']  =  110;
+						$the_options['button_accept_all_btn_min_width1']  =  110;
+						$the_options['button_accept_all_btn_min_width2']  =  110;
+						$the_options['button_accept_button_min_width']   =  100;
+						$the_options['button_accept_button_min_width1']   =  100;
+						$the_options['button_accept_button_min_width2']   =  100;
+						$the_options['button_decline_button_min_width']  =  100;
+						$the_options['button_decline_button_min_width1']  =  100;
+						$the_options['button_decline_button_min_width2']  =  100;
+						$the_options['button_settings_button_min_width'] =  140;
+						$the_options['button_settings_button_min_width1'] =  140;
+						$the_options['button_settings_button_min_width2'] =  140;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+				
+					} elseif ( 'almond' === $template || 'gray_pink' === $template || 'bold' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c5'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'center', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = ( 'bold' === $template ) ? array( 'logo', 'heading' ) : array( 'heading', 'logo' );
+						$banner_structure['c5'] = array( 'accept_all', 'accept' );
+						$banner_structure['c6'] = array( 'decline', 'settings' );
+				
+						$the_options['button_accept_all_btn_min_width']  =  140;
+						$the_options['button_accept_all_btn_min_width1']  =  140;
+						$the_options['button_accept_all_btn_min_width2']  =  140;
+						$the_options['button_accept_button_min_width']   =  140;
+						$the_options['button_accept_button_min_width1']   =  140;
+						$the_options['button_accept_button_min_width2']   =  140;
+						$the_options['button_decline_button_min_width']  =  140;
+						$the_options['button_decline_button_min_width1']  =  140;
+						$the_options['button_decline_button_min_width2']  =  140;
+						$the_options['button_settings_button_min_width'] =  140;
+						$the_options['button_settings_button_min_width1'] =  140;
+						$the_options['button_settings_button_min_width2'] =  140;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+				
+					} elseif ( 'blue_full' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c5'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'end', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'accept_all', 'accept' );
+						$banner_structure['c6'] = array( 'decline', 'settings' );
+				
+						$the_options['button_accept_all_btn_min_width']  =  140;
+						$the_options['button_accept_all_btn_min_width1']  =  140;
+						$the_options['button_accept_all_btn_min_width2']  =  140;
+						$the_options['button_accept_button_min_width']   =  140;
+						$the_options['button_accept_button_min_width1']   =  140;
+						$the_options['button_accept_button_min_width2']   =  140;
+						$the_options['button_decline_button_min_width']  =  140;
+						$the_options['button_decline_button_min_width1']  =  140;
+						$the_options['button_decline_button_min_width2']  =  140;
+						$the_options['button_settings_button_min_width'] =  140;
+						$the_options['button_settings_button_min_width1'] =  140;
+						$the_options['button_settings_button_min_width2'] =  140;
+				
+						$the_options['button_accept_all_btn_width']  =  'full';
+						$the_options['button_accept_all_btn_width1']  =  'full';
+						$the_options['button_accept_all_btn_width2']  =  'full';
+						$the_options['button_accept_button_width']   =  'full';
+						$the_options['button_accept_button_width1']   =  'full';
+						$the_options['button_accept_button_width2']   =  'full';
+						$the_options['button_decline_button_width']  =  'full';
+						$the_options['button_decline_button_width1']  =  'full';
+						$the_options['button_decline_button_width2']  =  'full';
+						$the_options['button_settings_button_width'] =  'full';
+						$the_options['button_settings_button_width1'] =  'full';
+						$the_options['button_settings_button_width2'] =  'full';
+				
+					} elseif ( 'gray' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c5'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'center', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'accept_all', 'accept' );
+						$banner_structure['c6'] = array( 'decline', 'settings' );
+				
+						$the_options['button_accept_all_btn_min_width']  =  140;
+						$the_options['button_accept_all_btn_min_width1']  =  140;
+						$the_options['button_accept_all_btn_min_width2']  =  140;
+						$the_options['button_accept_button_min_width']   =  140;
+						$the_options['button_accept_button_min_width1']   =  140;
+						$the_options['button_accept_button_min_width2']   =  140;
+						$the_options['button_decline_button_min_width']  =  140;
+						$the_options['button_decline_button_min_width1']  =  140;
+						$the_options['button_decline_button_min_width2']  =  140;
+						$the_options['button_settings_button_min_width'] =  140;
+						$the_options['button_settings_button_min_width1'] =  140;
+						$the_options['button_settings_button_min_width2'] =  140;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+				
+					} elseif ( 'blue_center' === $template || 'almond_row' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c5'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'center', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'accept_all', 'accept', 'settings', 'decline' );
+						$banner_structure['c6'] = array();
+				
+						$the_options['button_accept_all_btn_min_width']  =  140;
+						$the_options['button_accept_all_btn_min_width1']  =  140;
+						$the_options['button_accept_all_btn_min_width2']  =  140;
+						$the_options['button_accept_button_min_width']   =  140;
+						$the_options['button_accept_button_min_width1']   =  140;
+						$the_options['button_accept_button_min_width2']   =  140;
+						$the_options['button_decline_button_min_width']  =  140;
+						$the_options['button_decline_button_min_width1']  =  140;
+						$the_options['button_decline_button_min_width2']  =  140;
+						$the_options['button_settings_button_min_width'] =  140;
+						$the_options['button_settings_button_min_width1'] =  140;
+						$the_options['button_settings_button_min_width2'] =  140;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+				
+					} elseif ( 'blue_center_column' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c5'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'center', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'decline', 'settings' );
+						$banner_structure['c6'] = array( 'accept', 'accept_all' );
+				
+						$the_options['button_accept_all_btn_min_width']  =  280;
+						$the_options['button_accept_all_btn_min_width1']  =  280;
+						$the_options['button_accept_all_btn_min_width2']  =  280;
+						$the_options['button_accept_button_min_width']   =  140;
+						$the_options['button_accept_button_min_width1']   =  140;
+						$the_options['button_accept_button_min_width2']   =  140;
+						$the_options['button_decline_button_min_width']  =  135;
+						$the_options['button_decline_button_min_width1']  =  135;
+						$the_options['button_decline_button_min_width2']  =  135;
+						$the_options['button_settings_button_min_width'] =  135;
+						$the_options['button_settings_button_min_width1'] =  135;
+						$the_options['button_settings_button_min_width2'] =  135;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+				
+					} elseif ( 'blue_split' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c5'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'center', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'settings', 'accept_all' );
+						$banner_structure['c6'] = array( 'decline', 'accept' );
+				
+						$the_options['button_accept_all_btn_min_width']  =  140;
+						$the_options['button_accept_all_btn_min_width1']  =  140;
+						$the_options['button_accept_all_btn_min_width2']  =  140;
+						$the_options['button_accept_button_min_width']   =  140;
+						$the_options['button_accept_button_min_width1']   =  140;
+						$the_options['button_accept_button_min_width2']   =  140;
+						$the_options['button_decline_button_min_width']  =  140;
+						$the_options['button_decline_button_min_width1']  =  140;
+						$the_options['button_decline_button_min_width2']  =  140;
+						$the_options['button_settings_button_min_width'] =  140;
+						$the_options['button_settings_button_min_width1'] =  140;
+						$the_options['button_settings_button_min_width2'] =  140;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+					}
+				
+					$the_options['banner_layouts']   = wp_json_encode( $banner_layouts );
+					$the_options['banner_structure'] = wp_json_encode( $banner_structure );
 				}
 			}
 			// restrict posts when gpdr free is activated.
@@ -5873,8 +6201,332 @@ class Gdpr_Cookie_Consent_Admin {
 				if ( 'none' !== $template && $saved_options['template'] !== $template ) {
 					
 					$the_options['template']                     = $template;
-					if($template != "default") $the_options['selected_template_json'] 		 = json_encode($this->templates_json[$template]);
+					if($template != "new_default") $the_options['selected_template_json'] 		 = json_encode($this->templates_json[$template]);
 					else $the_options['selected_template_json'] = json_encode(get_option('gdpr_default_template_object'));
+
+					
+
+					$banner_layouts = json_decode($the_options['banner_layouts'], true);
+					$banner_structure = json_decode($the_options['banner_structure'], true);
+					if ( ! is_array( $banner_layouts ) ) {
+						$banner_layouts = array();
+					}
+					if ( ! is_array( $banner_structure ) ) {
+						$banner_structure = array();
+					}
+
+					if ( 'new_default' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c5'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'end', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'settings', 'accept', 'decline', 'accept_all' );
+						$banner_structure['c6'] = array();
+				
+						$the_options['button_accept_all_btn_min_width']  =  132;
+						$the_options['button_accept_all_btn_min_width1']  =  132;
+						$the_options['button_accept_all_btn_min_width2']  =  132;
+						$the_options['button_accept_button_min_width']   =  132;
+						$the_options['button_accept_button_min_width1']   =  132;
+						$the_options['button_accept_button_min_width2']   =  132;
+						$the_options['button_decline_button_min_width']  =  132;
+						$the_options['button_decline_button_min_width1']  =  132;
+						$the_options['button_decline_button_min_width2']  =  132;
+						$the_options['button_settings_button_min_width'] =  132;
+						$the_options['button_settings_button_min_width1'] =  132;
+						$the_options['button_settings_button_min_width2'] =  132;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+				
+						$the_options['cookie_bar_padding']            =  14;
+						$the_options['cookie_bar_padding1']            =  14;
+						$the_options['cookie_bar_padding2']            =  14;
+						$the_options['cookie_bar_horizontal_padding'] =  30;
+						$the_options['cookie_bar_horizontal_padding1'] =  30;
+						$the_options['cookie_bar_horizontal_padding2'] =  30;
+						$the_options['cookie_bar_vertical_padding']   =  14;
+						$the_options['cookie_bar_vertical_padding1']   =  14;
+						$the_options['cookie_bar_vertical_padding2']   =  14;
+						$the_options['cookie_bar_spacing']            =  5;
+						$the_options['cookie_bar_spacing1']            =  5;
+						$the_options['cookie_bar_spacing2']            =  5;
+				
+					} elseif ( 'dark' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c5'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'end', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'decline', 'settings' );
+						$banner_structure['c6'] = array( 'accept', 'accept_all' );
+				
+						$the_options['button_accept_all_btn_min_width']  =  110;
+						$the_options['button_accept_all_btn_min_width1']  =  110;
+						$the_options['button_accept_all_btn_min_width2']  =  110;
+						$the_options['button_accept_button_min_width']   =  100;
+						$the_options['button_accept_button_min_width1']   =  100;
+						$the_options['button_accept_button_min_width2']   =  100;
+						$the_options['button_decline_button_min_width']  =  100;
+						$the_options['button_decline_button_min_width1']  =  100;
+						$the_options['button_decline_button_min_width2']  =  100;
+						$the_options['button_settings_button_min_width'] =  140;
+						$the_options['button_settings_button_min_width1'] =  140;
+						$the_options['button_settings_button_min_width2'] =  140;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+				
+					} elseif ( 'almond' === $template || 'gray_pink' === $template || 'bold' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c5'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'center', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = ( 'bold' === $template ) ? array( 'logo', 'heading' ) : array( 'heading', 'logo' );
+						$banner_structure['c5'] = array( 'accept_all', 'accept' );
+						$banner_structure['c6'] = array( 'decline', 'settings' );
+				
+						$the_options['button_accept_all_btn_min_width']  =  140;
+						$the_options['button_accept_all_btn_min_width1']  =  140;
+						$the_options['button_accept_all_btn_min_width2']  =  140;
+						$the_options['button_accept_button_min_width']   =  140;
+						$the_options['button_accept_button_min_width1']   =  140;
+						$the_options['button_accept_button_min_width2']   =  140;
+						$the_options['button_decline_button_min_width']  =  140;
+						$the_options['button_decline_button_min_width1']  =  140;
+						$the_options['button_decline_button_min_width2']  =  140;
+						$the_options['button_settings_button_min_width'] =  140;
+						$the_options['button_settings_button_min_width1'] =  140;
+						$the_options['button_settings_button_min_width2'] =  140;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+				
+					} elseif ( 'blue_full' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c5'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'end', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'accept_all', 'accept' );
+						$banner_structure['c6'] = array( 'decline', 'settings' );
+				
+						$the_options['button_accept_all_btn_min_width']  =  140;
+						$the_options['button_accept_all_btn_min_width1']  =  140;
+						$the_options['button_accept_all_btn_min_width2']  =  140;
+						$the_options['button_accept_button_min_width']   =  140;
+						$the_options['button_accept_button_min_width1']   =  140;
+						$the_options['button_accept_button_min_width2']   =  140;
+						$the_options['button_decline_button_min_width']  =  140;
+						$the_options['button_decline_button_min_width1']  =  140;
+						$the_options['button_decline_button_min_width2']  =  140;
+						$the_options['button_settings_button_min_width'] =  140;
+						$the_options['button_settings_button_min_width1'] =  140;
+						$the_options['button_settings_button_min_width2'] =  140;
+				
+						$the_options['button_accept_all_btn_width']  =  'full';
+						$the_options['button_accept_all_btn_width1']  =  'full';
+						$the_options['button_accept_all_btn_width2']  =  'full';
+						$the_options['button_accept_button_width']   =  'full';
+						$the_options['button_accept_button_width1']   =  'full';
+						$the_options['button_accept_button_width2']   =  'full';
+						$the_options['button_decline_button_width']  =  'full';
+						$the_options['button_decline_button_width1']  =  'full';
+						$the_options['button_decline_button_width2']  =  'full';
+						$the_options['button_settings_button_width'] =  'full';
+						$the_options['button_settings_button_width1'] =  'full';
+						$the_options['button_settings_button_width2'] =  'full';
+				
+					} elseif ( 'gray' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c5'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'center', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'accept_all', 'accept' );
+						$banner_structure['c6'] = array( 'decline', 'settings' );
+				
+						$the_options['button_accept_all_btn_min_width']  =  140;
+						$the_options['button_accept_all_btn_min_width1']  =  140;
+						$the_options['button_accept_all_btn_min_width2']  =  140;
+						$the_options['button_accept_button_min_width']   =  140;
+						$the_options['button_accept_button_min_width1']   =  140;
+						$the_options['button_accept_button_min_width2']   =  140;
+						$the_options['button_decline_button_min_width']  =  140;
+						$the_options['button_decline_button_min_width1']  =  140;
+						$the_options['button_decline_button_min_width2']  =  140;
+						$the_options['button_settings_button_min_width'] =  140;
+						$the_options['button_settings_button_min_width1'] =  140;
+						$the_options['button_settings_button_min_width2'] =  140;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+				
+					} elseif ( 'blue_center' === $template || 'almond_row' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c5'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'center', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'accept_all', 'accept', 'settings', 'decline' );
+						$banner_structure['c6'] = array();
+				
+						$the_options['button_accept_all_btn_min_width']  =  140;
+						$the_options['button_accept_all_btn_min_width1']  =  140;
+						$the_options['button_accept_all_btn_min_width2']  =  140;
+						$the_options['button_accept_button_min_width']   =  140;
+						$the_options['button_accept_button_min_width1']   =  140;
+						$the_options['button_accept_button_min_width2']   =  140;
+						$the_options['button_decline_button_min_width']  =  140;
+						$the_options['button_decline_button_min_width1']  =  140;
+						$the_options['button_decline_button_min_width2']  =  140;
+						$the_options['button_settings_button_min_width'] =  140;
+						$the_options['button_settings_button_min_width1'] =  140;
+						$the_options['button_settings_button_min_width2'] =  140;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+				
+					} elseif ( 'blue_center_column' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c5'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'center', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'decline', 'settings' );
+						$banner_structure['c6'] = array( 'accept', 'accept_all' );
+				
+						$the_options['button_accept_all_btn_min_width']  =  280;
+						$the_options['button_accept_all_btn_min_width1']  =  280;
+						$the_options['button_accept_all_btn_min_width2']  =  280;
+						$the_options['button_accept_button_min_width']   =  140;
+						$the_options['button_accept_button_min_width1']   =  140;
+						$the_options['button_accept_button_min_width2']   =  140;
+						$the_options['button_decline_button_min_width']  =  135;
+						$the_options['button_decline_button_min_width1']  =  135;
+						$the_options['button_decline_button_min_width2']  =  135;
+						$the_options['button_settings_button_min_width'] =  135;
+						$the_options['button_settings_button_min_width1'] =  135;
+						$the_options['button_settings_button_min_width2'] =  135;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+				
+					} elseif ( 'blue_split' === $template ) {
+						$banner_layouts['c1'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c2'] = array( 'justify' => 'start', 'direction' => 'row' );
+						$banner_layouts['c4'] = array( 'justify' => 'start', 'direction' => 'col' );
+						$banner_layouts['c5'] = array( 'justify' => 'center', 'direction' => 'row' );
+						$banner_layouts['c6'] = array( 'justify' => 'center', 'direction' => 'row' );
+				
+						$banner_structure['c1'] = array( 'logo', 'heading' );
+						$banner_structure['c5'] = array( 'settings', 'accept_all' );
+						$banner_structure['c6'] = array( 'decline', 'accept' );
+				
+						$the_options['button_accept_all_btn_min_width']  =  140;
+						$the_options['button_accept_all_btn_min_width1']  =  140;
+						$the_options['button_accept_all_btn_min_width2']  =  140;
+						$the_options['button_accept_button_min_width']   =  140;
+						$the_options['button_accept_button_min_width1']   =  140;
+						$the_options['button_accept_button_min_width2']   =  140;
+						$the_options['button_decline_button_min_width']  =  140;
+						$the_options['button_decline_button_min_width1']  =  140;
+						$the_options['button_decline_button_min_width2']  =  140;
+						$the_options['button_settings_button_min_width'] =  140;
+						$the_options['button_settings_button_min_width1'] =  140;
+						$the_options['button_settings_button_min_width2'] =  140;
+				
+						$the_options['button_accept_all_btn_width']  =  'fit';
+						$the_options['button_accept_all_btn_width1']  =  'fit';
+						$the_options['button_accept_all_btn_width2']  =  'fit';
+						$the_options['button_accept_button_width']   =  'fit';
+						$the_options['button_accept_button_width1']   =  'fit';
+						$the_options['button_accept_button_width2']   =  'fit';
+						$the_options['button_decline_button_width']  =  'fit';
+						$the_options['button_decline_button_width1']  =  'fit';
+						$the_options['button_decline_button_width2']  =  'fit';
+						$the_options['button_settings_button_width'] =  'fit';
+						$the_options['button_settings_button_width1'] =  'fit';
+						$the_options['button_settings_button_width2'] =  'fit';
+					}
+				
+					$the_options['banner_layouts']   = wp_json_encode( $banner_layouts );
+					$the_options['banner_structure'] = wp_json_encode( $banner_structure );
 				}
 			}
 			// language translation based on the selected language.
@@ -12085,7 +12737,7 @@ public function gdpr_support_request_handler() {
 				'cookies_categories'                       => $cookies_categories,
 				'scanned_cookies'                          => $scanned_cookies,
 				'cookie_scan_list'                         => $cookie_scan_list,
-				'template'								   => $the_options['template'] ?? 'default',
+				'template'								   => $the_options['template'] ?? 'new_default',
 				'scan_schedule_data'                       => get_option( 'gdpr_scan_schedule_data' ),
 				'scan_in_progress'                         => get_option( 'gdpr_scanning_action_hash' ) ? true : false,
 				'category_descriptions' 				   => $category_descriptions,
@@ -13171,12 +13823,12 @@ public function gdpr_support_request_handler() {
 		$normalized = strtolower( trim( (string) $template_name ) );
 
 		$name_map = array(
-			'light'   => 'default',
+			'light'   => 'new_default',
 			'dark'    => 'dark',
 			'minimal' => 'bold',
 		);
 
-		$resolved_key = isset( $name_map[ $normalized ] ) ? $name_map[ $normalized ] : 'default';
+		$resolved_key = isset( $name_map[ $normalized ] ) ? $name_map[ $normalized ] : 'new_default';
 		$the_options['template'] = $resolved_key;
 
 
@@ -13191,7 +13843,7 @@ public function gdpr_support_request_handler() {
 
 		$suffixes = array( '', '1', '2' );
 		
-		if ( in_array( $resolved_key, array( 'default', 'dark' ), true ) ) {
+		if ( in_array( $resolved_key, array( 'dark' ), true ) ) {
 
 			
 			foreach ( $suffixes as $suffix ) {
@@ -13199,6 +13851,21 @@ public function gdpr_support_request_handler() {
 				$the_options[ 'button_accept_button_min_width' . $suffix ]  = 100;
 				$the_options[ 'button_decline_button_min_width' . $suffix ] = 100;
 				$the_options[ 'button_settings_button_min_width' . $suffix ] = 140;
+
+				$the_options[ 'button_accept_all_btn_width' . $suffix ] = 'fit';
+				$the_options[ 'button_accept_button_width' . $suffix ]  = 'fit';
+				$the_options[ 'button_decline_button_width' . $suffix ] = 'fit';
+				$the_options[ 'button_settings_button_width' . $suffix ] = 'fit';
+			}
+
+		} elseif ( in_array( $resolved_key, array( 'new_default' ), true ) ) {
+
+			
+			foreach ( $suffixes as $suffix ) {
+				$the_options[ 'button_accept_all_btn_min_width' . $suffix ] = 132;
+				$the_options[ 'button_accept_button_min_width' . $suffix ]  = 132;
+				$the_options[ 'button_decline_button_min_width' . $suffix ] = 132;
+				$the_options[ 'button_settings_button_min_width' . $suffix ] = 132;
 
 				$the_options[ 'button_accept_all_btn_width' . $suffix ] = 'fit';
 				$the_options[ 'button_accept_button_width' . $suffix ]  = 'fit';
@@ -13241,11 +13908,11 @@ public function gdpr_support_request_handler() {
 					'direction' => ($the_options['template'] === 'almond' || $the_options['template'] === 'gray' || $the_options['template'] === 'gray_pink' || $the_options['template'] === 'blue_center_column' || $the_options['template'] === 'bold' || $the_options['template'] === 'blue_split') ? 'col' : 'row',
 				),
 				'c5' => array(
-					'justify'   => ($the_options['template'] === 'default' || $the_options['template'] === 'dark' || $the_options['template'] === 'blue_full') ? 'start' : 'center',
+					'justify'   => ($the_options['template'] === 'new_default' || $the_options['template'] === 'dark' || $the_options['template'] === 'blue_full') ? 'start' : 'center',
 					'direction' => 'row',
 				),
 				'c6' => array(
-					'justify'   => ($the_options['template'] === 'default' || $the_options['template'] === 'dark' || $the_options['template'] === 'blue_full') ? 'end' : 'center',
+					'justify'   => ($the_options['template'] === 'new_default' || $the_options['template'] === 'dark' || $the_options['template'] === 'blue_full') ? 'end' : 'center',
 					'direction' => 'row',
 				),
 			)
