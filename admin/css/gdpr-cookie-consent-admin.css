@@ -878,6 +878,23 @@ ul.gdpr_sub_tab li:first-child {
     gap: 10px;
 }
 /*button layouts*/
+
+.gdpr-template-field .cookie_notice_content .left_align_buttons{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.gdpr-template-field .cookie_notice_content .left_align_buttons-buttons{
+  flex-direction: row;
+  gap: 5px;
+  justify-content: start;
+}
+.gdpr-template-field .cookie_notice_content .left_align_buttons .left_buttons{
+  flex-direction: row-reverse;
+}
+.gdpr-template-field .cookie_notice_content .left_align_buttons-buttons a{
+  width: 132px;
+}
 .gdpr-template-field .cookie_notice_content .row_spaced{
   display: flex;
   flex-direction: column;
@@ -1106,6 +1123,23 @@ ul.gdpr_sub_tab li:first-child {
 }
 
 /* small button layouts */
+.gdpr-template-field-small .cookie_notice_content .left_align_buttons{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.gdpr-template-field-small .cookie_notice_content .left_align_buttons-buttons{
+  flex-direction: row;
+  gap: 5px;
+  justify-content: start;
+}
+.gdpr-template-field-small .cookie_notice_content .left_align_buttons .left_buttons{
+  flex-direction: row-reverse;
+}
+.gdpr-template-field-small .cookie_notice_content .left_align_buttons-buttons a{
+  width: 132px;
+}
+
 .gdpr-template-field-small .cookie_notice_content .row_spaced{
   display: flex;
   flex-direction: column;
@@ -9715,7 +9749,7 @@ div#gdpr-scan-history {
 }
 
 #gdpr-cookie-consent-settings-app .notice-type-popup, #gdpr-cookie-consent-settings-app .notice-type-widget {
-  width:  700px;
+  width:  768px;
 }
 
 #gdpr-cookie-consent-settings-app .notice-container .notice-content {
@@ -10176,7 +10210,17 @@ div#gdpr-scan-history {
     top: 82px;
     width: calc(25% - 130px);
   }
+@media (min-width:1920px) {
+   #gdpr-cookie-consent-settings-app .notice-type-banner .notice-content-body,  #gdpr-cookie-consent-settings-app .notice-type-banner .notice-content-header{
+    max-width: 1536px;
+   }
+}
 
+.new_default_banner .powered-by-credits{
+  position: absolute;
+  bottom: 22px;
+  right: 10px;
+}
 
 /* Plugin Dashboard Revamp - Sep25 */
 .wplp-compliance-main-wrapper {
