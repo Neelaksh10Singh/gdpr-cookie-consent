@@ -494,7 +494,7 @@ GDPR_CCPA_COOKIE_EXPIRE =
         }
       }
     },
-    getSubtleColors(finalColor, buttonColor) {
+    getSubtleColors: function (finalColor, buttonColor) {
         // Use button color for the overlay.
         var color = buttonColor || finalColor;
         var hex = color.replace(/^#/, '');

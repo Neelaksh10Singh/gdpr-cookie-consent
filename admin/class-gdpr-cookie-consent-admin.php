@@ -2292,6 +2292,10 @@ class Gdpr_Cookie_Consent_Admin {
 			unset( $prev_gdpr_option['button_1_selected_text'] );
 			$prev_gdpr_option['button_1_text']              = 'Accept';
 			$prev_gdpr_option['notify_message']             = addslashes( 'We use cookies to optimize your experience, analyze traffic, and personalize ads. Please choose whether you accept our use of non-essential cookies.' );
+			$prev_gdpr_option['notify_message_uk_gdpr'] 	= addslashes( 'We use cookies to improve our site, analyze performance, and serve personalized marketing. Please select your cookie preferences.' );
+			$prev_gdpr_option['notify_message_pdpl']		= addslashes( 'We utilize cookies to analyze traffic and customize your experience in compliance with KSA PDPL. Please provide your consent for non-essential tracking.' );
+			$prev_gdpr_option['notify_message_pipeda']		= addslashes( 'We use cookies to analyze performance and power our site. For details on how we protect your privacy or to adjust your choices, view our Cookie Policy.' );
+			$prev_gdpr_option['notify_message_app']			= addslashes( 'We collect data via tracking technologies to optimize our site and deliver marketing. To review your options or opt-out of sharing, view our Privacy Policy.' );
 			$prev_gdpr_option['opacity']                    = '1';
 			$prev_gdpr_option['template']                   = 'new_default';
 			$prev_gdpr_option['banner_template']            = 'banner-default';
@@ -2413,6 +2417,8 @@ class Gdpr_Cookie_Consent_Admin {
 			$prev_gdpr_option['cookie_usage_for'] = 'gdpr';
 			// ccpa message.
 			$prev_gdpr_option['notify_message_ccpa'] = addslashes( 'We use tracking tools to provide targeted advertising. Under state law, you have the right to opt-out of the sharing or sale of your personal information.' );
+			$prev_gdpr_option['notify_message_default_opt_out'] = addslashes( 'We use cookies and similar technologies for targeted advertising. You have the right to opt-out of the sale or processing of your personal data.' );
+			$prev_gdpr_option['notify_message_pure_opt_out'] = addslashes( 'We collect personal data via tracking technologies for analytics and marketing. To exercise your right to opt-out of this processing, choose below.' );
 			update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $prev_gdpr_option );
 			delete_option( 'GDPRCookieConsent-4.0' );
 		}
@@ -2563,14 +2569,23 @@ class Gdpr_Cookie_Consent_Admin {
 		}
 		$settings        = Gdpr_Cookie_Consent::gdpr_get_settings();
 		$gdpr_policies   = self::get_cookie_usage_for_options();
+		$us_state_policies = self::get_us_state_laws_for_options();
 		$policies_length = count( $gdpr_policies );
 		$policy_keys     = array_keys( $gdpr_policies );
+		$us_policy_keys  = array_keys( $us_state_policies );
 		$policies        = array();
+		$us_policies     = array();
 		$is_pro_active   = get_option( 'wpl_pro_active' );
 		for ( $i = 0; $i < $policies_length; $i++ ) {
 			$policies[ $i ] = array(
 				'label' => $policy_keys[ $i ],
 				'code'  => $gdpr_policies[ $policy_keys[ $i ] ],
+			);
+		}
+		for ( $i = 0; $i < count( $us_state_policies ); $i++ ) {
+			$us_policies[ $i ] = array(
+				'label' => $us_policy_keys[ $i ],
+				'code'  => $us_state_policies[ $us_policy_keys[ $i ] ],
 			);
 		}
 		$cookie_durations        = self::get_cookie_expiry_options();
@@ -3359,6 +3374,7 @@ class Gdpr_Cookie_Consent_Admin {
 				'default_template_json'			   => get_option('gdpr_default_template_object'),
 				'ajaxurl'                          => admin_url( 'admin-ajax.php' ),
 				'policies'                         => $policies,
+				'us_policies'					   => $us_policies,
 				'position_options'                 => $position_options,
 				'show_cookie_as_options'           => $show_cookie_as_options,
 				'show_language_as_options'         => $show_language_as_options,
@@ -3865,6 +3881,22 @@ class Gdpr_Cookie_Consent_Admin {
 				__( 'LGPD', 'gdpr-cookie-consent' )        => 'lgpd',
 			);
 		}
+		
+		$options = apply_filters( 'gdprcookieconsent_cookie_usage_for_options', $options );
+		return $options;
+	}
+
+	/**
+	 * Return us laws cookie usage options.
+	 *
+	 * @since 1.8.1
+	 */
+	public function get_us_state_laws_for_options() {
+		$options = array(
+			__( 'CCPA/CPRA', 'gdpr-cookie-consent' )    => 'ccpa',
+			__( 'Default', 'gdpr-cookie-consent' )        => 'default_opt_out',
+			__( 'Pure', 'gdpr-cookie-consent' )        => 'pure_opt_out',
+		);
 		
 		$options = apply_filters( 'gdprcookieconsent_cookie_usage_for_options', $options );
 		return $options;
@@ -5315,6 +5347,114 @@ class Gdpr_Cookie_Consent_Admin {
 				$the_options['gcm_about_message'] = isset($_POST['gcm_about_message_field']) ? sanitize_text_field(wp_unslash($_POST['gcm_about_message_field'])) : "For more information on how Google's third party cookies operate and handle your data, see: ";
 				$the_options['gcm_privacy_policy_text'] = isset($_POST['gcm_privacy_policy_text_field']) ? sanitize_text_field(wp_unslash($_POST['gcm_privacy_policy_text_field'])) : "Google's Privacy Policy";
 			}
+			$the_options['notify_message_uk_gdpr']      = 
+				isset( $_POST['notify_message_uk_gdpr_field'] ) ? wp_kses(
+					wp_unslash( $_POST['notify_message_uk_gdpr_field'] ),
+					array(
+						'a'      => array(
+							'href'   => array(),
+							'title'  => array(),
+							'target' => array(),
+							'rel'    => array(),
+							'class'  => array(),
+							'id'     => array(),
+							'style'  => array(),
+							'data-toggle' => array(),
+							'data-target' => array(), 
+						),
+						'br'     => array(),
+						'em'     => array(),
+						'strong' => array(),
+						'span'   => array(),
+						'p'      => array(),
+						'i'      => array(),
+						'img'    => array(),
+						'b'      => array(),
+						'div'    => array(),
+						'label'  => array(),
+					)
+				) : "We use cookies to improve our site, analyze performance, and serve personalized marketing. Please select your cookie preferences.";
+			$the_options['notify_message_pdpl']      = 
+				isset( $_POST['notify_message_pdpl_field'] ) ? wp_kses(
+					wp_unslash( $_POST['notify_message_pdpl_field'] ),
+					array(
+						'a'      => array(
+							'href'   => array(),
+							'title'  => array(),
+							'target' => array(),
+							'rel'    => array(),
+							'class'  => array(),
+							'id'     => array(),
+							'style'  => array(),
+							'data-toggle' => array(),
+							'data-target' => array(), 
+						),
+						'br'     => array(),
+						'em'     => array(),
+						'strong' => array(),
+						'span'   => array(),
+						'p'      => array(),
+						'i'      => array(),
+						'img'    => array(),
+						'b'      => array(),
+						'div'    => array(),
+						'label'  => array(),
+					)
+				) : "We utilize cookies to analyze traffic and customize your experience in compliance with KSA PDPL. Please provide your consent for non-essential tracking.";
+			$the_options['notify_message_pipeda']      = 
+				isset( $_POST['notify_message_pipeda_field'] ) ? wp_kses(
+					wp_unslash( $_POST['notify_message_pipeda_field'] ),
+					array(
+						'a'      => array(
+							'href'   => array(),
+							'title'  => array(),
+							'target' => array(),
+							'rel'    => array(),
+							'class'  => array(),
+							'id'     => array(),
+							'style'  => array(),
+							'data-toggle' => array(),
+							'data-target' => array(), 
+						),
+						'br'     => array(),
+						'em'     => array(),
+						'strong' => array(),
+						'span'   => array(),
+						'p'      => array(),
+						'i'      => array(),
+						'img'    => array(),
+						'b'      => array(),
+						'div'    => array(),
+						'label'  => array(),
+					)
+				) : "We use cookies to analyze performance and power our site. For details on how we protect your privacy or to adjust your choices, view our Cookie Policy.";
+			$the_options['notify_message_app']      = 
+				isset( $_POST['notify_message_app_field'] ) ? wp_kses(
+					wp_unslash( $_POST['notify_message_app_field'] ),
+					array(
+						'a'      => array(
+							'href'   => array(),
+							'title'  => array(),
+							'target' => array(),
+							'rel'    => array(),
+							'class'  => array(),
+							'id'     => array(),
+							'style'  => array(),
+							'data-toggle' => array(),
+							'data-target' => array(), 
+						),
+						'br'     => array(),
+						'em'     => array(),
+						'strong' => array(),
+						'span'   => array(),
+						'p'      => array(),
+						'i'      => array(),
+						'img'    => array(),
+						'b'      => array(),
+						'div'    => array(),
+						'label'  => array(),
+					)
+				) : "We collect data via tracking technologies to optimize our site and deliver marketing. To review your options or opt-out of sharing, view our Privacy Policy.";
 			$the_options['notify_message_lgpd'] = isset( $_POST['notify_message_lgpd_field'] ) ? wp_kses(
 				wp_unslash( $_POST['notify_message_lgpd_field'] ),
 				array(
@@ -5338,7 +5478,7 @@ class Gdpr_Cookie_Consent_Admin {
 					'div'    => array(),
 					'label'  => array(),
 				)
-			) : "This website uses cookies for technical and other purposes as specified in the cookie policy. We'll assume you're ok with this, but you can opt-out if you wish.";
+			) : "This website uses cookies to provide a better browsing experience. You can select your cookie preferences or accept all tracking categories below.";
 			
 			$the_options['about_message_lgpd']                   = isset( $_POST['about_message_lgpd_field'] ) ? sanitize_text_field( wp_unslash( $_POST['about_message_lgpd_field'] ) ) : "Cookies are small text files that can be used by websites to make a user's experience more efficient. The law states that we can store cookies on your device if they are strictly necessary for the operation of this site. For all other types of cookies we need your permission. This site uses different types of cookies. Some cookies are placed by third party services that appear on our pages.";
 			$the_options['notify_message_ccpa']                  = isset( $_POST['notify_message_ccpa_field'] ) ? wp_kses(
@@ -5365,6 +5505,55 @@ class Gdpr_Cookie_Consent_Admin {
 					'label'  => array(),
 				)
 			) : 'We use tracking tools to provide targeted advertising. Under state law, you have the right to opt-out of the sharing or sale of your personal information.';
+
+			$the_options['notify_message_default_opt_out']                  = isset( $_POST['notify_message_default_opt_out_field'] ) ? wp_kses(
+				wp_unslash( $_POST['notify_message_default_opt_out_field'] ),
+				array(
+					'a'      => array(
+						'href'   => array(),
+						'title'  => array(),
+						'target' => array(),
+						'rel'    => array(),
+						'class'  => array(),
+						'id'     => array(),
+						'style'  => array(),
+					),
+					'br'     => array(),
+					'em'     => array(),
+					'strong' => array(),
+					'span'   => array(),
+					'p'      => array(),
+					'i'      => array(),
+					'img'    => array(),
+					'b'      => array(),
+					'div'    => array(),
+					'label'  => array(),
+				)
+			) : 'We use cookies and similar technologies for targeted advertising. You have the right to opt-out of the sale or processing of your personal data.';
+			$the_options['notify_message_pure_opt_out']                  = isset( $_POST['notify_message_pure_opt_out_field'] ) ? wp_kses(
+				wp_unslash( $_POST['notify_message_pure_opt_out_field'] ),
+				array(
+					'a'      => array(
+						'href'   => array(),
+						'title'  => array(),
+						'target' => array(),
+						'rel'    => array(),
+						'class'  => array(),
+						'id'     => array(),
+						'style'  => array(),
+					),
+					'br'     => array(),
+					'em'     => array(),
+					'strong' => array(),
+					'span'   => array(),
+					'p'      => array(),
+					'i'      => array(),
+					'img'    => array(),
+					'b'      => array(),
+					'div'    => array(),
+					'label'  => array(),
+				)
+			) : 'We collect personal data via tracking technologies for analytics and marketing. To exercise your right to opt-out of this processing, choose below.';
 			if(($the_options['is_iabtcf_on'] == false && $_POST['gcc-iabtcf-enable'] == "true") || ($the_options['is_iabtcf_on'] == true && $_POST['gcc-iabtcf-enable'] == "false")){
 				$the_options['is_iabtcf_on'] = isset( $_POST['gcc-iabtcf-enable'] ) && ( true === $_POST['gcc-iabtcf-enable'] || 'true' === $_POST['gcc-iabtcf-enable'] ) ? 'true' : 'false';
 				$the_options = $this->changeLanguage($the_options);
@@ -11161,7 +11350,13 @@ public function gdpr_support_request_handler() {
 			__( 'Cookies are small text files that can be used by websites to make a user\'s experience more efficient. The law states that we can store cookies on your device if they are strictly necessary for the operation of this site. For all other types of cookies we need your permission. This site uses different types of cookies. Some cookies are placed by third party services that appear on our pages.', 'gdpr-cookie-consent' );
 			__( 'This website uses cookies', 'gdpr-cookie-consent' );
 			__( 'We use cookies to optimize your experience, analyze traffic, and personalize ads. Please choose whether you accept our use of non-essential cookies.', 'gdpr-cookie-consent' );
+			__( 'We use cookies to improve our site, analyze performance, and serve personalized marketing. Please select your cookie preferences.', 'gdpr-cookie-consent' );
+			__( 'We utilize cookies to analyze traffic and customize your experience in compliance with KSA PDPL. Please provide your consent for non-essential tracking.', 'gdpr-cookie-consent' );
+			__( 'We use cookies to analyze performance and power our site. For details on how we protect your privacy or to adjust your choices, view our Cookie Policy.', 'gdpr-cookie-consent' );
+			__( 'We collect data via tracking technologies to optimize our site and deliver marketing. To review your options or opt-out of sharing, view our Privacy Policy.', 'gdpr-cookie-consent' );
 			__( 'We use tracking tools to provide targeted advertising. Under state law, you have the right to opt-out of the sharing or sale of your personal information.', 'gdpr-cookie-consent' );
+			__( 'We use cookies and similar technologies for targeted advertising. You have the right to opt-out of the sale or processing of your personal data.', 'gdpr-cookie-consent' );
+			__( 'We collect personal data via tracking technologies for analytics and marketing. To exercise your right to opt-out of this processing, choose below.', 'gdpr-cookie-consent' );
 			__( 'Do Not Sell My Personal Information', 'gdpr-cookie-consent' );
 			__( 'We use third-party cookies that help us analyse how you use this website, store your preferences, and provide the content and advertisements that are relevant to you. However, you can opt out of these cookies by checking "Do Not Sell or Share My Personal Information" and clicking the "Save My Preferences" button. Once you opt out, you can opt in again at any time by unchecking "Do Not Sell or Share My Personal Information" and clicking the "Save My Preferences" button.', 'gdpr-cookie-consent' );
 			__( 'Accept All', 'gdpr-cookie-consent' );
