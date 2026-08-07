@@ -1047,27 +1047,28 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 											<?php
 											$geo_options = get_option( 'wpl_geo_options' );
 											 if ( !$is_user_connected || empty($is_user_connected) || $api_user_plan === 'free') : ?>
-												<div class="gdpr-disabled-geo-integration">
-													<input id="gdpr-visitors-condition-radio-btn-disabled-gdpr" class="gdpr-visiotrs-condition-radio-btn" type="checkbox" name="gcc-eu-enable" disabled>
-													<label><?php esc_attr_e( 'EU Countries & UK', 'gdpr-cookie-consent' ); ?></label>
+												<div v-show="is_auto_mode ? false : !!region_label" class="gdpr-disabled-geo-integration">
+													<input id="gdpr-visitors-condition-radio-btn-disabled-gdpr" class="gdpr-visiotrs-condition-radio-btn" type="checkbox" name="gcc-region-enable" v-model="is_law_region_on" @click="onSwitchRegionEnable($event.target.checked)">
+													<label for="gdpr-visitors-condition-radio-btn-disabled-gdpr">{{ region_label }}</label>
 												</div>
-												<p class="gdpr-eu_visitors_message-gdpr">
+												<p class="gdpr-law_region_visitors_message-gdpr">
 													<?php esc_attr_e( 'To enable this feature, connect to your pro account', 'gdpr-cookie-consent' ); ?>
 												</p>
 											<?php elseif ( $the_options['enable_safe'] === true || $the_options['enable_safe'] === 'true' ) : ?>
-												<div class="gdpr-disabled-geo-integration">
-													<input id="gdpr-visitors-condition-radio-btn-disabled-gdpr" class="gdpr-visiotrs-condition-radio-btn" type="checkbox" name="gcc-eu-enable" disabled>
-													<label><?php esc_attr_e( 'EU Countries & UK', 'gdpr-cookie-consent' ); ?></label>
+												<div v-show="is_auto_mode ? false : !!region_label" class="gdpr-disabled-geo-integration">
+													<input id="gdpr-visitors-condition-radio-btn-disabled-gdpr" class="gdpr-visiotrs-condition-radio-btn" type="checkbox" name="gcc-region-enable" v-model="is_law_region_on" @click="onSwitchRegionEnable($event.target.checked)">
+													<label for="gdpr-visitors-condition-radio-btn-disabled-gdpr">{{ region_label }}</label>
 												</div>
 												<p class="gdpr-eu_visitors_message-gdpr">
 													<?php esc_attr_e( 'Safe Mode enabled. Disable it in Compliance settings to configure Geo-Targeting settings.', 'gdpr-cookie-consent' ); ?>
 												</p>
 											<?php else : ?>
-												<div>
-													<input id="gdpr-eu-id" class="gdpr-visiotrs-condition-radio-btn" type="checkbox" name="gcc-eu-enable" v-model="is_eu_on" @click="onSwitchEUEnable($event.target.checked)">
-													<label for="gdpr-eu-id"><?php esc_attr_e( 'EU Countries & UK', 'gdpr-cookie-consent' ); ?></label>
+												<div v-show="is_auto_mode ? false : !!region_label">
+													<input id="gdpr-region-id" class="gdpr-visiotrs-condition-radio-btn" type="checkbox"
+														name="gcc-region-enable" v-model="is_law_region_on" @click="onSwitchRegionEnable($event.target.checked)">
+													<label for="gdpr-region-id">Show only to users from {{ region_label }}</label>
 												</div>
-												<input type="hidden" name="gcc-eu-enable" v-model="is_eu_on">
+												<input type="hidden" name="gcc-region-enable" v-model="is_law_region_on">
 											<?php endif; ?>
 									</div>
 									<div>
