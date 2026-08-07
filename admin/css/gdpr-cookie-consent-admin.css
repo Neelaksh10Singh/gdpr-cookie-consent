@@ -7945,17 +7945,6 @@ button.btn.gdpr-renew-now-btn.pro,
   width: 20px;
   margin-right: 19px;
 }
-.compliances_card input[type="radio"]:checked::before {
-  background-color: var(--orange-50);
-  margin: 0;
-  width: 10px;
-  height: 10px;
-  border: none;
-  position: relative;
-  top: 4px;
-  left: 4px;
-  border-color: var(--orange-50);
-}
 .compliances_card .gdpr-visiotrs-condition-radio-btn:checked {
   border-color: var(--orange-50);
 }
@@ -9836,6 +9825,7 @@ div#gdpr-scan-history {
 
 #gdpr-cookie-consent-settings-app .notice-container  .notice-content-body .notice-buttons-wrapper {
   display: flex;
+  align-items: center;
 }
 #gdpr-cookie-consent-settings-app .notice-container .notice-content-body .notice-buttons-wrapper a{
   display: flex;
@@ -12288,4 +12278,27 @@ div#gdpr-scan-history {
 	margin-bottom: 0;
 	color: #3A3A41;
 	font-size: 14px;
+}
+
+/* Cookie Consent Law Improvements - Aug 2026 */
+.gcc-law-mode-toggle { 
+  margin-bottom: 12px; 
+  display: flex; 
+  gap: 20px; 
+}
+
+.gcc-radio { 
+  display: flex; 
+  align-items: center; 
+  gap: 6px; 
+  cursor: pointer; 
+}
+
+.gcc-flag { 
+  margin-right: 6px; 
+}
+
+.gcc-radio-disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
 }

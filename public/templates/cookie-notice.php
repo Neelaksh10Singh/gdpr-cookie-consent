@@ -179,7 +179,7 @@ if ( 'popup' === $the_options['cookie_bar_as'] ) {
 	$accept_style_attr .= "font-size: {$the_options['button_font_size' . $suffix]}px;";
 	$accept_style_attr .= "font-weight: {$the_options['button_text_weight' . $suffix]};";
 	$button_accept_button_width = $the_options['button_accept_button_width' . $suffix] === 'full' ? '100%' : 'fit-content';
-	$accept_style_attr .= "width: {button_accept_button_width};";
+	$accept_style_attr .= "width: {$button_accept_button_width};";
 	$accept_style_attr .= "min-width: {$the_options['button_accept_button_min_width' . $suffix]}px;";
 
 
