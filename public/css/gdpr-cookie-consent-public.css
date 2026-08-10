@@ -54,6 +54,7 @@
 #gdpr-cookie-consent-bar 
   .cookie_notice_buttons{
     display: flex;
+    align-items: center;
   }
 #gdpr-cookie-consent-bar 
   .cookie_notice_buttons .left_buttons,
