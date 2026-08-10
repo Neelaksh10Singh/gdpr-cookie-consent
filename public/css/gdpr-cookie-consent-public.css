@@ -1327,6 +1327,9 @@ Bootstrap CSS for frontend UI
   position: relative;
   margin-right: 6px;
 }
+.gdpr-more-details.is-expanded .gdpr-dropdown-arrow svg {
+    transform: rotate(-90deg);
+}
 .gdpr-more-details{
   margin: 0 0 0 0;
   cursor: pointer;
@@ -2687,4 +2690,8 @@ Bootstrap CSS for frontend UI
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.gdpr-notice-content-body p a#vendor-link{
+  color: var(--vendor-link-color);
 }

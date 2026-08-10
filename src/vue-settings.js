@@ -751,6 +751,12 @@ var gen = new Vue({
       cookie_bar_color: settings_obj.the_options.hasOwnProperty("background")
         ? settings_obj.the_options["background"]
         : "#ffffff",
+      cookie_settings_border_color: settings_obj.the_options.hasOwnProperty("cookie_settings_border_color")
+        ? settings_obj.the_options["cookie_settings_border_color"]
+        : "#ffffff",
+      cookie_settings_overlay_color: settings_obj.the_options.hasOwnProperty("cookie_settings_overlay_color")
+        ? settings_obj.the_options["cookie_settings_overlay_color"]
+        : "#ffffff",
       on_hide:
         settings_obj.the_options.hasOwnProperty("notify_animate_hide") &&
         (true === settings_obj.the_options["notify_animate_hide"] ||
@@ -3052,6 +3058,166 @@ var gen = new Vue({
                 });
             });
     },
+    generatePopupColors(backgroundColor, acceptAllButtonColor) {
+      const parseHex = (color, fallback) => {
+        let hex = String(color || '')
+          .trim()
+          .replace(/^#/, '');
+
+        // Support #RGB and #RGBA.
+        if (hex.length === 3 || hex.length === 4) {
+          hex =
+            hex[0] + hex[0] +
+            hex[1] + hex[1] +
+            hex[2] + hex[2];
+        } else {
+          // Ignore alpha from #RRGGBBAA.
+          hex = hex.substring(0, 6);
+        }
+
+        if (!/^[0-9a-fA-F]{6}$/.test(hex)) {
+          return fallback;
+        }
+
+        return {
+          r: parseInt(hex.substring(0, 2), 16),
+          g: parseInt(hex.substring(2, 4), 16),
+          b: parseInt(hex.substring(4, 6), 16),
+        };
+      };
+
+      const clamp = (value) => {
+        return Math.max(0, Math.min(255, Math.round(value)));
+      };
+
+      const mixColors = (base, tint, strength) => {
+        return {
+          r: clamp(base.r + (tint.r - base.r) * strength),
+          g: clamp(base.g + (tint.g - base.g) * strength),
+          b: clamp(base.b + (tint.b - base.b) * strength),
+        };
+      };
+
+      const toHex = (color) => {
+        const valueToHex = (value) => {
+          return clamp(value)
+            .toString(16)
+            .padStart(2, '0');
+        };
+
+        return (
+          '#' +
+          valueToHex(color.r) +
+          valueToHex(color.g) +
+          valueToHex(color.b)
+        );
+      };
+
+      const getLuminance = (color) => {
+        const convertChannel = (channel) => {
+          const value = channel / 255;
+
+          return value <= 0.04045
+            ? value / 12.92
+            : Math.pow((value + 0.055) / 1.055, 2.4);
+        };
+
+        return (
+          0.2126 * convertChannel(color.r) +
+          0.7152 * convertChannel(color.g) +
+          0.0722 * convertChannel(color.b)
+        );
+      };
+
+      const getColorDifference = (first, second) => {
+        return (
+          Math.abs(first.r - second.r) +
+          Math.abs(first.g - second.g) +
+          Math.abs(first.b - second.b)
+        ) / 3;
+      };
+
+      const black = { r: 0, g: 0, b: 0 };
+      const white = { r: 255, g: 255, b: 255 };
+
+      const background = parseHex(
+        backgroundColor,
+        white
+      );
+
+      const buttonColor = parseHex(
+        acceptAllButtonColor,
+        background
+      );
+
+      const backgroundLuminance =
+        getLuminance(background);
+
+      /*
+      * Overlay:
+      * 92% background + 8% Accept All button color.
+      */
+      const overlayTintStrength = 0.08;
+
+      let overlay = mixColors(
+        background,
+        buttonColor,
+        overlayTintStrength
+      );
+
+      /*
+      * If the button and background are almost identical,
+      * apply a small light/dark adjustment so the card remains
+      * distinguishable.
+      */
+      if (getColorDifference(background, overlay) < 4) {
+        const overlayFallbackTarget =
+          backgroundLuminance < 0.45
+            ? white
+            : black;
+
+        overlay = mixColors(
+          background,
+          overlayFallbackTarget,
+          0.05
+        );
+      }
+
+      /*
+      * Border:
+      * Lighten dark overlays by 16%.
+      * Darken light overlays by 12%.
+      */
+      const overlayLuminance = getLuminance(overlay);
+      const isDark = overlayLuminance < 0.45;
+
+      const borderTarget = isDark ? white : black;
+      const borderStrength = isDark ? 0.16 : 0.12;
+
+      const border = mixColors(
+        overlay,
+        borderTarget,
+        borderStrength
+      );
+
+      return {
+        overlay: toHex(overlay),
+        border: toHex(border),
+      };
+    },
+
+    updatePopupColors() {
+      const colors = this.generatePopupColors(
+        this.cookie_bar_color,
+        this.button_accept_all_button_color
+      );
+
+      this.cookie_settings_overlay_color =
+        colors.overlay;
+
+      this.cookie_settings_border_color =
+        colors.border;
+    },
     isPluginVersionLessOrEqual(version) {
       return this.pluginVersion && this.pluginVersion <= version;
     },
@@ -4106,6 +4272,19 @@ var gen = new Vue({
       }
       this.select_pages = dummy_array;
     },
+    onHeadingInput(value){
+      if(value.length > 0)  {
+        this.heading_is_on = true;
+        this.heading_is_on1 = true;
+        this.heading_is_on2 = true;
+      }
+      else{
+        this.heading_is_on = false;
+        this.heading_is_on1 = false;
+        this.heading_is_on2 = false;
+      }
+
+    },
     onSelectPrivacyPage(value) {
       this.button_readmore_page = value;
     },
@@ -4873,7 +5052,9 @@ var gen = new Vue({
               that.gdpr_css_text+
               "&auto_generated_banner=" + (that.auto_generated_banner ? '1' : '0') +
               "&is_template_changed=" + (that.is_template_changed ? '1' : '0') +
-              "&reset_auto_generated=" + (shouldResetAutoGenerated ? '1' : '0'),
+              "&reset_auto_generated=" + (shouldResetAutoGenerated ? '1' : '0') +
+              "&cookie_settings_overlay_color=" + that.cookie_settings_overlay_color + 
+              "&cookie_settings_border_color=" + that.cookie_settings_border_color ,
           })
           .done(function (data) {
             that.success_error_message = "Settings Saved";
@@ -5621,6 +5802,17 @@ var gen = new Vue({
         }
       });
 
+  },
+  watch: {
+    cookie_bar_color: {
+      handler: 'updatePopupColors',
+      immediate: true
+    },
+
+    button_accept_all_button_color: {
+      handler: 'updatePopupColors',
+      immediate: true
+    }
   },
   icons: { cilPencil, cilSettings, cilInfo, cibGoogleKeep },
 });
