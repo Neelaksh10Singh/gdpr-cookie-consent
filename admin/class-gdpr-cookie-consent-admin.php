@@ -10644,7 +10644,7 @@ class Gdpr_Cookie_Consent_Admin {
 				array(
 					'methods'  => 'POST',
 					'callback' => array( $this, 'gdpr_get_wplp_payment_status' ),
-					'permission_callback' => array( $this, 'permission_callback_for_react_app' )
+					'permission_callback' => array( $this, 'permission_callback_for_delete_activation' ) //use master key only
 				)
 			);
 		}
@@ -10656,7 +10656,8 @@ class Gdpr_Cookie_Consent_Admin {
 				array(
 					'methods'  => 'POST',
 					'callback' => array( $this, 'gdpr_set_subscription_payment_pending_cancel' ),
-					'permission_callback' => array( $this, 'permission_callback_for_react_app' )				)
+					'permission_callback' => array( $this, 'permission_callback_for_delete_activation' ) //use master key only
+				)
 			);
 		}
 	}
