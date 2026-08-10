@@ -1169,6 +1169,7 @@ class Gdpr_Cookie_Consent {
 			'is_iabtcf_on'                         => false,
 			'is_gacm_on'						   => false,
 			'is_eu_on'                             => false,
+			'is_law_region_on'                     => false,
 			'is_ccpa_on'                           => false,
 			'is_ccpa_iab_on'                       => false,
 			'is_worldwide_on'                      => true,
@@ -1298,6 +1299,7 @@ class Gdpr_Cookie_Consent {
 			case 'is_on':
 			case 'is_iabtcf_on':
 			case 'is_eu_on':
+			case 'is_law_region_on':
 			case 'is_ccpa_on':
 			case 'is_ccpa_iab_on':
 			case 'is_script_blocker_on':

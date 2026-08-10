@@ -320,6 +320,98 @@ class Gdpr_Cookie_Consent_Public {
 		// check_ajax_referer( 'wpl_consent_logging_nonce', 'security' );
 		$this->user_iab_consent = json_decode(stripslashes($_POST['user_iab_consent']),true);
 	}
+
+	/**
+	 * Returns the list of country codes that constitute the "home region" for a law.
+	 */
+	private function gdpr_get_law_region_countries( $law ) {
+		switch ( $law ) {
+			case 'gdpr':
+			case 'eprivacy':
+				return Gdpr_Cookie_Consent::get_eu_countries();
+			case 'uk_gdpr':
+				return array( 'GB' );
+			case 'us_state_laws':
+				return array( 'US' );
+			case 'lgpd':
+				return array( 'BR' );
+			case 'pipeda':
+				return array( 'CA' );
+			case 'au_app':
+				return array( 'AU' );
+			case 'sa_pdpl':
+				return array( 'SA' );
+			default:
+				return array();
+		}
+	}
+
+	private function gdpr_get_geo_targeting_settings( $law, $the_options ) {
+		$truthy = function ( $v ) {
+			return true === $v || 1 === $v || '1' === $v || 'true' === $v;
+		};
+
+		if ( get_option( 'gdpr_geo_targeting_migrated' ) ) {
+			return array(
+				'worldwide'    => $truthy( $the_options['is_worldwide_on'] ?? false ),
+				'region'       => $truthy( $the_options['is_law_region_on'] ?? false ),
+				'countries_on' => $truthy( $the_options['is_selectedCountry_on'] ?? false ),
+				'countries'    => is_array( $the_options['select_countries'] ?? null ) ? $the_options['select_countries'] : array(),
+			);
+		}
+
+		// Legacy install: US State Laws (formerly CCPA) used the *_ccpa key family.
+		if ( 'us_state_laws' === $law ) {
+			return array(
+				'worldwide'    => $truthy( $the_options['is_worldwide_on_ccpa'] ?? false ),
+				'region'       => $truthy( $the_options['is_ccpa_on'] ?? false ),
+				'countries_on' => $truthy( $the_options['is_selectedCountry_on_ccpa'] ?? false ),
+				'countries'    => is_array( $the_options['select_countries_ccpa'] ?? null ) ? $the_options['select_countries_ccpa'] : array(),
+			);
+		}
+
+		return array(
+			'worldwide'    => $truthy( $the_options['is_worldwide_on'] ?? false ),
+			'region'       => $truthy( $the_options['is_eu_on'] ?? false ),
+			'countries_on' => $truthy( $the_options['is_selectedCountry_on'] ?? false ),
+			'countries'    => is_array( $the_options['select_countries'] ?? null ) ? $the_options['select_countries'] : array(),
+		);
+	}
+
+	/**
+	 * Decides whether the banner should be shown to the current visitor for a given law.
+	 */
+	private function gdpr_should_show_banner_for_law( $law, $the_options ) {
+		$geo = $this->gdpr_get_geo_targeting_settings( $law, $the_options );
+
+		if ( $geo['worldwide'] ) {
+			return true;
+		}
+
+		$allowed_countries = array();
+
+		if ( $geo['region'] ) {
+			$allowed_countries = array_merge( $allowed_countries, $this->gdpr_get_law_region_countries( $law ) );
+		}
+
+		if ( $geo['countries_on'] ) {
+			$allowed_countries = array_merge( $allowed_countries, $geo['countries'] );
+		}
+
+		if ( empty( $allowed_countries ) ) {
+			return false;
+		}
+
+		$geoip             = new Gdpr_Cookie_Consent_Geo_Ip();
+		$user_country_code = $geoip->wpl_is_selected_country();
+
+		if ( false === $user_country_code || '' === $user_country_code ) {
+			return true;
+		}
+
+		return in_array( $user_country_code, $allowed_countries, true );
+	}
+
 	/**
 	 * Returns cookie consent bar status.
 	 *
@@ -328,99 +420,26 @@ class Gdpr_Cookie_Consent_Public {
 	//This product includes GeoLite2 data created by MaxMind, available from https://www.maxmind.com. The data is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
 	public function show_cookie_consent_bar() {
 		update_option( 'gdpr_settings_enabled', 0 );
+		
+		$the_options = Gdpr_Cookie_Consent::gdpr_get_settings();
+		$law         = isset( $the_options['cookie_usage_for'] ) ? $the_options['cookie_usage_for'] : 'gdpr';
+
+		if ( 'ccpa' === $law ) {
+			$law = 'us_state_laws';
+		}
+		if ( 'both' === $law ) {
+			$law = 'gdpr';
+		}
+
+		$show = $this->gdpr_should_show_banner_for_law( $law, $the_options );
+
 		$return_array = array(
-			'eu_status'   => 'on',
-			'ccpa_status' => 'on',
+			'geo_status'  => $show ? 'on' : 'off',
+			'law'         => $law,
+			'eu_status'   => $show ? 'on' : 'off',
+			'ccpa_status' => $show ? 'on' : 'off',
 		);
-		$the_options  = Gdpr_Cookie_Consent::gdpr_get_settings();
-		if ( 'gdpr' === $the_options['cookie_usage_for'] ) {
-			if ( $the_options['is_worldwide_on'] === false) {
-				$show_banner_for_selected_countries = array();
-				if ( true === boolval( $the_options['is_eu_on'] ) ) {
-					$eu_countries = Gdpr_Cookie_Consent::get_eu_countries();
-					$show_banner_for_selected_countries = array_merge( $show_banner_for_selected_countries, $eu_countries );
-				}
 
-				if ( true === boolval( $the_options['is_selectedCountry_on'] ) ) {
-					if ( isset( $the_options['select_countries'] ) && is_array( $the_options['select_countries'] ) ) {
-						$show_banner_for_selected_countries = array_merge( $show_banner_for_selected_countries, $the_options['select_countries'] );
-					}
-				}
-				
-				$geoip             = new Gdpr_Cookie_Consent_Geo_Ip();
-				$user_country_code = $geoip->wpl_is_selected_country();
-				if ( ! in_array( $user_country_code, $show_banner_for_selected_countries ) ) {
-						$return_array['eu_status'] = 'off';
-				}
-			}
-			$return_array['ccpa_status'] = 'off';
-		}
-		else if('ccpa' === $the_options['cookie_usage_for']){
-			if ( $the_options['is_worldwide_on_ccpa'] === false) {
-				$show_banner_for_selected_countries = array();
-				
-				if ( true === boolval( $the_options['is_ccpa_on'] ) ) {
-					$ccpa_countries = array(
-						'US',
-					);
-					$show_banner_for_selected_countries = array_merge( $show_banner_for_selected_countries, $ccpa_countries );
-				}
-				if ( true === boolval( $the_options['is_selectedCountry_on_ccpa'] ) ) {
-					if ( isset( $the_options['select_countries_ccpa'] ) && is_array( $the_options['select_countries_ccpa'] ) ) {
-						$show_banner_for_selected_countries = array_merge( $show_banner_for_selected_countries, $the_options['select_countries_ccpa'] );
-					}
-				}
-				
-				$geoip             = new Gdpr_Cookie_Consent_Geo_Ip();
-				$user_country_code = $geoip->wpl_is_selected_country();
-				if ( ! in_array( $user_country_code, $show_banner_for_selected_countries ) ) {
-						$return_array['ccpa_status'] = 'off';
-				}
-			}
-			$return_array['eu_status'] = 'off';
-		}
-		else if( 'both' == $the_options['cookie_usage_for']){
-			if ( $the_options['is_worldwide_on'] === false) {
-				$show_banner_for_selected_countries = array();
-				if ( true === boolval( $the_options['is_eu_on'] ) ) {
-					$eu_countries = Gdpr_Cookie_Consent::get_eu_countries();
-					$show_banner_for_selected_countries = array_merge( $show_banner_for_selected_countries, $eu_countries );
-				}
-
-				if ( true === boolval( $the_options['is_selectedCountry_on'] ) ) {
-					if ( isset( $the_options['select_countries'] ) && is_array( $the_options['select_countries'] ) ) {
-						$show_banner_for_selected_countries = array_merge( $show_banner_for_selected_countries, $the_options['select_countries'] );
-					}
-				}
-				
-				$geoip             = new Gdpr_Cookie_Consent_Geo_Ip();
-				$user_country_code = $geoip->wpl_is_selected_country();
-				if ( ! in_array( $user_country_code, $show_banner_for_selected_countries ) ) {
-						$return_array['eu_status'] = 'off';
-				}
-			}
-			if ( $the_options['is_worldwide_on_ccpa'] === false) {
-				$show_banner_for_selected_countries = array();
-				
-				if ( true === boolval( $the_options['is_ccpa_on'] ) ) {
-					$ccpa_countries = array(
-						'US',
-					);
-					$show_banner_for_selected_countries = array_merge( $show_banner_for_selected_countries, $ccpa_countries );
-				}
-				if ( true === boolval( $the_options['is_selectedCountry_on_ccpa'] ) ) {
-					if ( isset( $the_options['select_countries_ccpa'] ) && is_array( $the_options['select_countries_ccpa'] ) ) {
-						$show_banner_for_selected_countries = array_merge( $show_banner_for_selected_countries, $the_options['select_countries_ccpa'] );
-					}
-				}
-				
-				$geoip             = new Gdpr_Cookie_Consent_Geo_Ip();
-				$user_country_code = $geoip->wpl_is_selected_country();
-				if ( ! in_array( $user_country_code, $show_banner_for_selected_countries ) ) {
-						$return_array['ccpa_status'] = 'off';
-				}
-			}
-		}
 		wp_send_json( $return_array );
 		wp_die();
 	}

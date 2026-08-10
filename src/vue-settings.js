@@ -80,9 +80,6 @@ var gen = new Vue({
         }
     }
 
-    console.log(settings_obj.law_selection_mode);
-    console.log(this.law_selection_mode);
-
     const c5Buttons = Array.isArray(bannerStructure?.c5)
         ? bannerStructure.c5
         : ["accept_all", "accept", "settings"];
@@ -97,6 +94,13 @@ var gen = new Vue({
     const visibleC6Items1 = c6Buttons.filter((item) => isButtonVisible(item, settings_obj.the_options, '1'));
     const visibleC5Items2 = c5Buttons.filter((item) => isButtonVisible(item, settings_obj.the_options, '2'));
     const visibleC6Items2 = c6Buttons.filter((item) => isButtonVisible(item, settings_obj.the_options, '2'));
+
+    const lawCode = settings_obj.the_options.hasOwnProperty("cookie_usage_for")
+      ? settings_obj.the_options["cookie_usage_for"]
+      : "gdpr";
+    // 'ccpa' and 'both' are legacy codes kept readable indefinitely.
+    const isUsStateLaws = lawCode === "us_state_laws" || lawCode === "ccpa" || lawCode === "both";
+
     return {
       labelIcon: {},
       labelIconNew: {
@@ -105,7 +109,8 @@ var gen = new Vue({
       },
 
       isGdprProActive: "1" === settings_obj.is_pro_active,
-      pro_only_law_codes: ['sa_pdpl', 'pipeda', 'au_app'],
+      // Keep in sync with gdpr_pro_only_law_codes() in class-gdpr-cookie-consent-admin.php.
+      pro_only_law_codes: ['uk_gdpr', 'sa_pdpl', 'pipeda', 'au_app'],
       disableSwitch: false,
       is_template_changed: false,
       is_auto_template_generated: false,
@@ -295,25 +300,17 @@ var gen = new Vue({
       banner_preview_is_on:
         false,
       policy_options: settings_obj.policies,
-      law_selection_mode: settings_obj.law_selection_mode || 'auto',
+      law_selection_mode: settings_obj.law_selection_mode || 'manual',
       disabled_for_free: Boolean(Number(settings_obj.disabled_for_free)),
-      gdpr_policy: settings_obj.the_options.hasOwnProperty("cookie_usage_for")
-        ? settings_obj.the_options["cookie_usage_for"]
-        : "gdpr",
-      is_gdpr:
-        this.gdpr_policy === "gdpr" || this.gdpr_policy === "both"
-          ? true
-          : false,
-      is_us_state_laws:
-        this.gdpr_policy === "ccpa" || this.gdpr_policy === "both"
-          ? true
-          : false,
-      is_lgpd: this.gdpr_policy === "lgpd" ? true : false,
-      is_eprivacy: this.gdpr_policy === "eprivacy" ? true : false,
-      is_uk_gdpr: this.gdpr_policy === "uk_gdpr" ? true : false,
-      is_pipeda: this.gdpr_policy === "pipeda" ? true : false,
-      is_au_app: this.gdpr_policy === "au_app" ? true : false,
-      is_sa_pdpl: this.gdpr_policy === "sa_pdpl" ? true : false,
+      gdpr_policy: lawCode,
+      is_gdpr: lawCode === "gdpr" || lawCode === "both",
+      is_us_state_laws: isUsStateLaws,
+      is_lgpd: lawCode === "lgpd",
+      is_eprivacy: lawCode === "eprivacy",
+      is_uk_gdpr: lawCode === "uk_gdpr",
+      is_pipeda: lawCode === "pipeda",
+      is_au_app: lawCode === "au_app",
+      is_sa_pdpl: lawCode === "sa_pdpl",
       eprivacy_message: settings_obj.the_options.hasOwnProperty(
         "notify_message_eprivacy"
       )
@@ -2950,7 +2947,7 @@ var gen = new Vue({
           : false,
       is_law_region_on:
         settings_obj.the_options.hasOwnProperty("is_law_region_on") &&
-        (true === settings_obj.the_options["is_law_region_onis_worldwide_on"] ||
+        (true === settings_obj.the_options["is_law_region_on"] ||
           1 === settings_obj.the_options["is_law_region_on"])
           ? true
           : false, 
@@ -3094,42 +3091,50 @@ var gen = new Vue({
 
       return decodedCSS;
     },
+    applyLawFlags(code) {
+      // 'ccpa' and 'both' are legacy codes kept readable indefinitely.
+      const isUsStateLaws =
+        code === "us_state_laws" || code === "ccpa" || code === "both";
+      const known = [
+        "gdpr",
+        "both",
+        "us_state_laws",
+        "ccpa",
+        "lgpd",
+        "eprivacy",
+        "uk_gdpr",
+        "pipeda",
+        "au_app",
+        "sa_pdpl",
+      ].includes(code);
+
+      this.is_us_state_laws = isUsStateLaws;
+      this.is_gdpr = code === "gdpr" || code === "both" || !known;
+      this.is_lgpd = code === "lgpd";
+      this.is_eprivacy = code === "eprivacy";
+      this.is_uk_gdpr = code === "uk_gdpr";
+      this.is_pipeda = code === "pipeda";
+      this.is_au_app = code === "au_app";
+      this.is_sa_pdpl = code === "sa_pdpl";
+    },
     setValues() {
+      this.applyLawFlags(this.gdpr_policy);
+
       if (this.gdpr_policy === "both") {
-        this.is_us_state_laws = true;
-        this.is_gdpr = true;
-        this.is_eprivacy = false;
-        this.is_lgpd = false;
         this.show_visitor_conditions = true;
         this.show_revoke_card = true;
-      } else if (this.gdpr_policy === "ccpa") {
-        this.is_us_state_laws = true;
-        this.is_eprivacy = false;
-        this.is_gdpr = false;
-        this.is_lgpd = false;
+      } else if (this.is_us_state_laws) {
         this.show_visitor_conditions = true;
         this.show_revoke_card = false;
-      } else if (this.gdpr_policy === "gdpr") {
-        this.is_gdpr = true;
-        this.is_us_state_laws = false;
-        this.is_eprivacy = false;
-        this.is_lgpd = false;
+      } else if (this.is_lgpd) {
+        this.show_revoke_card = true;
+        this.show_visitor_conditions = false;
+      } else if (this.is_eprivacy) {
+        this.show_visitor_conditions = false;
+        this.show_revoke_card = true;
+      } else {
         this.show_revoke_card = true;
         this.show_visitor_conditions = true;
-      } else if (this.gdpr_policy === "lgpd") {
-        this.is_gdpr = false;
-        this.is_us_state_laws = false;
-        this.is_lgpd = true;
-        this.is_eprivacy = false;
-        this.show_revoke_card = true;
-        this.show_visitor_conditions = false;
-      } else {
-        this.is_eprivacy = true;
-        this.is_gdpr = false;
-        this.is_us_state_laws = false;
-        this.is_lgpd = false;
-        this.show_visitor_conditions = false;
-        this.show_revoke_card = true;
       }
       for (let i = 0; i < this.list_of_contents.length; i++) {
         if (
@@ -3449,30 +3454,28 @@ var gen = new Vue({
       this.selectedRadioWorldWide = "yes";
       this.selectedRadioCountry = false;
       this.is_worldwide_on = true;
-      this.is_eu_on = false;
+      this.is_law_region_on = false;
       this.is_selectedCountry_on = false;
     },
     onSwitchRegionEnable(isChecked) {
+      this.is_law_region_on = isChecked;
       if (isChecked) {
-        this.is_law_region_on = true;
-        this.selectedRadioWorldWide = false; 
+        this.selectedRadioWorldWide = false;
         this.is_worldwide_on = false;
       } else if (this.is_selectedCountry_on !== true) {
-        this.selectedRadioWorldWide = 'yes'; // fall back to worldwide, same pattern as your existing onSwitchEUEnable
+        this.selectedRadioWorldWide = "yes";
+        this.is_worldwide_on = true;
       }
     },
     onSwitchSelectedCountryEnable(isChecked) {
+      this.is_selectedCountry_on = isChecked;
+      this.selectedRadioCountry = isChecked;
       if (isChecked) {
-        this.is_selectedCountry_on = true;
-        this.selectedRadioCountry = true;
         this.selectedRadioWorldWide = false;
         this.is_worldwide_on = false;
-      } else {
-        this.is_selectedCountry_on = false;
-        this.selectedRadioCountry = false;
-        if (this.is_eu_on != true) {
-          this.selectedRadioWorldWide = "yes";
-        }
+      } else if (this.is_law_region_on !== true) {
+        this.selectedRadioWorldWide = "yes";
+        this.is_worldwide_on = true;
       }
     },
     onCountrySelect(value) {
@@ -4158,20 +4161,27 @@ var gen = new Vue({
       return true;
     },
     onLawModeChange() {
-      this.is_auto_mode = this.law_selection_mode === 'auto';
-      console.log("Law mode changed to: ", this.law_selection_mode);
-      console.log("Disabled for free: ", this.disabled_for_free);
-      console.log("Is auto mode: ", this.is_auto_mode);
+      // is_auto_mode is a computed derived from law_selection_mode — assigning to
+      // it here would be a write to a setter-less computed.
       this.success_error_message = "Law selection mode updated. Save changes please before progressing further.";
       j("#gdpr-cookie-consent-save-settings-alert").css("background-color", "#72b85c");
       j("#gdpr-cookie-consent-save-settings-alert").fadeIn(400);
       j("#gdpr-cookie-consent-save-settings-alert").fadeOut(5000);
+
+      if (this.law_selection_mode === "auto" && this.is_law_region_on) {
+        this.onSwitchRegionEnable(false);
+      }
     },
     cookiePolicyChange(value) {
       this.onSwitchReloadLaw();
       if (this.gdpr_policy) {
         value = this.gdpr_policy;
       }
+      // Set all law flags up front from the single source of truth. The branches
+      // below then only apply their law-specific side effects (button defaults,
+      // IAB/GCM resets, geo resets); they no longer own flag bookkeeping, so a
+      // branch that forgets to clear a sibling flag can't leave one stuck on.
+      this.applyLawFlags(value);
       if (value === "us_state_laws") {
         this.is_us_state_laws = true;
         this.is_eprivacy = false;
@@ -4267,19 +4277,16 @@ var gen = new Vue({
         this.is_pipeda = false;
         this.is_au_app = false;
         this.is_sa_pdpl = true;
-      } else {
-        this.is_eprivacy = true;
-        this.is_gdpr = false;
-        this.is_us_state_laws = false;
-        this.is_lgpd = false;
-        this.is_uk_gdpr = false;
-        this.is_pipeda = false;
-        this.is_au_app = false;
-        this.is_sa_pdpl = false;
+      } else if (value === "eprivacy") {
+        // Matched by name, not used as a catch-all: an unrecognised code must not
+        // silently become ePrivacy. applyLawFlags() above already defaulted it.
         this.show_visitor_conditions = false;
         this.show_revoke_card = true;
         this.iabtcf_is_on = false;
         this.gacm_is_on = false;
+      } else {
+        this.show_revoke_card = true;
+        this.show_visitor_conditions = true;
       }
       if (this.iabtcf_is_on) {
         this.gdpr_message = `We and our <a id = "vendor-link" href = "#" data-toggle = "gdprmodal" data-target = "#gdpr-gdprmodal">836 partners</a> use cookies and other tracking technologies to improve your experience on our website. We may store and/or access information on a device and process personal data, such as your IP address and browsing data, for personalised advertising and content, advertising and content measurement, audience research and services development. Additionally, we may utilize precise geolocation data and identification through device scanning.\n\nPlease note that your consent will be valid across all our subdomains. You can change or withdraw your consent at any time by clicking the “Cookie Settings” button at the bottom of your screen. We respect your choices and are committed to providing you with a transparent and secure browsing experience.`;
@@ -4299,6 +4306,10 @@ var gen = new Vue({
       );
       j("#gdpr-cookie-consent-save-settings-alert").fadeIn(400);
       j("#gdpr-cookie-consent-save-settings-alert").fadeOut(5000);
+
+      if (!this.region_label && this.is_law_region_on) {
+        this.onSwitchRegionEnable(false);
+      }
     },
 
     onSwitchDefaultCookieBar() {
