@@ -10590,13 +10590,7 @@ class Gdpr_Cookie_Consent_Admin {
 			array(
 				'methods'  => 'POST',
 				'callback' => array($this, 'gdpr_send_data_to_dashboard_appwplp_server'), // Function to handle the request
-				'permission_callback' => function() use ($is_user_connected) {
-					// Check if user is connected and the API plan is valid
-					if ($is_user_connected) {
-						return true; // Allow access
-					}
-					return new WP_Error('rest_forbidden', 'Unauthorized access', array('status' => 401));
-				},
+				'permission_callback'	=> array( $this, 'permission_callback_for_react_app' ),
 			)
 		);
 		register_rest_route(
@@ -10650,13 +10644,7 @@ class Gdpr_Cookie_Consent_Admin {
 				array(
 					'methods'  => 'POST',
 					'callback' => array( $this, 'gdpr_get_wplp_payment_status' ),
-					'permission_callback' => function() use ( $is_user_connected ) {
-						// Check if user is connected and the API plan is valid.
-						if ( $is_user_connected ) {
-							return true; // Allow access.
-						}
-						return new WP_Error( 'rest_forbidden', 'Unauthorized access', array( 'status' => 401 ) );
-					},
+					'permission_callback' => array( $this, 'permission_callback_for_react_app' )
 				)
 			);
 		}
@@ -10668,14 +10656,7 @@ class Gdpr_Cookie_Consent_Admin {
 				array(
 					'methods'  => 'POST',
 					'callback' => array( $this, 'gdpr_set_subscription_payment_pending_cancel' ),
-					'permission_callback' => function() use ( $is_user_connected ) {
-						// Check if user is connected and the API plan is valid.
-						if ( $is_user_connected ) {
-							return true; // Allow access.
-						}
-						return new WP_Error( 'rest_forbidden', 'Unauthorized access', array( 'status' => 401 ) );
-					},
-				)
+					'permission_callback' => array( $this, 'permission_callback_for_react_app' )				)
 			);
 		}
 	}
