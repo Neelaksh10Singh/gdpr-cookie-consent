@@ -2578,7 +2578,7 @@ class Gdpr_Cookie_Consent_Admin {
 				'label' => $label,
 				'code'  => $data['code'],
 				'flag'  => $data['flag'],
-			)
+			);
 		}
 		$us_state_policies = self::get_us_state_laws_for_options();
 		$policies_length = count( $gdpr_policies );
