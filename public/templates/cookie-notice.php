@@ -201,8 +201,8 @@ if ( 'popup' === $the_options['cookie_bar_as'] ) {
 	$accept_all_style_attr .= "width: {$button_accept_all_btn_width};";
 	$accept_all_style_attr .= "min-width: {$the_options['button_accept_all_btn_min_width' . $suffix]}px;";
 
+	$vendor_link_color = ( ! empty( $the_options['button_accept_all_as_button' . $suffix] ) && filter_var($the_options['button_accept_all_as_button' . $suffix], FILTER_VALIDATE_BOOLEAN)) ? $the_options['button_accept_all_button_color' . $suffix] : $the_options["button_accept_all_link_color" . $suffix];
 
-	
 	$settings_style_attr ="";
 	$settings_style_attr .=  " color: {$the_options["button_settings_link_color" . $suffix]};";
 	if ( ! empty( $the_options['button_settings_as_button' . $suffix] ) && filter_var($the_options['button_settings_as_button' . $suffix], FILTER_VALIDATE_BOOLEAN)) {
@@ -349,7 +349,7 @@ if ( 'popup' === $the_options['cookie_bar_as'] ) {
 	};
 ?>
 
-<div id="<?php echo esc_html( $the_options['container_id'] ); ?>" class="<?php echo esc_html( $the_options['container_class'] ); ?> <?php echo esc_html( $the_options['theme_class'] ); ?>"  style="<?php echo esc_attr($notice_container_styles); ?>">	
+<div id="<?php echo esc_html( $the_options['container_id'] ); ?>" class="<?php echo esc_html( $the_options['container_class'] ); ?> <?php echo esc_html( $the_options['theme_class'] ); ?>"  style="<?php echo esc_attr($notice_container_styles); ?>; --vendor-link-color: <?php echo esc_attr($vendor_link_color); ?>;">	
 	<?php if(filter_var( $the_options['bypass_button_is_on' . $suffix] ?? false, FILTER_VALIDATE_BOOLEAN )) { ?>
 	<span id="cookie-banner-cancle-img" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: absolute; top:5px; right: <?php echo 5 + ((int)$the_options[($ab_testing_enabled === "true" ? 'cookie_bar_spacing' . $chosenBanner : 'cookie_bar_spacing')]) / 2 + ((int)$the_options[($ab_testing_enabled === "true" ? 'cookie_bar_border_radius' . $chosenBanner : 'background_border_radius')]) / 2;?>px; height: 20px; width: 20px; border-radius: 50%; color: <?php echo esc_html($the_options['bypass_button_text_color' . $suffix]);?>; scale: <?php echo esc_html($the_options['bypass_button_size'. $suffix]) == 'lg' ? '115%' : (esc_html($the_options['bypass_button_size'. $suffix]) == 'sm' ? '85%' : '100%'); ?>;">
 		<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg">

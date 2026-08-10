@@ -304,6 +304,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 		<div v-show="banner_preview_is_on" class="notice-container" :class="{ 'notice-type-banner': show_cookie_as == 'banner', 'notice-type-popup': show_cookie_as == 'popup', 'notice-type-widget': show_cookie_as == 'widget', 'banner-top': cookie_position == 'top' && show_cookie_as == 'banner' ,'banner-bottom': cookie_position == 'bottom' && show_cookie_as == 'banner', 'widget-left': cookie_widget_position == 'left' && show_cookie_as == 'widget','widget-right': cookie_widget_position == 'right' && show_cookie_as == 'widget', 'widget-top-right': cookie_widget_position == 'top_right' && show_cookie_as == 'widget', 'widget-top-left': cookie_widget_position == 'top_left' && show_cookie_as == 'widget', 'new_default_banner': template == 'new_default' }"
 		  :style="{
 		  	'background-color': this[`cookie_bar_color${active_test_banner_tab}`] + Math.floor(this[`cookie_bar_opacity${active_test_banner_tab}`] * 255).toString(16).toUpperCase(),
+			'--vendor-link-color': this[`accept_all_as_button${active_test_banner_tab}`] ? `${this[`accept_all_background_color${active_test_banner_tab}`]}` : this[`accept_all_text_color${active_test_banner_tab}`],
 			'color': this[`cookie_text_color${active_test_banner_tab}`],
 		  	'border-style': this[`border_style${active_test_banner_tab}`],
 			'border-width': this[`cookie_bar_border_width${active_test_banner_tab}`] + 'px',
@@ -404,7 +405,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 					</div>
 					
 
-					<div v-if="ab_testing_enabled && gdpr_policy !== 'ccpa'" class="notice-buttons-wrapper" :style="{'gap': this[`cookie_bar_spacing${active_test_banner_tab}`] * 2 + 'px'}" style="display: flex; flex-direction: <?php echo esc_attr($banner_layouts['c4']['direction'] ?? 'row') == 'col' ? 'column' : 'row'; ?>; <?php echo $banner_layouts['c2']['direction'] == 'row' ? 'width: 40%' : '' ;?>">
+					<div v-if="ab_testing_enabled && gdpr_policy !== 'ccpa'" class="notice-buttons-wrapper" :style="{'gap': this[`cookie_bar_spacing${active_test_banner_tab}`] * 2 + 'px'}" style="display: flex; flex-direction: <?php echo esc_attr($banner_layouts['c4']['direction'] ?? 'row') == 'col' ? 'column' : 'row'; ?>; <?php echo $banner_layouts['c2']['direction'] == 'row' ? 'width: 40%' : '' ;?>; margin-top: <?php echo esc_attr($banner_layouts['c2']['direction'] ?? 'row') == 'col' ? '5px' : '0px'; ?>;">
 					<div class="notice-left-buttons" :style="{'gap': this[`cookie_bar_spacing${active_test_banner_tab}`] * 2 + 'px', display: this[`visible_c5_items${active_test_banner_tab}`].length > 0 ? 'flex' : 'none', width: '100%'}" style=" flex-direction: <?php echo esc_attr($banner_layouts['c5']['direction'] ?? 'row') == 'col' ? 'column' : 'row'; ?>; <?php echo $banner_layouts['c5']['direction'] === 'row' ? 'align-items: center; justify-content: ' . ($banner_layouts['c5']['justify'] ===  'between' ? 'space-between' : ($banner_layouts['c5']['justify'] ?? '')) : 'align-items: ' . ($banner_layouts['c5']['justify'] ?? '') ?>">
 						
 						<?php
@@ -456,6 +457,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 		<div v-if="banner_preview_is_on " class="notice-container" :class="{ 'notice-type-banner': show_cookie_as == 'banner', 'notice-type-popup': show_cookie_as == 'popup', 'notice-type-widget': show_cookie_as == 'widget', 'banner-top': cookie_position == 'top' && show_cookie_as == 'banner' ,'banner-bottom': cookie_position == 'bottom' && show_cookie_as == 'banner', 'widget-left': cookie_widget_position == 'left' && show_cookie_as == 'widget','widget-right': cookie_widget_position == 'right' && show_cookie_as == 'widget', 'widget-top-right': cookie_widget_position == 'top_right' && show_cookie_as == 'widget', 'widget-top-left': cookie_widget_position == 'top_left' && show_cookie_as == 'widget', 'new_default_banner': template == 'new_default' }"
 			:style="{
 				'background-color': `${cookie_bar_color}${Math.floor(cookie_bar_opacity * 255).toString(16).toUpperCase()}`,
+				'--vendor-link-color': this[`accept_all_as_button${active_test_banner_tab}`] ? `${this[`accept_all_background_color${active_test_banner_tab}`]}` : this[`accept_all_text_color${active_test_banner_tab}`],
 				'color': cookie_text_color,
 				'border-style': border_style,
 				'border-width': cookie_bar_border_width + 'px',
@@ -541,7 +543,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 				</div>	
 				
 
-				<div v-if="gdpr_policy !== 'ccpa'" class="notice-buttons-wrapper" :style="{'gap': cookie_bar_spacing * 2 + 'px'}" style="display: flex; flex-direction: <?php echo esc_attr($banner_layouts['c4']['direction'] ?? 'row') == 'col' ? 'column' : 'row'; ?>; <?php echo $banner_layouts['c2']['direction'] == 'row' ? 'width: 40%' : '' ;?>">
+				<div v-if="gdpr_policy !== 'ccpa'" class="notice-buttons-wrapper" :style="{'gap': cookie_bar_spacing * 2 + 'px'}" style="display: flex; flex-direction: <?php echo esc_attr($banner_layouts['c4']['direction'] ?? 'row') == 'col' ? 'column' : 'row'; ?>; <?php echo $banner_layouts['c2']['direction'] == 'row' ? 'width: 40%' : '' ;?>; margin-top: <?php echo esc_attr($banner_layouts['c2']['direction'] ?? 'row') == 'col' ? '5px' : '0px'; ?>;">
 					<div class="notice-left-buttons" :style="{'gap': cookie_bar_spacing * 2 + 'px', display: visible_c5_items.length > 0 ? 'flex' : 'none', width: '100%'}" style=" flex-direction: <?php echo esc_attr($banner_layouts['c5']['direction'] ?? 'row') == 'col' ? 'column' : 'row'; ?>; <?php echo $banner_layouts['c5']['direction'] === 'row' ? 'align-items: center; justify-content: ' . ($banner_layouts['c5']['justify'] ===  'between' ? 'space-between' : ($banner_layouts['c5']['justify'] ?? '')) : 'align-items: ' . ($banner_layouts['c5']['justify'] ?? '') ?>">
 						
 						<?php
@@ -1515,7 +1517,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 						<c-row v-show="is_gdpr">
 							<c-col class="col-sm-4"><label><?php esc_attr_e( 'Message Heading', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'Leave it blank, If you do not need a heading.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
 							<c-col class="col-sm-8">
-								<c-textarea name="bar_heading_text_field" v-model="gdpr_message_heading"></c-textarea>
+								<c-textarea name="bar_heading_text_field" v-model="gdpr_message_heading"  @input="onHeadingInput"></c-textarea>
 							</c-col>
 						</c-row>
 						<c-row v-show="is_eprivacy">

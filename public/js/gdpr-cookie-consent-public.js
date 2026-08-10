@@ -494,54 +494,6 @@ GDPR_CCPA_COOKIE_EXPIRE =
         }
       }
     },
-    getSubtleColors(finalColor, buttonColor) {
-        // Use button color for the overlay.
-        var color = buttonColor || finalColor;
-        var hex = color.replace(/^#/, '');
-
-        // Ignore alpha from #RRGGBBAA.
-        if (hex.length === 8) {
-            hex = hex.substring(0, 6);
-        }
-
-        // Expand #RGB into #RRGGBB.
-        if (hex.length === 3) {
-            hex = hex
-                .split('')
-                .map(function (character) {
-                    return character + character;
-                })
-                .join('');
-        }
-
-        var r = parseInt(hex.substring(0, 2), 16);
-        var g = parseInt(hex.substring(2, 4), 16);
-        var b = parseInt(hex.substring(4, 6), 16);
-
-        // Keep 6% of the button color and mix in 94% white.
-        var tintStrength = 0.06;
-
-        var overlayR = Math.round(
-            255 - (255 - r) * tintStrength
-        );
-
-        var overlayG = Math.round(
-            255 - (255 - g) * tintStrength
-        );
-
-        var overlayB = Math.round(
-            255 - (255 - b) * tintStrength
-        );
-
-        return (
-            '#' +
-            [overlayR, overlayG, overlayB]
-                .map(function (value) {
-                    return value.toString(16).padStart(2, '0');
-                })
-                .join('')
-        );
-    },
     render_vendor_list: function () {
       if (!vendor_data || !vendor_data.vendors || current_vendor_index >= vendor_data.vendors.length) return;
 
@@ -579,7 +531,7 @@ GDPR_CCPA_COOKIE_EXPIRE =
                   ? GDPR.settings.button_accept_all_link_color
                   : acceptAllBGColor;
 
-          const overlay = GDPR.getSubtleColors(finalColor, cookieSettingsPopupAccentColor);
+          const overlay = GDPR.settings.cookie_settings_overlay_color;
 
           var limit = Math.min(10, vendors.length);
 
@@ -766,12 +718,16 @@ GDPR_CCPA_COOKIE_EXPIRE =
               arrow2.innerHTML = '<svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.5303 0.53125L5.53027 5.53125L0.530273 0.531251" stroke="currentColor" stroke-width="1.5"/></svg>';
 
               var more_text = document.createElement("span");
+              more_text.className = "gdpr-more-details-text";
               more_text.innerHTML = 'More details';
 
               var moreDetails = document.createElement("p");
               moreDetails.className = "gdpr-more-details"
               moreDetails.appendChild(arrow2)
               moreDetails.appendChild(more_text)
+              moreDetails.setAttribute("role", "button");
+              moreDetails.setAttribute("tabindex", "0");
+              moreDetails.setAttribute("aria-expanded", "false");
 
               vendorWrapper.appendChild(moreDetails);
 
@@ -779,12 +735,49 @@ GDPR_CCPA_COOKIE_EXPIRE =
               detailsWrapper.className = "gdpr-vendor-details-wrapper";
               detailsWrapper.style.display = "none";
 
-              moreDetails.addEventListener("click", function () {
-                  console.log("trying")
-                  var wrapper = this.nextElementSibling;
-                  var isHidden = window.getComputedStyle(wrapper).display === "none";
+              moreDetails.addEventListener("click", function (event) {
+                  event.preventDefault();
 
-                  wrapper.style.display = isHidden ? "block" : "none";
+                  var currentToggle = event.currentTarget;
+                  var wrapper = currentToggle.nextElementSibling;
+
+                  if (
+                      !wrapper ||
+                      !wrapper.classList.contains(
+                          "gdpr-vendor-details-wrapper"
+                      )
+                  ) {
+                      return;
+                  }
+
+                  var isExpanded =
+                      currentToggle.getAttribute("aria-expanded") === "true";
+
+                  var shouldExpand = !isExpanded;
+
+                  wrapper.style.display = shouldExpand
+                      ? "block"
+                      : "none";
+
+                  var textElement = currentToggle.querySelector(
+                      ".gdpr-more-details-text"
+                  );
+
+                  if (textElement) {
+                      textElement.textContent = shouldExpand
+                          ? "Less details"
+                          : "More details";
+                  }
+
+                  currentToggle.classList.toggle(
+                      "is-expanded",
+                      shouldExpand
+                  );
+
+                  currentToggle.setAttribute(
+                      "aria-expanded",
+                      shouldExpand ? "true" : "false"
+                  );
               });
 
               /* DATA RETENTION */
