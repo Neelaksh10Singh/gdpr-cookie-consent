@@ -1651,7 +1651,7 @@ body.toplevel_page_gdpr-cookie-consent-settings-page #wpbody-content {
 #gdpr-cookie-consent-cookie_manager-settings.gdpr-cookie-consent-app-container {
   background-color: var(--white-100);
   font-family: "Roboto", sans-serif;
-  font-weight: var(--text-medium-font-weight);
+  font-weight: 400;
   font-size: var(--text-sm-font-size);
   line-height: var(--text-sm-line-height);
   min-height: 750px;
@@ -6413,10 +6413,6 @@ fieldset:disabled #gdpr-cookie-consent-bar a.btn {
   .category-group
   .category-item
   .description-container,
-.gdpr_messagebar_detail.layout-classic
-  .category-group
-  .category-item
-  .inner-description-container,
 .gdpr_messagebar_detail.layout-default
   .category-group
   .category-item
@@ -6425,9 +6421,21 @@ fieldset:disabled #gdpr-cookie-consent-bar a.btn {
   left: unset;
   float: unset;
   position: relative;
+  padding: 0 0;
+  background-clip: content-box;
+}
+.gdpr_messagebar_detail.layout-classic
+  .category-group
+  .category-item
+  .inner-description-container{
+    width: 100%;
+  left: unset;
+  float: unset;
+  position: relative;
   padding: 0 10px;
   background-clip: content-box;
 }
+
 .gdpr_messagebar_detail .category-group .category-item div:focus,
 .gdpr_messagebar_detail.layout-classic
   .category-group
@@ -7337,7 +7345,13 @@ fieldset:disabled #gdpr-cookie-consent-bar a.btn {
 .gdprmodal-content
   .gdprmodal-body
   .gdpr-columns 
-  .dashicons.dashicons-arrow-up-alt2,
+  .dashicons.dashicons-arrow-up-alt2{
+    margin-top: 7px;
+    font-size: 10px;
+    height: 10px;
+    width: 10px;
+  }
+
 .gdprmodal-content
   .gdprmodal-body
   .inner-gdpr-columns

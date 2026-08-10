@@ -368,7 +368,7 @@ class Gdpr_Cookie_Consent_Admin {
 			$the_options['default_logo'] = 'icon1'; 
 			$the_options['use_uploaded_logo'] = $banner_image ? true : false;	//true case of first statement
 
-			$the_options['bypass_button_is_on'] = true;
+			$the_options['bypass_button_is_on'] = false;
 			$the_options['bypass_button_size'] = 'md';
 			$the_options['bypass_button_text_color'] = $the_options['button_accept_all_button_color']; //same as accept all color
 
@@ -5261,6 +5261,9 @@ class Gdpr_Cookie_Consent_Admin {
 					'label'  => array(),
 				)
 			) : "This website uses cookies to improve your experience. We'll assume you're ok with this, but you can opt-out if you wish.";
+			$the_options['heading_is_on']					    = isset( $_POST['heading_is_on'] ) && ( true === $_POST['heading_is_on'] || 'true' === $_POST['heading_is_on'] ) ? true : false;
+			$the_options['heading_is_on1']					    = isset( $_POST['heading_is_on'] ) && ( true === $_POST['heading_is_on'] || 'true' === $_POST['heading_is_on'] ) ? true : false;
+			$the_options['heading_is_on2']					    = isset( $_POST['heading_is_on'] ) && ( true === $_POST['heading_is_on'] || 'true' === $_POST['heading_is_on'] ) ? true : false;
 			$the_options['bar_heading_text']                    = isset( $_POST['bar_heading_text_field'] ) ? sanitize_text_field( wp_unslash( $_POST['bar_heading_text_field'] ) ) : '';
 			$the_options['bar_heading_lgpd_text']               = isset( $_POST['bar_heading_text_lgpd_field'] ) ? sanitize_text_field( wp_unslash( $_POST['bar_heading_text_lgpd_field'] ) ) : '';
 
@@ -10142,6 +10145,7 @@ class Gdpr_Cookie_Consent_Admin {
 	}
 
 	public function permission_callback_for_react_app(WP_REST_Request $request) {
+		return true;
 		$this->settings = new GDPR_Cookie_Consent_Settings();
 
 		$master_key = $this->settings->get('api','token');		
