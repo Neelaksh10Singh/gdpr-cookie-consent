@@ -4177,10 +4177,7 @@ var gen = new Vue({
       if (this.gdpr_policy) {
         value = this.gdpr_policy;
       }
-      // Set all law flags up front from the single source of truth. The branches
-      // below then only apply their law-specific side effects (button defaults,
-      // IAB/GCM resets, geo resets); they no longer own flag bookkeeping, so a
-      // branch that forgets to clear a sibling flag can't leave one stuck on.
+
       this.applyLawFlags(value);
       if (value === "us_state_laws") {
         this.is_us_state_laws = true;
