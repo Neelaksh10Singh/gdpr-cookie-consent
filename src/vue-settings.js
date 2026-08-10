@@ -8805,6 +8805,19 @@ var app = new Vue({
     onSelectPrivacyPage2(value) {
       this.button_readmore_page2 = value;
     },
+    onHeadingInput(value){
+      if(value.length > 0)  {
+        this.heading_is_on = true;
+        this.heading_is_on1 = true;
+        this.heading_is_on2 = true;
+      }
+      else{
+        this.heading_is_on = false;
+        this.heading_is_on1 = false;
+        this.heading_is_on2 = false;
+      }
+
+    },
     cookiePolicyChange(value) {
       this.onSwitchReloadLaw();
       if (this.gdpr_policy) {
