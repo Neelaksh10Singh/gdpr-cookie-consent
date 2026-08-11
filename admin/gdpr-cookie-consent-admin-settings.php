@@ -124,8 +124,8 @@ if ( ! function_exists( 'wplp_render_notice_button' ) ) {
 
 			case 'accept':
 				?>
-				<a v-show="cookie_accept_on" 
-				  href="#"
+				<a v-show="cookie_accept_on && !((!is_auto_mode && (is_pipeda || is_au_app)) || (is_auto_mode && (banner_edit_law === 'pipeda' || banner_edit_law === 'au_app')))" 
+				  href="#" 
 				  :style="{
 						  'background-color': accept_as_button ? `${accept_background_color}${Math.floor(accept_opacity * 255).toString(16).toUpperCase()}` : 'transparent',
 						  'color': accept_text_color,
@@ -235,7 +235,7 @@ if ( ! function_exists( 'wplp_render_notice_button_ab_test' ) ) {
 
 			case 'accept':
 				?>
-				<a v-show="this[`cookie_accept_on${active_test_banner_tab}`]" 
+				<a v-show="this[`cookie_accept_on${active_test_banner_tab}`] && !((!is_auto_mode && (is_pipeda || is_au_app)) || (is_auto_mode && (banner_edit_law === 'pipeda' || banner_edit_law === 'au_app')))" 
 				  href="#"
 				  :style="{
 						  'background-color': this[`accept_as_button${active_test_banner_tab}`] ? `${this[`accept_background_color${active_test_banner_tab}`]}${Math.floor(this[`accept_opacity${active_test_banner_tab}`] * 255).toString(16).toUpperCase()}` : 'transparent',
@@ -370,8 +370,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 					'font-size': this[`heading_text_size${active_test_banner_tab}`] + 'px',
 					'font-weight': this[`heading_text_weight${active_test_banner_tab}`],
 				}">
-					<h3 v-if="gdpr_message_heading.length>0 && ((!is_auto_mode && is_gdpr) || (is_auto_mode && banner_edit_law === 'gdpr'))">{{gdpr_message_heading}}</h3>
-					<h3  v-if="lgpd_message_heading.length>0 && ((!is_auto_mode && is_lgpd) || (is_auto_mode && banner_edit_law === 'lgpd'))">{{lgpd_message_heading}}</h3>
+					<h3 v-if="gdpr_message_heading.length>0">{{gdpr_message_heading}}</h3>
 				</div>	
 			</div>
 
@@ -504,8 +503,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 					'font-size': heading_text_size + 'px',
 					'font-weight': heading_text_weight,
 				}">
-						<h3 v-if="gdpr_message_heading.length>0 && ((!is_auto_mode && is_gdpr) || (is_auto_mode && banner_edit_law === 'gdpr'))">{{gdpr_message_heading}}</h3>
-						<h3  v-if="lgpd_message_heading.length>0 && ((!is_auto_mode && is_lgpd) || (is_auto_mode && banner_edit_law === 'lgpd'))">{{lgpd_message_heading}}</h3>
+						<h3 v-if="gdpr_message_heading.length>0">{{gdpr_message_heading}}</h3>
 				</div>
 			</div>
 			
@@ -1572,7 +1570,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 							</c-col>
 						</c-row>
 
-						<c-row v-show="(!is_auto_mode && is_gdpr) || (is_auto_mode && banner_edit_law === 'gdpr')">
+						<c-row v-show="(!is_auto_mode && (is_gdpr || is_au_app || is_pipeda || is_sa_pdpl || is_uk_gdpr)) || (is_auto_mode && (banner_edit_law === 'gdpr' || banner_edit_law === 'uk_gdpr' || banner_edit_law === 'sa_pdpl' || banner_edit_law === 'pipeda' || banner_edit_law === 'au_app'))">
 							<c-col class="col-sm-4"><label><?php esc_attr_e( 'About Cookies Message', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'Text shown under "About Cookies" section when users click on "Cookie Settings" button.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
 							<c-col class="col-sm-8">
 								<c-textarea :rows="6" name="about_message_field" v-model="gdpr_about_cookie_message" :readonly="iabtcf_is_on"></c-textarea>
