@@ -2581,19 +2581,8 @@ class Gdpr_Cookie_Consent_Admin {
 			);
 		}
 		$us_state_policies = self::get_us_state_laws_for_options();
-		$policies_length = count( $gdpr_policies );
-		$policy_keys     = array_keys( $gdpr_policies );
 		$us_policy_keys  = array_keys( $us_state_policies );
-		$policies        = array();
 		$us_policies     = array();
-		$is_pro_active   = get_option( 'wpl_pro_active' );
-		for ( $i = 0; $i < $policies_length; $i++ ) {
-			$policies[ $i ] = array(
-				'label' => $policy_keys[ $i ],
-				'code'  => $gdpr_policies[ $policy_keys[ $i ] ],
-			);
-		}
-
 		$is_pro_active   = get_option( 'wpl_pro_active' );
 
 		for ( $i = 0; $i < count( $us_state_policies ); $i++ ) {
@@ -4829,7 +4818,7 @@ class Gdpr_Cookie_Consent_Admin {
 		?>
 		<div v-show = "show_cookie_as == 'widget' || show_cookie_as == 'popup' || '<?php echo esc_js($template['name']); ?>' !== 'blue_full'" class="gdpr-template-field-small gdpr-<?php echo esc_attr( $template['name'] ); ?>">
 				<div class="gdpr-left-field">
-					<c-input type="radio"  name="<?php echo 'template_field'; ?>" :value="'<?php echo esc_attr( $template['name'] ); ?>'" @change="onTemplateChange" :checked="template === '<?php echo esc_attr($template['name']); ?>'">
+					<c-input type="radio"  name="<?php echo 'template_field'; ?>" :value="'<?php echo esc_attr( $template['name'] ); ?>'" @change="onTemplateChange" :checked="template === '<?php echo esc_attr($template['name']); ?>'"></c-input>
 				</div>
 				<?php 
 

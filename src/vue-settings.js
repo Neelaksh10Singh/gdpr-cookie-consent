@@ -3287,41 +3287,94 @@ var gen = new Vue({
       return decodedCSS;
     },
     setValues() {
-      if (this.gdpr_policy === "both") {
-        this.is_us_state_laws = true;
-        this.is_gdpr = true;
-        this.is_eprivacy = false;
-        this.is_lgpd = false;
-        this.show_visitor_conditions = true;
-        this.show_revoke_card = true;
-      } else if (this.gdpr_policy === "ccpa") {
-        this.is_us_state_laws = true;
-        this.is_eprivacy = false;
-        this.is_gdpr = false;
-        this.is_lgpd = false;
-        this.show_visitor_conditions = true;
-        this.show_revoke_card = false;
-      } else if (this.gdpr_policy === "gdpr") {
+      if (this.gdpr_policy === "gdpr") {
         this.is_gdpr = true;
         this.is_us_state_laws = false;
         this.is_eprivacy = false;
         this.is_lgpd = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
         this.show_revoke_card = true;
         this.show_visitor_conditions = true;
+      } else if (this.gdpr_policy === "us_state_laws") {
+        this.is_us_state_laws = true;
+        this.is_gdpr = false;
+        this.is_eprivacy = false;
+        this.is_lgpd = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
+        this.show_visitor_conditions = true;
+        this.show_revoke_card = false;
       } else if (this.gdpr_policy === "lgpd") {
         this.is_gdpr = false;
         this.is_us_state_laws = false;
         this.is_lgpd = true;
         this.is_eprivacy = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
         this.show_revoke_card = true;
         this.show_visitor_conditions = false;
-      } else {
+      } else if (this.gdpr_policy === "eprivacy") {
         this.is_eprivacy = true;
         this.is_gdpr = false;
         this.is_us_state_laws = false;
         this.is_lgpd = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
         this.show_visitor_conditions = false;
         this.show_revoke_card = true;
+      } else if (this.gdpr_policy === "uk_gdpr") {
+        this.is_uk_gdpr = true;
+        this.is_gdpr = false;
+        this.is_us_state_laws = false;
+        this.is_lgpd = false;
+        this.is_eprivacy = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
+        this.show_revoke_card = true;
+        this.show_visitor_conditions = true;
+      } else if (this.gdpr_policy === "pipeda") {
+        this.is_pipeda = true;
+        this.is_gdpr = false;
+        this.is_us_state_laws = false;
+        this.is_lgpd = false;
+        this.is_eprivacy = false;
+        this.is_uk_gdpr = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
+        this.show_revoke_card = true;
+        this.show_visitor_conditions = true;
+      } else if (this.gdpr_policy === "au_app") {
+        this.is_au_app = true;
+        this.is_gdpr = false;
+        this.is_us_state_laws = false;
+        this.is_lgpd = false;
+        this.is_eprivacy = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_sa_pdpl = false;
+        this.show_revoke_card = true;
+        this.show_visitor_conditions = true;
+      } else if (this.gdpr_policy === "sa_pdpl") {
+        this.is_sa_pdpl = true;
+        this.is_gdpr = false;
+        this.is_us_state_laws = false;
+        this.is_lgpd = false;
+        this.is_eprivacy = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.show_revoke_card = true;
+        this.show_visitor_conditions = true;
       }
       for (let i = 0; i < this.list_of_contents.length; i++) {
         if (
@@ -3407,11 +3460,6 @@ var gen = new Vue({
       for (let i = 0; i < this.list_of_countries.length; i++) {
         if (this.select_countries.includes(this.list_of_countries[i].code)) {
           this.select_countries_array.push(this.list_of_countries[i]);
-        }
-      }
-      for (let i = 0; i < this.list_of_countries.length; i++) {
-        if (this.select_countries_ccpa.includes(this.list_of_countries[i].code)) {
-          this.select_countries_array_ccpa.push(this.list_of_countries[i]);
         }
       }
 
@@ -4386,6 +4434,10 @@ var gen = new Vue({
         this.is_eprivacy = false;
         this.is_gdpr = false;
         this.is_lgpd = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
         this.show_visitor_conditions = true;
         this.show_revoke_card = false;
         this.iabtcf_is_on = false;
@@ -4415,6 +4467,10 @@ var gen = new Vue({
         this.is_us_state_laws = false;
         this.is_eprivacy = false;
         this.is_lgpd = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
         this.show_revoke_card = true;
         this.show_visitor_conditions = true;
         this.selectedRadioWorldWide = "yes";
@@ -4428,6 +4484,10 @@ var gen = new Vue({
         this.is_eprivacy = false;
         this.is_gdpr = false;
         this.is_lgpd = true;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
         this.show_revoke_card = true;
         this.show_visitor_conditions = true;
         this.iabtcf_is_on = false;
