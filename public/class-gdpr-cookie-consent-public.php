@@ -97,6 +97,41 @@ class Gdpr_Cookie_Consent_Public {
 		}
 		add_action( 'wp_ajax_gdpr_fetch_user_iab_consent', array( $this, 'wplcl_collect_user_iab_consent' ) );
 		add_action( 'wp_ajax_nopriv_gdpr_fetch_user_iab_consent', array( $this, 'wplcl_collect_user_iab_consent' ) );
+		add_action( 'template_redirect', array( $this, 'gdprcookieconsent_set_auto_mode_cache_flag' ) );
+	}
+
+	/**
+	 * In auto mode the rendered banner depends on the visitor's country, so a
+	 * full-page cache would serve the first visitor's law to everyone.
+	 *
+	 * The US laws vary the rendered notice by the visitor's *state*, so they need
+	 * the same treatment in manual mode — the law is fixed there, the copy is not.
+	 *
+	 * Setting DONOTCACHEPAGE is honoured by WP Rocket, W3 Total Cache, WP Super
+	 * Cache, LiteSpeed Cache and others. If your cache already varies by country
+	 * (Cloudflare geo headers, a CDN edge rule), keep caching enabled with:
+	 *
+	 *     add_filter( 'gdprcookieconsent_auto_mode_disable_page_cache', '__return_false' );
+	 *
+	 * @since 4.4.0
+	 */
+	public function gdprcookieconsent_set_auto_mode_cache_flag() {
+		if ( is_admin() ) {
+			return;
+		}
+
+		if ( ! $this->gdpr_is_auto_mode()
+			&& 'us_state_laws' !== $this->gdpr_get_effective_law( Gdpr_Cookie_Consent::gdpr_get_settings() ) ) {
+			return;
+		}
+
+		if ( ! apply_filters( 'gdprcookieconsent_auto_mode_disable_page_cache', true ) ) {
+			return;
+		}
+
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
+		}
 	}
 
 	public function init_random_banner() {
@@ -379,9 +414,82 @@ class Gdpr_Cookie_Consent_Public {
 	}
 
 	/**
+	 * Resolve the visitor's country once per request.
+	 */
+	private function gdpr_get_visitor_country() {
+		$geo  = $this->gdpr_get_visitor_geo();
+		$code = ( is_array( $geo ) && ! empty( $geo['country'] ) ) ? $geo['country'] : '';
+
+		return ( '' !== $code ) ? strtoupper( $code ) : false;
+	}
+
+	/**
+	 * The visitor's state (ISO-3166-2 subdivision, no country prefix).
+	 */
+	private function gdpr_get_visitor_state() {
+		$geo = $this->gdpr_get_visitor_geo();
+
+		return ( is_array( $geo ) && ! empty( $geo['state'] ) ) ? strtoupper( $geo['state'] ) : '';
+	}
+
+	/**
+	 * Law-resolution debug payload for the front end.
+	 */
+	private function gdpr_get_law_debug_data( $the_options ) {
+		
+		$enabled = ( defined( 'GDPR_LAW_DEBUG' ) && GDPR_LAW_DEBUG )
+			|| ( defined( 'WP_DEBUG' ) && WP_DEBUG );
+
+		if ( ! apply_filters( 'gdprcookieconsent_law_debug', $enabled ) ) {
+			return false;
+		}
+
+		$is_auto = $this->gdpr_is_auto_mode();
+		$geo     = $this->gdpr_get_visitor_geo();
+
+		return array(
+			'law_selection_mode' => $is_auto ? 'auto' : 'manual',
+			'geo_available'      => is_array( $geo ),
+			'ip'                 => is_array( $geo ) ? $geo['ip'] : '',
+			'country'            => is_array( $geo ) ? $geo['country'] : '',
+			'state'              => is_array( $geo ) ? $geo['state'] : '',
+			'city'               => is_array( $geo ) ? $geo['city'] : '',
+			'resolved_law'       => $is_auto
+				? Gdpr_Cookie_Consent::resolve_law_for_country( $this->gdpr_get_visitor_country() )
+				: $the_options['cookie_usage_for'],
+			'rendered_law'       => $the_options['cookie_usage_for'],
+			'placeholder_message' => Gdpr_Cookie_Consent::get_law_placeholder_message(
+				$the_options['cookie_usage_for'],
+				$this->gdpr_get_visitor_state()
+			),
+		);
+	}
+
+	/**
+	 * The visitor's full geo record (country, state, city), resolved once.
+	 */
+	private function gdpr_get_visitor_geo() {
+		static $geo = null;
+
+		if ( null !== $geo ) {
+			return $geo;
+		}
+
+		if ( ! class_exists( 'Gdpr_Cookie_Consent_Geo_Ip' ) ) {
+			$geo = false;
+			return $geo;
+		}
+
+		$geoip = new Gdpr_Cookie_Consent_Geo_Ip();
+		$geo   = $geoip->wpl_get_geo_data();
+
+		return $geo;
+	}
+
+	/**
 	 * Decides whether the banner should be shown to the current visitor for a given law.
 	 */
-	private function gdpr_should_show_banner_for_law( $law, $the_options ) {
+	private function gdpr_should_show_banner_for_law( $law, $the_options, $is_auto_mode = false ) {
 		$geo = $this->gdpr_get_geo_targeting_settings( $law, $the_options );
 
 		if ( $geo['worldwide'] ) {
@@ -390,7 +498,7 @@ class Gdpr_Cookie_Consent_Public {
 
 		$allowed_countries = array();
 
-		if ( $geo['region'] ) {
+		if ( $geo['region'] && ! $is_auto_mode ) {
 			$allowed_countries = array_merge( $allowed_countries, $this->gdpr_get_law_region_countries( $law ) );
 		}
 
@@ -402,14 +510,13 @@ class Gdpr_Cookie_Consent_Public {
 			return false;
 		}
 
-		$geoip             = new Gdpr_Cookie_Consent_Geo_Ip();
-		$user_country_code = $geoip->wpl_is_selected_country();
+		$user_country_code = $this->gdpr_get_visitor_country();
 
-		if ( false === $user_country_code || '' === $user_country_code ) {
+		if ( false === $user_country_code ) {
 			return true;
 		}
 
-		return in_array( $user_country_code, $allowed_countries, true );
+		return in_array( $user_country_code, array_map( 'strtoupper', $allowed_countries ), true );
 	}
 
 	/**
@@ -422,7 +529,68 @@ class Gdpr_Cookie_Consent_Public {
 		update_option( 'gdpr_settings_enabled', 0 );
 		
 		$the_options = Gdpr_Cookie_Consent::gdpr_get_settings();
-		$law         = isset( $the_options['cookie_usage_for'] ) ? $the_options['cookie_usage_for'] : 'gdpr';
+		$law         = $this->gdpr_get_effective_law( $the_options );
+		$is_auto     = $this->gdpr_is_auto_mode();
+
+		$show = $this->gdpr_should_show_banner_for_law( $law, $the_options, $is_auto );
+
+		// `geo_status` is the law-agnostic verdict, `law` the effective law for this
+		// visitor (auto mode resolves it per visitor, so the front end must branch
+		// on this rather than on the stored cookie_usage_for). `render_law` is kept
+		// for consumers that already read it; every law now renders as itself — a
+		// law without copy of its own shows a placeholder notice rather than
+		// borrowing the GDPR banner — so the two values are identical. `eu_status` /
+		// `ccpa_status` are emitted unconditionally for consumers that have not
+		// been updated — the minified public bundle and checkEuAndCCPAStatus().
+		$return_array = array(
+			'geo_status'   => $show ? 'on' : 'off',
+			'law'          => $law,
+			'render_law'   => $law,
+			'auto_mode'    => $is_auto ? 'on' : 'off',
+			'eu_status'    => $show ? 'on' : 'off',
+			'ccpa_status'  => $show ? 'on' : 'off',
+		);
+
+		wp_send_json( $return_array );
+		wp_die();
+	}
+
+	/**
+	 * Whether law selection is in auto ("Detect Automatically") mode.
+	 */
+	private function gdpr_is_auto_mode() {
+		static $is_auto = null;
+
+		if ( null !== $is_auto ) {
+			return $is_auto;
+		}
+
+		if ( 'auto' !== get_option( 'gdpr_law_selection_mode', 'manual' ) ) {
+			$is_auto = false;
+			return $is_auto;
+		}
+
+		if ( ! get_option( 'gdpr_connected' ) ) {
+			$is_auto = false;
+			return $is_auto;
+		}
+
+		require_once GDPR_COOKIE_CONSENT_PLUGIN_PATH . 'includes/settings/class-gdpr-cookie-consent-settings.php';
+		$settings = new GDPR_Cookie_Consent_Settings();
+		$is_auto  = ( 'free' !== $settings->get_plan() );
+
+		return $is_auto;
+	}
+
+	/**
+	 * The law that applies to the current visitor.
+	 */
+	private function gdpr_get_effective_law( $the_options ) {
+		if ( $this->gdpr_is_auto_mode() ) {
+			return Gdpr_Cookie_Consent::resolve_law_for_country( $this->gdpr_get_visitor_country() );
+		}
+
+		$law = isset( $the_options['cookie_usage_for'] ) ? $the_options['cookie_usage_for'] : 'gdpr';
 
 		if ( 'ccpa' === $law ) {
 			$law = 'us_state_laws';
@@ -431,17 +599,7 @@ class Gdpr_Cookie_Consent_Public {
 			$law = 'gdpr';
 		}
 
-		$show = $this->gdpr_should_show_banner_for_law( $law, $the_options );
-
-		$return_array = array(
-			'geo_status'  => $show ? 'on' : 'off',
-			'law'         => $law,
-			'eu_status'   => $show ? 'on' : 'off',
-			'ccpa_status' => $show ? 'on' : 'off',
-		);
-
-		wp_send_json( $return_array );
-		wp_die();
+		return $law;
 	}
 	/**
 	 * Register public modules
@@ -584,8 +742,33 @@ class Gdpr_Cookie_Consent_Public {
 		$chosenBanner = $this->chosenBanner;
 		$ab_options = get_option( 'wpl_ab_options' );
 		$the_options = Gdpr_Cookie_Consent::gdpr_get_settings();
+
+		// Auto mode: the banner body rendered below is chosen from
+		// $the_options['cookie_usage_for'], so swap in the law resolved from this
+		// visitor's country — unmapped. A law with no copy of its own keeps its own
+		// identity here and renders the placeholder notice below instead of
+		// borrowing the GDPR message.
+		//
+		// NOTE: this runs at page-render time, so a full-page cache will serve the
+		// first visitor's law to everyone. gdprcookieconsent_set_auto_mode_cache_flag()
+		// sets DONOTCACHEPAGE for this reason; a cache that varies by country can
+		// disable that via the gdprcookieconsent_auto_mode_disable_page_cache filter.
+		if ( $this->gdpr_is_auto_mode() ) {
+			$the_options['cookie_usage_for'] = Gdpr_Cookie_Consent::resolve_law_for_country( $this->gdpr_get_visitor_country() );
+		}
+
+		// Placeholder copy for the laws still awaiting their own message keys. The
+		// US laws pick one of three notices from the visitor's state, so this is
+		// per-visitor in manual mode too — see the cache note above. Empty string
+		// for every law that has real copy, which leaves the template untouched.
+		$law_placeholder_message = Gdpr_Cookie_Consent::get_law_placeholder_message(
+			$the_options['cookie_usage_for'],
+			$this->gdpr_get_visitor_state()
+		);
+
 		if ( true === $the_options['is_on'] ) {
-			if ( 'ccpa' === $the_options['cookie_usage_for'] || 'both' === $the_options['cookie_usage_for'] ) {
+			// Accept the canonical 'us_state_laws' alongside the legacy 'ccpa'.
+			if ( in_array( $the_options['cookie_usage_for'], array( 'ccpa', 'us_state_laws', 'both' ), true ) ) {
 				wp_enqueue_script( $this->plugin_name . '-uspapi', plugin_dir_url( __FILE__ ) . 'js/iab/uspapi.js', array( 'jquery' ), $this->version, false );
 			}
 			// //tcf
@@ -655,27 +838,40 @@ class Gdpr_Cookie_Consent_Public {
 			$lgpd_message     = '';
 			$eprivacy_message = '';
 			// Output the HTML in the footer.
-			if ( 'eprivacy' === $the_options['cookie_usage_for'] ) {
+			//
+			// The template's message blocks use the legacy 'ccpa' vocabulary while the
+			// law dropdown stores the canonical 'us_state_laws', and the four newest
+			// laws have no content of their own at all. get_content_law() resolves
+			// both cases to the law whose copy, cookie categories and settings-modal
+			// sections the banner should be built from — without it those installs
+			// render a banner with no body and an empty settings popup.
+			//
+			// Content selection only: $the_options['cookie_usage_for'] itself is left
+			// alone because it also feeds container_class and the CSS that targets it,
+			// and the visitor is genuinely on that law.
+			$content_law = Gdpr_Cookie_Consent::get_content_law( $the_options['cookie_usage_for'] );
+
+			if ( 'eprivacy' === $content_law ) {
 				$eprivacy_message               = nl2br( $the_options['notify_message_eprivacy'] );
 				$the_options['eprivacy_notify'] = true;
 			}
-			if ( 'gdpr' === $the_options['cookie_usage_for'] ) {
+			if ( 'gdpr' === $content_law ) {
 				$gdpr_message               = nl2br( $the_options['notify_message'] );
 				$the_options['gdpr_notify'] = true;
 				$the_options['ccpa_notify']    = false;
 			}
-			if ( 'ccpa' === $the_options['cookie_usage_for'] ) {
+			if ( 'ccpa' === $content_law ) {
 				$ccpa_message                  = nl2br( $the_options['notify_message_ccpa'] );
 				$the_options['ccpa_notify']    = true;
 				$the_options['optout_text']    = nl2br( $the_options['optout_text'] );
 				$the_options['confirm_button'] = __( 'Confirm', 'gdpr-cookie-consent' );
 				$the_options['cancel_button']  = __( 'Cancel', 'gdpr-cookie-consent' );
 			}
-			if ( 'lgpd' === $the_options['cookie_usage_for'] ) {
+			if ( 'lgpd' === $content_law ) {
 				$lgpd_message               = nl2br( $the_options['notify_message_lgpd'] );
 				$the_options['lgpd_notify'] = true;
 			}
-			if ( 'both' === $the_options['cookie_usage_for'] ) {
+			if ( 'both' === $content_law ) {
 				$gdpr_message                  = nl2br( $the_options['notify_message'] );
 				$ccpa_message                  = nl2br( $the_options['notify_message_ccpa'] );
 				$the_options['gdpr_notify']    = true;
@@ -1372,7 +1568,8 @@ class Gdpr_Cookie_Consent_Public {
 				'cookieSettingsPopupAccentColor'	        => strtoupper(substr($finalColor, 0, -2)) === strtoupper($acceptAllBGColor) ? $the_options['button_accept_all_link_color'] : $acceptAllBGColor,
 				'template_parts' 	                        => $the_options['template_parts'],
 				'gdpr_monthly_page_views_percent'			=> $gdpr_monthly_page_views_percent,
-				'youtube_embed_category'					=> $youtube_category
+				'youtube_embed_category'					=> $youtube_category,
+				'gdpr_law_debug'							=> $this->gdpr_get_law_debug_data( $the_options ),
 			);
 
 

@@ -89,6 +89,8 @@ if ( 'popup' === $the_options['cookie_bar_as'] ) {
 	$notice_container_styles .= "backdrop-filter: blur(" . ($ab_testing_enabled === "true" ? $the_options['cookie_bar_blur' . $chosenBanner] : $the_options["cookie_bar_blur"])*20 . "px);";
 	$notice_container_styles .= "box-shadow: " . ($ab_testing_enabled === "true" ? $the_options['cookie_bar_shadow_size' . $chosenBanner] : $the_options["cookie_bar_shadow_size"]) . "px " . ($ab_testing_enabled === "true" ? $the_options['cookie_bar_shadow_size' . $chosenBanner] : $the_options["cookie_bar_shadow_size"]) . "px " . ($ab_testing_enabled === "true" ? $the_options['cookie_bar_shadow_size' . $chosenBanner] * 2 : $the_options["cookie_bar_shadow_size"] * 2) . "px " . hex_to_rgba($ab_testing_enabled === "true" ? $the_options['cookie_bar_shadow_color' . $chosenBanner] : $the_options["cookie_bar_shadow_color"], 0.5) . ";";
 	
+	$content_law = isset( $content_law ) ? $content_law : $the_options['cookie_usage_for'];
+
 	$suffix =  ($ab_testing_enabled === "true" ? $chosenBanner : '');
 	$banner_layouts = json_decode($the_options['banner_layouts'], true);
 	$banner_structure = json_decode($the_options['banner_structure'], true);
@@ -403,9 +405,9 @@ if ( 'popup' === $the_options['cookie_bar_as'] ) {
 		} ?>
 		<?php
 		if(filter_var( $the_options['heading_is_on' . $suffix] ?? false, FILTER_VALIDATE_BOOLEAN )) {
-			if ( ($the_options['cookie_usage_for'] === 'gdpr' || $the_options['cookie_usage_for'] === 'both' ) && strlen($the_options['bar_heading_text']) > 0) : ?>
+			if ( ($content_law === 'gdpr' || $content_law === 'both' ) && strlen($the_options['bar_heading_text']) > 0) : ?>
 				<h3 class = "<?php if($the_options['cookie_usage_for'] === 'both') echo 'gdpr_heading';?>" style = "<?php echo esc_attr($heading_style_attr); ?>" ><?php echo esc_html($the_options['bar_heading_text'] ?? ''); ?></h3>
-			<?php elseif (( $the_options['cookie_usage_for'] === 'lgpd' ) && strlen($the_options['bar_heading_lgpd_text']) > 0) : ?>
+			<?php elseif (( $content_law === 'lgpd' ) && strlen($the_options['bar_heading_lgpd_text']) > 0) : ?>
 				<h3 style = "<?php echo esc_attr($heading_style_attr); ?>" ><?php echo esc_html($the_options['bar_heading_lgpd_text'] ?? ''); ?></h3>
 			<?php endif; 
 		} ?>
@@ -419,7 +421,15 @@ if ( 'popup' === $the_options['cookie_bar_as'] ) {
 				
 					
 				<p style="<?php echo esc_attr($text_style_attr); ?>"  class = "<?php if($the_options['cookie_usage_for'] === 'both') echo 'gdpr';?>">
-					<?php if ( $the_options['cookie_usage_for'] === 'gdpr'  || $the_options['cookie_usage_for'] === 'both' ) : ?>
+					<?php
+					// Laws still awaiting their own copy render scaffolding text in place
+					// of the message body — see Gdpr_Cookie_Consent::get_law_placeholder_message().
+					// Empty for every law that has real copy, so the ladder below is
+					// unchanged for GDPR, LGPD and ePrivacy.
+					?>
+					<?php if ( ! empty( $law_placeholder_message ) ) : ?>
+						<span><?php echo esc_html( $law_placeholder_message ); ?></span>
+					<?php elseif ( $the_options['cookie_usage_for'] === 'gdpr'  || $the_options['cookie_usage_for'] === 'both' ) : ?>
 						<span>
 							<?php
 							echo wp_kses(
