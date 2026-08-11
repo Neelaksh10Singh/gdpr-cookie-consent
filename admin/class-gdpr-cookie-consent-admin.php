@@ -4036,21 +4036,6 @@ class Gdpr_Cookie_Consent_Admin {
 	}
 
 
-	/**
-	 * Return us laws cookie usage options.
-	 *
-	 * @since 1.8.1
-	 */
-	public function get_us_state_laws_for_options() {
-		$options = array(
-			__( 'CCPA/CPRA', 'gdpr-cookie-consent' )    => 'ccpa',
-			__( 'Default', 'gdpr-cookie-consent' )        => 'default_opt_out',
-			__( 'Pure', 'gdpr-cookie-consent' )        => 'pure_opt_out',
-		);
-		
-		$options = apply_filters( 'gdprcookieconsent_cookie_usage_for_options', $options );
-		return $options;
-	}
 
 	/**
 	 * Return cookie design options.
