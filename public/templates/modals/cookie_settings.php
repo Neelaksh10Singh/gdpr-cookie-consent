@@ -74,8 +74,8 @@ if ( ! defined( 'ABSPATH' ) ) {
         $cookieSettingsPopupAccentColor = $acceptAllBGColor;
     }
 	
-	$border_color  = $the_options['cookie_settings_border_color'];
-	$overlay_color = $the_options['cookie_settings_overlay_color'];
+	$border_color  = isset($the_options['cookie_settings_border_color']) ? $the_options['cookie_settings_border_color'] : '#e1e1e1';
+	$overlay_color = isset($the_options['cookie_settings_overlay_color']) ? $the_options['cookie_settings_overlay_color'] : '#ffffff';
 
 ?>
 

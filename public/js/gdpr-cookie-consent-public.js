@@ -649,7 +649,6 @@ GDPR_CCPA_COOKIE_EXPIRE =
           var dataCategories = vendor_data.dataCategories;
 
           var ul = document.querySelector(".vendors-list");
-          console.log(GDPR.settings)
           const color = GDPR.settings['background_active_color' + chosenBanner];
           const opacity = parseFloat(GDPR.settings['opacity' + chosenBanner]);
 
@@ -856,6 +855,21 @@ GDPR_CCPA_COOKIE_EXPIRE =
                   privacyP.appendChild(privacyLink);
 
                   vendorWrapper.appendChild(privacyP);
+
+                  var legIntClaim = document.createElement("p");
+                  legIntClaim.className = "gdpr-vendor-privacy-link";
+
+                  
+
+                  var legIntLink = document.createElement("a");
+                  legIntLink.href = vendor.urls[0].legIntClaim;
+                  legIntLink.target = "_blank";
+                  legIntLink.rel = "noopener noreferrer";
+                  legIntLink.textContent = 'Legitimate Interest Claim'
+
+                  legIntClaim.appendChild(legIntLink);
+
+                  vendorWrapper.appendChild(legIntClaim);
               }
 
               var arrow2 = document.createElement("span");

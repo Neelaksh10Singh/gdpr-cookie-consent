@@ -1458,6 +1458,7 @@ Bootstrap CSS for frontend UI
   display: flex;
   column-gap: 24px;
   margin: 0;
+  padding-inline-start: 0px;
 }
 .gdpr_messagebar_detail.layout-default .gdpr-iab-navbar {
   flex-direction: column;
