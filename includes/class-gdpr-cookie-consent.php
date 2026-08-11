@@ -85,7 +85,7 @@ class Gdpr_Cookie_Consent {
 		if ( defined( 'GDPR_COOKIE_CONSENT_VERSION' ) ) {
 			$this->version = GDPR_COOKIE_CONSENT_VERSION;
 		} else {
-			$this->version = '4.3.9';
+			$this->version = '4.4.0';
 		}
 		add_action(
 			'current_screen',
@@ -2023,8 +2023,8 @@ class Gdpr_Cookie_Consent {
 			'animate_speed_hide'                     => $settings['animate_speed_hide'],
 			'animate_speed_show'                     => $settings['animate_speed_show'],
 			'background'                             => $settings['background'],
-			'cookie_settings_border_color'		     => $settings['cookie_settings_border_color'],
-			'cookie_settings_overlay_color'			 => $settings['cookie_settings_overlay_color'],
+			'cookie_settings_border_color'		     => isset($settings['cookie_settings_border_color']) ? $settings['cookie_settings_border_color'] : '',
+			'cookie_settings_overlay_color'			 => isset($settings['cookie_settings_overlay_color']) ? $settings['cookie_settings_overlay_color'] : '',
 			'opacity'                                => $settings['opacity'],
 			'background_border_width'                => $settings['background_border_width'],
 			'background_border_style'                => $settings['background_border_style'],

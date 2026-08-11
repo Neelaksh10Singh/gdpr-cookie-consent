@@ -261,7 +261,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                               </div>
                            </div>
                            <div class="description-container hide">
-                              <div class="group-description" tabindex="0"><?php echo esc_html( $the_options['gdpr_cookie_category_description_necessary'] ); ?></div>
+                              <div class="group-description" tabindex="0" :style="{'border-color': cookie_settings_border_color}"><?php echo esc_html( $the_options['gdpr_cookie_category_description_necessary'] ); ?></div>
                               <!-- sub groups -->
                               <div class="category-cookies-list-container">
                               </div>
