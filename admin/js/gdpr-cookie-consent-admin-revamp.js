@@ -551,16 +551,16 @@ jQuery(document).ready(function () {
       }
     );
 
-    // GDPR hover function
+    //Region hover message
     jQuery("#gdpr-visitors-condition-radio-btn-disabled-gdpr").hover(
       function () {
         gdprTimer = setTimeout(function () {
-          jQuery(".gdpr-eu_visitors_message-gdpr").css("display", "block");
+          jQuery(".gdpr-law_region_visitors_message-gdpr").css("display", "block");
         }, 250); // 250ms delay
       },
       function () {
         clearTimeout(gdprTimer); // Clear the timer to prevent delayed show
-        jQuery(".gdpr-eu_visitors_message-gdpr").css("display", "none");
+        jQuery(".gdpr-law_region_visitors_message-gdpr").css("display", "none");
       }
     );
 
