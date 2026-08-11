@@ -1094,7 +1094,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 											$geo_options = get_option( 'wpl_geo_options' );
 											 if ( !$is_user_connected || empty($is_user_connected) || $api_user_plan === 'free') : ?>
 												<div v-show="is_auto_mode ? false : !!region_label" class="gdpr-disabled-geo-integration">
-													<input id="gdpr-visitors-condition-radio-btn-disabled-gdpr" class="gdpr-visiotrs-condition-radio-btn" type="checkbox" name="gcc-region-enable" v-model="is_law_region_on" @click="onSwitchRegionEnable($event.target.checked)">
+													<input id="gdpr-visitors-condition-radio-btn-disabled-gdpr" class="gdpr-visiotrs-condition-radio-btn" type="checkbox" name="gcc-region-enable" disabled>
 													<label for="gdpr-visitors-condition-radio-btn-disabled-gdpr">{{ region_label }}</label>
 												</div>
 												<p class="gdpr-law_region_visitors_message-gdpr">
@@ -1102,10 +1102,10 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 												</p>
 											<?php elseif ( $the_options['enable_safe'] === true || $the_options['enable_safe'] === 'true' ) : ?>
 												<div v-show="is_auto_mode ? false : !!region_label" class="gdpr-disabled-geo-integration">
-													<input id="gdpr-visitors-condition-radio-btn-disabled-gdpr" class="gdpr-visiotrs-condition-radio-btn" type="checkbox" name="gcc-region-enable" v-model="is_law_region_on" @click="onSwitchRegionEnable($event.target.checked)">
+													<input id="gdpr-visitors-condition-radio-btn-disabled-gdpr" class="gdpr-visiotrs-condition-radio-btn" type="checkbox" name="gcc-region-enable" disabled>
 													<label for="gdpr-visitors-condition-radio-btn-disabled-gdpr">{{ region_label }}</label>
 												</div>
-												<p class="gdpr-eu_visitors_message-gdpr">
+												<p class="gdpr-law_region_visitors_message-gdpr">
 													<?php esc_attr_e( 'Safe Mode enabled. Disable it in Compliance settings to configure Geo-Targeting settings.', 'gdpr-cookie-consent' ); ?>
 												</p>
 											<?php else : ?>
