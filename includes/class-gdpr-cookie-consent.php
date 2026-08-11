@@ -1431,6 +1431,12 @@ class Gdpr_Cookie_Consent {
 			case 'notify_message_lgpd':
 			case 'notify_message_eprivacy':
 			case 'notify_message_ccpa':
+			case 'notify_message_uk_gdpr':
+			case 'notify_message_pdpl':
+			case 'notify_message_pipeda':
+			case 'notify_message_app':
+			case 'notify_message_default_opt_out':
+			case 'notify_message_pure_opt_out':
 			case 'optout_text':
 			case 'bar_heading_text':
 			case 'bar_heading_lgpd_text':
@@ -2568,24 +2574,27 @@ class Gdpr_Cookie_Consent {
 	}
 
 	/**
+	 * Which of the three US state-law notice messages a state's group maps to.
+	 */
+	public static function resolve_us_state_law_variant( $state_code ) {
+		$variants = array(
+			1 => 'ccpa',
+			2 => 'default_opt_out',
+			3 => 'pure_opt_out',
+		);
+		$group = self::get_us_state_law_group( $state_code );
+
+		return isset( $variants[ $group ] ) ? $variants[ $group ] : 'ccpa';
+	}
+
+	/**
 	 * Placeholder notice text for a law that has no copy of its own yet.
+	 *
+	 * Every law resolve_law_for_country() can return now has real copy
+	 * (see cookie-notice.php), so this always returns ''. Kept for any future
+	 * law added ahead of its own banner copy.
 	 */
 	public static function get_law_placeholder_message( $law, $state_code = '' ) {
-		$labels = array(
-			'uk_gdpr' => 'UK GDPR',
-			'pipeda'  => 'PIPEDA',
-			'au_app'  => 'AU APP',
-			'sa_pdpl' => 'SA PDPL',
-		);
-
-		if ( isset( $labels[ $law ] ) ) {
-			return $labels[ $law ] . ' TO BE IMPLEMENTED';
-		}
-
-		if ( in_array( $law, array( 'us_state_laws', 'ccpa' ), true ) ) {
-			return 'US STATE LAW BANNER ' . self::get_us_state_law_group( $state_code ) . ' TO BE IMPLEMENTED';
-		}
-
 		return '';
 	}
 }
