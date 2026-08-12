@@ -859,7 +859,7 @@ class Gdpr_Cookie_Consent {
 			'button_readmore_button_border_color'    => '#074FA8',
 			'button_readmore_button_border_radius'   => '0', // in pixel.
 
-			'button_decline_text'                    => 'Decline',
+			'button_decline_text'                    => 'Reject All',
 			'button_decline_url'                     => '#',
 			'button_decline_action'                  => '#cookie_action_close_header_reject',
 			'button_decline_link_color'              => '#ffffff',
@@ -874,7 +874,7 @@ class Gdpr_Cookie_Consent {
 			'button_decline_button_border_color'     => '#074FA8',
 			'button_decline_button_border_radius'    => '0', // in pixel.
 
-			'button_settings_text'                   => 'Cookie Settings',
+			'button_settings_text'                   => 'Preferences',
 			'button_settings_url'                    => '#',
 			'button_settings_action'                 => '#cookie_action_settings',
 			'button_settings_link_color'             => '#074FA8',
@@ -986,7 +986,7 @@ class Gdpr_Cookie_Consent {
 			'button_readmore_button_border_color1'    => '#074FA8',
 			'button_readmore_button_border_radius1'   => '0', // in pixel.
 
-			'button_decline_text1'                    => 'Decline',
+			'button_decline_text1'                    => 'Reject All',
 			'button_decline_url1'                     => '#',
 			'button_decline_action1'                  => '#cookie_action_close_header_reject',
 			'button_decline_link_color1'              => '#074FA8',
@@ -1001,7 +1001,7 @@ class Gdpr_Cookie_Consent {
 			'button_decline_button_border_color1'     => '#074FA8',
 			'button_decline_button_border_radius1'    => '0', // in pixel.
 
-			'button_settings_text1'                   => 'Cookie Settings',
+			'button_settings_text1'                   => 'Preferences',
 			'button_settings_url1'                    => '#',
 			'button_settings_action1'                 => '#cookie_action_settings',
 			'button_settings_link_color1'             => '#074FA8',
@@ -1095,7 +1095,7 @@ class Gdpr_Cookie_Consent {
 			'button_readmore_button_border_color2'    => '#074FA8',
 			'button_readmore_button_border_radius2'   => '0', // in pixel.
 
-			'button_decline_text2'                    => 'Decline',
+			'button_decline_text2'                    => 'Reject All',
 			'button_decline_url2'                     => '#',
 			'button_decline_action2'                  => '#cookie_action_close_header_reject',
 			'button_decline_link_color2'              => '#074FA8',
@@ -1110,7 +1110,7 @@ class Gdpr_Cookie_Consent {
 			'button_decline_button_border_color2'     => '#074FA8',
 			'button_decline_button_border_radius2'    => '0', // in pixel.
 
-			'button_settings_text2'                   => 'Cookie Settings',
+			'button_settings_text2'                   => 'Preferences',
 			'button_settings_url2'                    => '#',
 			'button_settings_action2'                 => '#cookie_action_settings',
 			'button_settings_link_color2'             => '#074FA8',

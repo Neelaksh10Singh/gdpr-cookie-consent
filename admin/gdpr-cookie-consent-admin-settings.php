@@ -1571,7 +1571,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 						</c-row>
 
 						<c-row v-show="(!is_auto_mode && (is_gdpr || is_au_app || is_pipeda || is_sa_pdpl || is_uk_gdpr)) || (is_auto_mode && (banner_edit_law === 'gdpr' || banner_edit_law === 'uk_gdpr' || banner_edit_law === 'sa_pdpl' || banner_edit_law === 'pipeda' || banner_edit_law === 'au_app'))">
-							<c-col class="col-sm-4"><label><?php esc_attr_e( 'About Cookies Message', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'Text shown under "About Cookies" section when users click on "Cookie Settings" button.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
+							<c-col class="col-sm-4"><label><?php esc_attr_e( 'About Cookies Message', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'Text shown under "About Cookies" section when users click on "Preferences" button.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
 							<c-col class="col-sm-8">
 								<c-textarea :rows="6" name="about_message_field" v-model="gdpr_about_cookie_message" :readonly="iabtcf_is_on"></c-textarea>
 							</c-col>
@@ -1611,7 +1611,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 							</c-col>
 						</c-row>
 						<c-row v-show="(!is_auto_mode && is_lgpd) || (is_auto_mode && banner_edit_law === 'lgpd')">
-							<c-col class="col-sm-4"><label><?php esc_attr_e( 'About Cookies Message', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'Text shown under "About Cookies" section when users click on "Cookie Settings" button.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
+							<c-col class="col-sm-4"><label><?php esc_attr_e( 'About Cookies Message', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'Text shown under "About Cookies" section when users click on "Preferences" button.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
 							<c-col class="col-sm-8">
 								<c-textarea :rows="6" name="about_message_lgpd_field" v-model="lgpd_about_cookie_message"></c-textarea>
 							</c-col>
@@ -2456,7 +2456,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 											<?php esc_attr_e( 'Manage Cookies Button', 'gdpr-cookie-consent' ); ?>
 										</template>
 										<template v-else-if="is_pipeda">
-											<?php esc_attr_e( 'Cookie Settings Button', 'gdpr-cookie-consent' ); ?>
+											<?php esc_attr_e( 'Preferences Button', 'gdpr-cookie-consent' ); ?>
 										</template>
 										<template v-else>
 											<?php esc_attr_e( 'Privacy Preferences Button', 'gdpr-cookie-consent' ); ?>
@@ -2963,7 +2963,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 							</c-col>
 						</c-row>
 						<c-row v-show="is_gdpr">
-							<c-col class="col-sm-4"><label><?php esc_attr_e( 'About Cookies Message', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'Text shown under "About Cookies" section when users click on "Cookie Settings" button.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
+							<c-col class="col-sm-4"><label><?php esc_attr_e( 'About Cookies Message', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'Text shown under "About Cookies" section when users click on "Preferences" button.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
 							<c-col class="col-sm-8">
 								<c-textarea :rows="6" name="about_message_field" v-model="gdpr_about_cookie_message" :readonly="iabtcf_is_on"></c-textarea>
 							</c-col>
@@ -2981,7 +2981,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 							</c-col>
 						</c-row>
 						<c-row v-show="is_lgpd">
-							<c-col class="col-sm-4"><label><?php esc_attr_e( 'About Cookies Message', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'Text shown under "About Cookies" section when users click on "Cookie Settings" button.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
+							<c-col class="col-sm-4"><label><?php esc_attr_e( 'About Cookies Message', 'gdpr-cookie-consent' ); ?> <tooltip text="<?php esc_html_e( 'Text shown under "About Cookies" section when users click on "Preferences" button.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
 							<c-col class="col-sm-8">
 								<c-textarea :rows="6" name="about_message_lgpd_field" v-model="lgpd_about_cookie_message"></c-textarea>
 							</c-col>
@@ -3663,7 +3663,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 								:centered="centered"
 							>
 							<div class="optout-settings-tittle-bar">
-									<div class="optout-setting-tittle"><?php esc_attr_e( 'Decline Button', 'gdpr-cookie-consent' ); ?></div>
+									<div class="optout-setting-tittle"><?php esc_attr_e( 'Reject All Button', 'gdpr-cookie-consent' ); ?></div>
 									<img @click="decline_button_popup1=false" class="add-new-entry-img" src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL ) . 'admin/images/cancel.svg'; ?>" alt="Add new entry logo">
 									</div>
 								<c-row class="gdpr-label-row">
@@ -4938,7 +4938,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 								:centered="centered"
 							>
 							<div class="optout-settings-tittle-bar">
-									<div class="optout-setting-tittle"><?php esc_attr_e( 'Decline Button', 'gdpr-cookie-consent' ); ?></div>
+									<div class="optout-setting-tittle"><?php esc_attr_e( 'Reject All Button', 'gdpr-cookie-consent' ); ?></div>
 									<img @click="decline_button_popup2=false" class="add-new-entry-img" src="<?php echo esc_url( GDPR_COOKIE_CONSENT_PLUGIN_URL ) . 'admin/images/cancel.svg'; ?>" alt="Add new entry logo">
 									</div>
 								<c-row class="gdpr-label-row">

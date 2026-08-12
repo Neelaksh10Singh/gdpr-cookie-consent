@@ -1162,7 +1162,7 @@ var gen = new Vue({
         "button_decline_text"
       )
         ? settings_obj.the_options["button_decline_text"]
-        : "Decline",
+        : "Reject All",
       decline_text_color: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color"
       )
@@ -1265,7 +1265,7 @@ var gen = new Vue({
         "button_settings_text"
       )
         ? settings_obj.the_options["button_settings_text"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color"
       )
@@ -1762,7 +1762,7 @@ var gen = new Vue({
         "button_decline_text1"
       )
         ? settings_obj.the_options["button_decline_text1"]
-        : "Decline",
+        : "Reject All",
       decline_text_color1: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color1"
       )
@@ -1836,7 +1836,7 @@ var gen = new Vue({
         "button_settings_text1"
       )
         ? settings_obj.the_options["button_settings_text1"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color1: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color1"
       )
@@ -2259,7 +2259,7 @@ var gen = new Vue({
         "button_decline_text2"
       )
         ? settings_obj.the_options["button_decline_text2"]
-        : "Decline",
+        : "Reject All",
       decline_text_color2: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color2"
       )
@@ -2334,7 +2334,7 @@ var gen = new Vue({
         "button_settings_text2"
       )
         ? settings_obj.the_options["button_settings_text2"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color2: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color2"
       )
@@ -4031,7 +4031,6 @@ var gen = new Vue({
     },
     onTemplateChange(value) {
       this.template = value;
-      console.log(value);
       let selectedTemplate
       if(value == "new_default"){
         selectedTemplate = this.default_template_json;
@@ -4470,12 +4469,6 @@ var gen = new Vue({
         this.iabtcf_is_on = false;
         this.gcm_is_on = false;
         //visitors condition.
-        this.selectedRadioWorldWide = "yes";
-        this.is_worldwide_on = true;
-        this.is_worldwide_on_ccpa = true;
-        this.is_eu_on = false;
-        this.selectedRadioCountry = false;
-        this.is_selectedCountry_on = false;
         this.gacm_is_on = false;
       } else if (value === "gdpr") {
         this.is_gdpr = true;
@@ -4500,12 +4493,6 @@ var gen = new Vue({
         this.is_sa_pdpl = false;
         this.show_revoke_card = true;
         this.show_visitor_conditions = true;
-        this.selectedRadioWorldWide = "yes";
-        this.is_worldwide_on = true;
-        this.is_worldwide_on_ccpa = true;
-        this.is_eu_on = false;
-        this.selectedRadioCountry = false;
-        this.is_selectedCountry_on = false;
       } else if (value === "lgpd") {
         this.is_us_state_laws = false;
         this.is_eprivacy = false;
@@ -4712,12 +4699,12 @@ var gen = new Vue({
       this.button_readmore_wp_page2 = false;
       this.button_readmore_page2 = "0";
 
-      this.decline_text = "Decline";
+      this.decline_text = "Reject All";
       this.decline_url = "#";
       this.decline_action = "#cookie_action_settings";
       this.open_decline_url = false;
       this.decline_as_button = true;
-      this.settings_text = "Cookie Settings";
+      this.settings_text = "Preferences";
       this.settings_as_button = true;
       this.cookie_on_frontend = true;
       this.opt_out_text = "Do Not Sell My Personal Information";
@@ -4734,12 +4721,12 @@ var gen = new Vue({
       this.accept_all_action1 = "#cookie_action_close_header";
       this.accept_all_new_win1 = false;
       this.accept_all_as_button1 = true;
-      this.decline_text1 = "Decline";
+      this.decline_text1 = "Reject All";
       this.decline_url1 = "#";
       this.decline_action1 = "#cookie_action_settings";
       this.open_decline_url1 = false;
       this.decline_as_button1 = true;
-      this.settings_text1 = "Cookie Settings";
+      this.settings_text1 = "Preferences";
       this.settings_as_button1 = true;
       this.cookie_on_frontend1 = true;
       this.opt_out_text1 = "Do Not Sell My Personal Information";
@@ -4756,12 +4743,12 @@ var gen = new Vue({
       this.accept_all_action2 = "#cookie_action_close_header";
       this.accept_all_new_win2 = false;
       this.accept_all_as_button2 = true;
-      this.decline_text2 = "Decline";
+      this.decline_text2 = "Reject All";
       this.decline_url2 = "#";
       this.decline_action2 = "#cookie_action_settings";
       this.open_decline_url2 = false;
       this.decline_as_button2 = true;
-      this.settings_text2 = "Cookie Settings";
+      this.settings_text2 = "Preferences";
       this.settings_as_button2 = true;
       this.cookie_on_frontend2 = true;
       this.opt_out_text2 = "Do Not Sell My Personal Information";
@@ -6755,7 +6742,7 @@ var app = new Vue({
         "button_decline_text"
       )
         ? settings_obj.the_options["button_decline_text"]
-        : "Decline",
+        : "Reject All",
       decline_text_color: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color"
       )
@@ -6828,7 +6815,7 @@ var app = new Vue({
         "button_settings_text"
       )
         ? settings_obj.the_options["button_settings_text"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color"
       )
@@ -7157,7 +7144,7 @@ var app = new Vue({
         "button_decline_text1"
       )
         ? settings_obj.the_options["button_decline_text1"]
-        : "Decline",
+        : "Reject All",
       decline_text_color1: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color1"
       )
@@ -7231,7 +7218,7 @@ var app = new Vue({
         "button_settings_text1"
       )
         ? settings_obj.the_options["button_settings_text1"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color1: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color1"
       )
@@ -7560,7 +7547,7 @@ var app = new Vue({
         "button_decline_text2"
       )
         ? settings_obj.the_options["button_decline_text2"]
-        : "Decline",
+        : "Reject All",
       decline_text_color2: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color2"
       )
@@ -7634,7 +7621,7 @@ var app = new Vue({
         "button_settings_text2"
       )
         ? settings_obj.the_options["button_settings_text2"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color2: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color2"
       )
@@ -8637,7 +8624,6 @@ var app = new Vue({
       this.banner_preview_is_on = false;
     },
     onTemplateChange(value) {
-      console.log(value);
       this.template = value;
       const selectedTemplate = this.json_templates[value];
       this.cookie_bar_color =                       selectedTemplate['styles']['background-color'];
@@ -9159,7 +9145,7 @@ var app = new Vue({
       this.gcm_advertiser_mode = false;
       this.gcm_url_passthrough = false;
       this.gacm_is_on = false;
-      this.decline_text = "Decline";
+      this.decline_text = "Reject All";
       this.decline_url = "#";
       this.decline_action = "#cookie_action_settings";
       this.decline_text_color = "#ffffff";
@@ -9172,7 +9158,7 @@ var app = new Vue({
       this.decline_style = "none";
       this.decline_border_color = "#333333";
       this.decline_border_radius = "0";
-      this.settings_text = "Cookie Settings";
+      this.settings_text = "Preferences";
       this.settings_text_color = "#ffffff";
       this.settings_background_color = "#333333";
       this.settings_as_button = true;
@@ -10262,7 +10248,7 @@ var adv = new Vue({
         "button_decline_text"
       )
         ? settings_obj.the_options["button_decline_text"]
-        : "Decline",
+        : "Reject All",
       decline_text_color: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color"
       )
@@ -10335,7 +10321,7 @@ var adv = new Vue({
         "button_settings_text"
       )
         ? settings_obj.the_options["button_settings_text"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color"
       )
@@ -10802,7 +10788,7 @@ var adv = new Vue({
         "button_decline_text1"
       )
         ? settings_obj.the_options["button_decline_text1"]
-        : "Decline",
+        : "Reject All",
       decline_text_color1: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color1"
       )
@@ -10876,7 +10862,7 @@ var adv = new Vue({
         "button_settings_text1"
       )
         ? settings_obj.the_options["button_settings_text1"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color1: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color1"
       )
@@ -11299,7 +11285,7 @@ var adv = new Vue({
         "button_decline_text2"
       )
         ? settings_obj.the_options["button_decline_text2"]
-        : "Decline",
+        : "Reject All",
       decline_text_color2: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color2"
       )
@@ -11374,7 +11360,7 @@ var adv = new Vue({
         "button_settings_text2"
       )
         ? settings_obj.the_options["button_settings_text2"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color2: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color2"
       )
@@ -12488,12 +12474,12 @@ var adv = new Vue({
       this.button_readmore_wp_page2 = false;
       this.button_readmore_page2 = "0";
 
-      this.decline_text = "Decline";
+      this.decline_text = "Reject All";
       this.decline_url = "#";
       this.decline_action = "#cookie_action_settings";
       this.open_decline_url = false;
       this.decline_as_button = true;
-      this.settings_text = "Cookie Settings";
+      this.settings_text = "Preferences";
       this.settings_as_button = true;
       this.cookie_on_frontend = true;
       this.opt_out_text = "Do Not Sell My Personal Information";
@@ -12510,12 +12496,12 @@ var adv = new Vue({
       this.accept_all_action1 = "#cookie_action_close_header";
       this.accept_all_new_win1 = false;
       this.accept_all_as_button1 = true;
-      this.decline_text1 = "Decline";
+      this.decline_text1 = "Reject All";
       this.decline_url1 = "#";
       this.decline_action1 = "#cookie_action_settings";
       this.open_decline_url1 = false;
       this.decline_as_button1 = true;
-      this.settings_text1 = "Cookie Settings";
+      this.settings_text1 = "Preferences";
       this.settings_as_button1 = true;
       this.cookie_on_frontend1 = true;
       this.opt_out_text1 = "Do Not Sell My Personal Information";
@@ -12532,12 +12518,12 @@ var adv = new Vue({
       this.accept_all_action2 = "#cookie_action_close_header";
       this.accept_all_new_win2 = false;
       this.accept_all_as_button2 = true;
-      this.decline_text2 = "Decline";
+      this.decline_text2 = "Reject All";
       this.decline_url2 = "#";
       this.decline_action2 = "#cookie_action_settings";
       this.open_decline_url2 = false;
       this.decline_as_button2 = true;
-      this.settings_text2 = "Cookie Settings";
+      this.settings_text2 = "Preferences";
       this.settings_as_button2 = true;
       this.cookie_on_frontend2 = true;
       this.opt_out_text2 = "Do Not Sell My Personal Information";

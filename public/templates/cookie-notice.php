@@ -407,10 +407,8 @@ if ( 'popup' === $the_options['cookie_bar_as'] ) {
 		} ?>
 		<?php
 		if(filter_var( $the_options['heading_is_on' . $suffix] ?? false, FILTER_VALIDATE_BOOLEAN )) {
-			if ( ($content_law === 'gdpr' || $content_law === 'both' ) && strlen($the_options['bar_heading_text']) > 0) : ?>
-				<h3 class = "<?php if($the_options['cookie_usage_for'] === 'both') echo 'gdpr_heading';?>" style = "<?php echo esc_attr($heading_style_attr); ?>" ><?php echo esc_html($the_options['bar_heading_text'] ?? ''); ?></h3>
-			<?php elseif (( $content_law === 'lgpd' ) && strlen($the_options['bar_heading_lgpd_text']) > 0) : ?>
-				<h3 style = "<?php echo esc_attr($heading_style_attr); ?>" ><?php echo esc_html($the_options['bar_heading_lgpd_text'] ?? ''); ?></h3>
+			if ( strlen($the_options['bar_heading_text']) > 0) : ?>
+				<h3 style = "<?php echo esc_attr($heading_style_attr); ?>" ><?php echo esc_html($the_options['bar_heading_text'] ?? ''); ?></h3>
 			<?php endif; 
 		} ?>
 	</div>

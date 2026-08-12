@@ -893,10 +893,9 @@ class Gdpr_Cookie_Consent_Public {
 			// above), but the banner text differs by which of the three notice
 			// groups the visitor's state belongs to. Manual mode has no per-visitor
 			// state to resolve, so it always shows the CCPA/CPRA notice.
-			$us_state_law_variant = ( 'us_state_laws' === $the_options['cookie_usage_for'] && $this->gdpr_is_auto_mode() )
+			$us_state_law_variant = ( $this->gdpr_is_auto_mode() || ( 'us_state_laws' === $the_options['cookie_usage_for'] && ( $the_options['is_worldwide_on'] === false || $the_options['is_worldwide_on'] === 'false' || $the_options['is_worldwide_on'] === 0 ) ) )
 				? Gdpr_Cookie_Consent::resolve_us_state_law_variant( $this->gdpr_get_visitor_state() )
 				: 'ccpa';
-			$us_state_message     = stripslashes( nl2br( $the_options[ 'notify_message_' . $us_state_law_variant ] ) );
 
 			$about_message      = stripslashes( nl2br( $the_options['about_message'] ) );
 			$about_message_lgpd = stripslashes( nl2br( $the_options['about_message_lgpd'] ) );

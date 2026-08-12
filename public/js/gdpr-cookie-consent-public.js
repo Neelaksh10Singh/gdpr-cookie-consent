@@ -212,7 +212,6 @@ GDPR_CCPA_COOKIE_EXPIRE =
     if (!GDPR_LAW_DEBUG) return;
     var args = Array.prototype.slice.call(arguments);
     args.unshift("[GDPR law]");
-    console.log.apply(console, args);
   }
 
   var gdpr_law_debug = gdpr_cookies_obj.gdpr_law_debug || false;
