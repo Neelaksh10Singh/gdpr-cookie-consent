@@ -1433,6 +1433,17 @@ banner.style.display = "none";
                 } else {
                   gdpr_law_log("-> banner suppressed (geo_status off)");
                   $("#gdpr-cookie-consent-bar").addClass("hide_show_again_dnt");
+                  if(!(gdpr_do_not_track == "true" && (browser_dnt_value || browser_gpc_value))){
+                    gtag('consent', 'update', {
+                      'ad_user_data':'granted',
+                      'ad_personalization':'granted',
+                      'ad_storage':'granted',
+                      'analytics_storage':'granted',
+                      'functionality_storage': 'granted',
+                      'personalization_storage':'granted',
+                      'security_storage': 'granted'
+                    });
+                  }
                 }
 
                 //ab-testing-data-collection
@@ -1479,6 +1490,17 @@ banner.style.display = "none";
                   gdpr_law_log("-> banner suppressed (geo_status off)");
                   $("#gdpr-cookie-consent-bar").addClass("hide_show_again_dnt");
                   $("#ccpa-cookie-consent-show-again").addClass("hide_show_again_dnt"); //check this
+                  if(!(gdpr_do_not_track == "true" && (browser_dnt_value || browser_gpc_value))){
+                    gtag('consent', 'update', {
+                      'ad_user_data':'granted',
+                      'ad_personalization':'granted',
+                      'ad_storage':'granted',
+                      'analytics_storage':'granted',
+                      'functionality_storage': 'granted',
+                      'personalization_storage':'granted',
+                      'security_storage': 'granted'
+                    });
+                  }
                 }
 
                 jQuery.ajax({
