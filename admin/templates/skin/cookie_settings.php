@@ -71,7 +71,10 @@ if ( ! defined( 'ABSPATH' ) ) {
           : `${cookie_bar_border_radius}px`,
 			'border-color': ab_testing_enabled 
           ? this[`cookie_border_color${active_test_banner_tab}`] 
-          : cookie_border_color
+          : cookie_border_color,
+         'backdrop-filter': cookie_bar_blur > 0 
+          ? `blur(${cookie_bar_blur * 20}px)` 
+          : undefined,
          }">
             <div class="gdprmodal-header">
                <p>Preferences</p>
@@ -186,7 +189,10 @@ if ( ! defined( 'ABSPATH' ) ) {
           : `${cookie_bar_border_radius}px`,
 			'border-color': ab_testing_enabled 
           ? this[`cookie_border_color${active_test_banner_tab}`] 
-          : cookie_border_color
+          : cookie_border_color,
+         'backdrop-filter': cookie_bar_blur > 0 
+          ? `blur(${cookie_bar_blur * 20}px)` 
+          : undefined,
          }">
 			<div class="gdprmodal-header">
             <p>Preferences</p>

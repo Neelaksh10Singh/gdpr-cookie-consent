@@ -1169,6 +1169,7 @@ class Gdpr_Cookie_Consent {
 			'is_iabtcf_on'                         => false,
 			'is_gacm_on'						   => false,
 			'is_eu_on'                             => false,
+			'is_law_region_on'                     => false,
 			'is_ccpa_on'                           => false,
 			'is_ccpa_iab_on'                       => false,
 			'is_worldwide_on'                      => true,
@@ -1298,6 +1299,7 @@ class Gdpr_Cookie_Consent {
 			case 'is_on':
 			case 'is_iabtcf_on':
 			case 'is_eu_on':
+			case 'is_law_region_on':
 			case 'is_ccpa_on':
 			case 'is_ccpa_iab_on':
 			case 'is_script_blocker_on':
@@ -2283,6 +2285,7 @@ class Gdpr_Cookie_Consent {
 			'text'                                   => $settings['text'],
 			'cookie_bar_as'                          => $settings['cookie_bar_as'],
 			'cookie_usage_for'                       => $settings['cookie_usage_for'],
+			'law_selection_mode'                     => get_option( 'gdpr_law_selection_mode', 'manual' ),
 			'popup_overlay'                          => $settings['popup_overlay'],
 			'border_color'                           => ( self::gdpr_su_hex_shift( $settings['text'], 'up', 40 ) ),
 			'background_color'                       => ( self::gdpr_su_hex_shift( $settings['background'], 'down', 10 ) ),
@@ -2465,5 +2468,118 @@ class Gdpr_Cookie_Consent {
 				'GB', // United Kingdom.
 			)
 		);
+	}
+
+	/**
+	 * Map of law code => the ISO-3166-1 alpha-2 countries that law governs.
+	 */
+	public static function get_law_region_map() {
+		return apply_filters(
+			'gdprcookieconsent_law_region_map',
+			array(
+				'uk_gdpr'       => array( 'GB' ),
+				'us_state_laws' => array( 'US' ),
+				'lgpd'          => array( 'BR' ),
+				'pipeda'        => array( 'CA' ),
+				'au_app'        => array( 'AU' ),
+				'sa_pdpl'       => array( 'SA' ),
+				'gdpr'          => self::get_eu_countries(),
+			)
+		);
+	}
+
+	/**
+	 * Resolve the privacy law that applies to a visitor's country.
+	 *
+	 * Used by auto ("Detect Automatically") law-selection mode. Any country not
+	 * covered by a specific law falls back to GDPR — the strictest of the
+	 * supported laws, and the safe default for an unknown visitor.
+	 *
+	 * @since 4.4.0
+	 * @param string|false $country_code ISO-3166-1 alpha-2 code, or false when the lookup failed.
+	 * @return string Law code.
+	 */
+	public static function resolve_law_for_country( $country_code ) {
+		if ( empty( $country_code ) || ! is_string( $country_code ) ) {
+			return 'gdpr';
+		}
+
+		$country_code = strtoupper( $country_code );
+
+		foreach ( self::get_law_region_map() as $law => $countries ) {
+			if ( in_array( $country_code, $countries, true ) ) {
+				return $law;
+			}
+		}
+
+		return 'gdpr';
+	}
+
+	/**
+	 * The law whose existing content a banner borrows when it has none of its own.
+	 */
+	public static function get_content_law( $law ) {
+		if ( in_array( $law, array( 'uk_gdpr', 'pipeda', 'au_app', 'sa_pdpl' ), true ) ) {
+			return 'gdpr';
+		}
+
+		if ( 'us_state_laws' === $law ) {
+			return 'ccpa';
+		}
+
+		return $law;
+	}
+
+	/**
+	 * Law codes whose banner copy has not been written yet.
+	 */
+	public static function get_placeholder_laws() {
+		return array( 'uk_gdpr', 'pipeda', 'au_app', 'sa_pdpl', 'us_state_laws', 'ccpa' );
+	}
+
+	/**
+	 * Which of the three US state-law notice groups a state belongs to.
+	 */
+	public static function get_us_state_law_group( $state_code ) {
+		$groups = apply_filters(
+			'gdprcookieconsent_us_state_law_groups',
+			array(
+				1 => array( 'CA', 'CO', 'CT', 'MD', 'MN', 'MT', 'NE', 'NH', 'NJ', 'OR', 'TX', 'DE' ),
+				2 => array( 'VA', 'IN', 'KY', 'TN', 'RI' ),
+				3 => array( 'UT', 'IA', 'FL' ),
+			)
+		);
+
+		$state_code = strtoupper( (string) $state_code );
+
+		foreach ( $groups as $group => $states ) {
+			if ( in_array( $state_code, $states, true ) ) {
+				return (int) $group;
+			}
+		}
+
+		return 3;
+	}
+
+	/**
+	 * Placeholder notice text for a law that has no copy of its own yet.
+	 */
+	public static function get_law_placeholder_message( $law, $state_code = '' ) {
+		$labels = array(
+			'uk_gdpr' => 'UK GDPR',
+			'pipeda'  => 'PIPEDA',
+			'au_app'  => 'AU APP',
+			'sa_pdpl' => 'SA PDPL',
+		);
+
+		if ( isset( $labels[ $law ] ) ) {
+			return $labels[ $law ] . ' TO BE IMPLEMENTED';
+		}
+
+		if ( in_array( $law, array( 'us_state_laws', 'ccpa' ), true ) ) {
+			return 'US STATE LAW BANNER ' . self::get_us_state_law_group( $state_code ) . ' TO BE IMPLEMENTED';
+		}
+
+		return '';
 	}
 }

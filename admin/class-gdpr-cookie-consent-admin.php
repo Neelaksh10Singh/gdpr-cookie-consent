@@ -113,6 +113,8 @@ class Gdpr_Cookie_Consent_Admin {
 
 			add_action( 'admin_post_gdpr_resolve', [ $this, 'wpl_data_req_process_resolve' ] );
 			add_action( 'admin_post_gdpr_delete', [ $this, 'wpl_data_req_process_delete' ] );
+			add_action( 'admin_init', array( $this, 'gcc_migrate_geo_targeting_options') );
+			add_action( 'admin_notices', array( $this, 'gdpr_both_law_retired_notice') );
 			add_action( 'admin_init', array( $this, 'gdpr_migrate_old_template_names_once') );
 			add_action( 'admin_init', array( $this, 'gdpr_add_banner_builder_settings_once')                                                                             );
 			add_action('admin_init', function() {
@@ -2563,17 +2565,19 @@ class Gdpr_Cookie_Consent_Admin {
 			return;
 		}
 		$settings        = Gdpr_Cookie_Consent::gdpr_get_settings();
-		$gdpr_policies   = self::get_cookie_usage_for_options();
-		$policies_length = count( $gdpr_policies );
-		$policy_keys     = array_keys( $gdpr_policies );
-		$policies        = array();
-		$is_pro_active   = get_option( 'wpl_pro_active' );
-		for ( $i = 0; $i < $policies_length; $i++ ) {
-			$policies[ $i ] = array(
-				'label' => $policy_keys[ $i ],
-				'code'  => $gdpr_policies[ $policy_keys[ $i ] ],
+		$gdpr_policies = self::get_cookie_usage_for_options();
+		$policies      = array();
+
+		foreach ( $gdpr_policies as $label => $data ) {
+			$policies[] = array(
+				'label' => $label,
+				'code'  => $data['code'],
+				'flag'  => $data['flag'],
 			);
 		}
+
+		$is_pro_active   = get_option( 'wpl_pro_active' );
+
 		$cookie_durations        = self::get_cookie_expiry_options();
 		$cookie_durations_length = count( $cookie_durations );
 		$cookie_expiry_keys      = array_keys( $cookie_durations );
@@ -3350,6 +3354,7 @@ class Gdpr_Cookie_Consent_Admin {
 				update_option(GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $settings);
 			}
 		}
+
 		wp_localize_script(
 			$this->plugin_name . '-main',
 			'settings_obj',
@@ -3360,6 +3365,8 @@ class Gdpr_Cookie_Consent_Admin {
 				'default_template_json'			   => get_option('gdpr_default_template_object'),
 				'ajaxurl'                          => admin_url( 'admin-ajax.php' ),
 				'policies'                         => $policies,
+				'law_selection_mode' 			   => get_option( 'gdpr_law_selection_mode', 'manual' ),
+				'disabled_for_free'				   => (int) ( ! $is_user_connected || $api_user_plan === 'free' ),
 				'position_options'                 => $position_options,
 				'show_cookie_as_options'           => $show_cookie_as_options,
 				'show_language_as_options'         => $show_language_as_options,
@@ -3409,6 +3416,100 @@ class Gdpr_Cookie_Consent_Admin {
 		);
 		wp_enqueue_script( $this->plugin_name . '-main' );
 		require_once plugin_dir_path( __FILE__ ) . 'gdpr-cookie-consent-admin-settings.php';
+	}
+
+	/*
+	 * Migrate geo-targeting options to the unified format.
+	 */
+	function gcc_migrate_geo_targeting_options() {
+
+		if ( get_option( 'gdpr_geo_targeting_migrated' ) ) {
+			return;
+		}
+
+		$the_options = Gdpr_Cookie_Consent::gdpr_get_settings();
+
+		$truthy = fn( $v ) => true === $v || 1 === $v || '1' === $v || 'true' === $v;
+
+		// explode() on an empty POST value stores array( '' ); treat that as empty.
+		$clean_countries = function ( $v ) {
+			if ( ! is_array( $v ) ) {
+				return array();
+			}
+			return array_values( array_filter( array_map( 'trim', $v ), 'strlen' ) );
+		};
+
+		$policy = isset( $the_options['cookie_usage_for'] ) ? $the_options['cookie_usage_for'] : 'gdpr';
+
+		if ( 'ccpa' === $policy || 'us_state_laws' === $policy ) {
+			$the_options['is_worldwide_on']       = $truthy( $the_options['is_worldwide_on_ccpa'] ?? false );
+			$the_options['is_law_region_on']      = $truthy( $the_options['is_ccpa_on'] ?? false );
+			$the_options['is_selectedCountry_on'] = $truthy( $the_options['is_selectedCountry_on_ccpa'] ?? false );
+			$the_options['select_countries']      = $clean_countries( $the_options['select_countries_ccpa'] ?? array() );
+			$the_options['cookie_usage_for']      = 'us_state_laws';
+		} elseif ( 'both' === $policy ) {
+			$the_options['is_worldwide_on'] = $truthy( $the_options['is_worldwide_on'] ?? false )
+				|| $truthy( $the_options['is_worldwide_on_ccpa'] ?? false );
+
+			$the_options['is_law_region_on'] = $truthy( $the_options['is_eu_on'] ?? false );
+
+			$countries = array_merge(
+				$clean_countries( $the_options['select_countries'] ?? array() ),
+				$clean_countries( $the_options['select_countries_ccpa'] ?? array() )
+			);
+
+			if ( $truthy( $the_options['is_ccpa_on'] ?? false ) ) {
+				$countries[] = 'US';
+			}
+
+			$the_options['select_countries']      = array_values( array_unique( $countries ) );
+			$the_options['is_selectedCountry_on'] = $truthy( $the_options['is_selectedCountry_on'] ?? false )
+				|| $truthy( $the_options['is_selectedCountry_on_ccpa'] ?? false )
+				|| ! empty( $countries );
+
+			$the_options['cookie_usage_for'] = 'gdpr';
+
+			update_option( 'gdpr_both_law_retired_notice', 1 );
+		} else {
+			
+			$the_options['is_law_region_on'] = $truthy( $the_options['is_eu_on'] ?? false );
+			$the_options['select_countries'] = $clean_countries( $the_options['select_countries'] ?? array() );
+
+			if ( in_array( $policy, array( 'lgpd', 'eprivacy' ), true ) ) {
+				$the_options['is_worldwide_on']       = true;
+				$the_options['is_law_region_on']      = false;
+				$the_options['is_selectedCountry_on'] = false;
+			}
+		}
+
+		update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
+
+		$law_selection_mode = get_option( 'gdpr_law_selection_mode' );
+		if ( ! in_array( $law_selection_mode, array( 'auto', 'manual' ), true ) ) {
+			update_option( 'gdpr_law_selection_mode', 'manual' );
+		}
+
+		update_option( 'gdpr_geo_targeting_migrated', 1 );
+	}
+
+	/**
+	 * One-time notice for installs migrated off the retired combined GDPR & CCPA law.
+	 */
+	public function gdpr_both_law_retired_notice() {
+		if ( ! get_option( 'gdpr_both_law_retired_notice' ) ) {
+			return;
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		?>
+		<div class="notice notice-warning is-dismissible">
+			<p>
+				<?php esc_html_e( 'WP Cookie Consent: the combined "GDPR & CCPA" law has been replaced. Your site now targets GDPR, and your previous CCPA geo-targeting countries were merged into the unified Geo-Targeting settings. Review them under Banner Settings.', 'gdpr-cookie-consent' ); ?>
+			</p>
+		</div>
+		<?php
+		delete_option( 'gdpr_both_law_retired_notice' );
 	}
 	
 	/**
@@ -3849,26 +3950,56 @@ class Gdpr_Cookie_Consent_Admin {
 	 * @since 1.8.1
 	 */
 	public function get_cookie_usage_for_options() {
-		$ab_options = get_option( 'wpl_ab_options' );
-		if($ab_options['ab_testing_enabled'] === 'false' || $ab_options['ab_testing_enabled'] === false  ){
-			$options = array(
-				__( 'ePrivacy', 'gdpr-cookie-consent' )    => 'eprivacy',
-				__( 'GDPR', 'gdpr-cookie-consent' )        => 'gdpr',
-				__( 'CCPA', 'gdpr-cookie-consent' )        => 'ccpa',
-				__( 'LGPD', 'gdpr-cookie-consent' )        => 'lgpd',
-				__( 'GDPR & CCPA', 'gdpr-cookie-consent' ) => 'both',
-			);
-		}else{
-			$options = array(
-				__( 'ePrivacy', 'gdpr-cookie-consent' )    => 'eprivacy',
-				__( 'GDPR', 'gdpr-cookie-consent' )        => 'gdpr',
-				__( 'CCPA', 'gdpr-cookie-consent' )        => 'ccpa',
-				__( 'LGPD', 'gdpr-cookie-consent' )        => 'lgpd',
-			);
-		}
 		
-		$options = apply_filters( 'gdprcookieconsent_cookie_usage_for_options', $options );
-		return $options;
+		$options = array(
+			__( 'Europe (GDPR)', 'gdpr-cookie-consent' )                => array( 'code' => 'gdpr',          'flag' => '🇪🇺' ),
+			__( 'Europe (ePrivacy)', 'gdpr-cookie-consent' )            => array( 'code' => 'eprivacy',      'flag' => '🇪🇺' ),
+			__( 'United Kingdom (UK GDPR)', 'gdpr-cookie-consent' )     => array( 'code' => 'uk_gdpr',       'flag' => '🇬🇧' ),
+			__( 'United States (State Laws)', 'gdpr-cookie-consent' )   => array( 'code' => 'us_state_laws', 'flag' => '🇺🇸' ),
+			__( 'Brazil (LGPD)', 'gdpr-cookie-consent' )                => array( 'code' => 'lgpd',          'flag' => '🇧🇷' ),
+			__( 'Canada (PIPEDA)', 'gdpr-cookie-consent' )              => array( 'code' => 'pipeda',        'flag' => '🇨🇦' ),
+			__( 'Australia (APPs)', 'gdpr-cookie-consent' )             => array( 'code' => 'au_app',        'flag' => '🇦🇺' ),
+			__( 'Saudi Arabia (PDPL)', 'gdpr-cookie-consent' )          => array( 'code' => 'sa_pdpl',       'flag' => '🇸🇦' ),
+		);
+		
+		return apply_filters( 'gdprcookieconsent_cookie_usage_for_options', $options );
+	}
+
+	private function migrate_legacy_law_code( $code ) {
+		if ( 'ccpa' === $code ) {
+			return 'us_state_laws';
+		}
+		if ( 'both' === $code ) {
+			return 'gdpr';
+		}
+		return $code;
+	}
+
+	/**
+	 * Law codes that require a paid, connected account.
+	 *
+	 * Mirrors `pro_only_law_codes` in the Vue bundle — keep the two in sync.
+	 */
+	private function gdpr_pro_only_law_codes() {
+		return array( 'uk_gdpr', 'pipeda', 'au_app', 'sa_pdpl' );
+	}
+
+	/**
+	 * Whether the current install is on the free tier.
+	 *
+	 * This must stay the exact predicate the UI uses for `disabled_for_free`
+	 * (see gdpr-cookie-consent-admin-settings.php): account connection and plan
+	 * only. Do NOT fold in `wpl_pro_active` — that flags whether the Pro plugin
+	 * is installed, not the account tier, and the free save branch is already
+	 * guarded by it. Treating "Pro plugin absent" as "free tier" makes this
+	 * always-true inside that branch, which silently wipes the geo keys for
+	 * connected paid users running the bundled plugin.
+	 */
+	private function gdpr_is_free_tier() {
+		require_once GDPR_COOKIE_CONSENT_PLUGIN_PATH . 'includes/settings/class-gdpr-cookie-consent-settings.php';
+		$settings = new GDPR_Cookie_Consent_Settings();
+
+		return ! $settings->is_connected() || 'free' === $settings->get_plan();
 	}
 
 	/**
@@ -4302,6 +4433,23 @@ class Gdpr_Cookie_Consent_Admin {
 				$the_options['ip_anonymization_on'] = isset( $_POST['gcc-ip-anonymization-enabled'] ) && ( true === $_POST['gcc-ip-anonymization-enabled'] || 'true' === $_POST['gcc-ip-anonymization-enabled'] ) ? 'true' : 'false';
 				$the_options['ip_masking_level'] = isset( $_POST['gcc-ip-masking-level'] )? sanitize_text_field( wp_unslash($_POST['gcc-ip-masking-level'] ) ): '2'; //recommended is 2 level
 
+
+				//For Law Region
+				if ( isset( $_POST['gcc-region-enable'] ) ) {
+					if ( 'no' === $_POST['gcc-region-enable'] ) {
+						$the_options['is_law_region_on'] = 'false';
+					} elseif ( 'false' == $_POST['gcc-region-enable'] ) {
+						$the_options['is_law_region_on'] = 'false';
+					} else {
+						
+						if(!$the_options['is_law_region_on']){
+							$this->auto_update_maxminddb();
+							$this->download_maxminddb();
+						}
+						$the_options['is_law_region_on'] = 'true';
+					}
+				}
+
 				// For EU.
 				if ( isset( $_POST['gcc-eu-enable'] ) ) {
 					if ( 'no' === $_POST['gcc-eu-enable'] ) {
@@ -4392,6 +4540,8 @@ class Gdpr_Cookie_Consent_Admin {
 				$selected_countries_ccpa             = isset( $_POST['gcc-selected-countries-ccpa'] ) ? explode( ',', sanitize_text_field( wp_unslash( $_POST['gcc-selected-countries-ccpa'] ) ) ) : '';
 				$the_options['select_countries_ccpa'] = $selected_countries_ccpa;
 				// storing id of pages in database.
+
+				$the_options['cookie_usage_for'] = $this->migrate_legacy_law_code( $the_options['cookie_usage_for'] );
 				
 				if ( isset( $the_options['cookie_usage_for'] ) ) {
 					switch ( $the_options['cookie_usage_for'] ) {
@@ -4402,6 +4552,7 @@ class Gdpr_Cookie_Consent_Admin {
 							update_option( 'wpl_bypass_script_blocker', 0 );
 							break;
 						case 'ccpa':
+						case 'us_state_laws':
 							update_option( 'wpl_bypass_script_blocker', 1 );
 							break;
 					}
@@ -4426,6 +4577,17 @@ class Gdpr_Cookie_Consent_Admin {
 			}
 
 			if ( get_option( 'wpl_pro_active' ) && get_option( 'wc_am_client_wpl_cookie_consent_activated' ) && 'Activated' === get_option( 'wc_am_client_wpl_cookie_consent_activated' ) ) {
+				//For Law Region
+				if ( isset( $_POST['gcc-region-enable'] ) ) {
+					if ( 'no' === $_POST['gcc-region-enable'] ) {
+						$the_options['is_law_region_on'] = 'false';
+					} elseif ( 'false' == $_POST['gcc-region-enable'] ) {
+						$the_options['is_law_region_on'] = 'false';
+					} else {
+						$the_options['is_law_region_on'] = 'true';
+					}
+				}
+				
 				// For EU.
 				if ( isset( $_POST['gcc-eu-enable'] ) ) {
 					if ( 'no' === $_POST['gcc-eu-enable'] ) {
@@ -4469,6 +4631,8 @@ class Gdpr_Cookie_Consent_Admin {
 				
 				$the_options['footer_dependency'] = isset( $_POST['gcc-footer-dependency'] )? sanitize_text_field( wp_unslash( $_POST['gcc-footer-dependency'] ) ): '';
 				
+				$the_options['cookie_usage_for'] = $this->migrate_legacy_law_code( $the_options['cookie_usage_for'] );
+
 				if ( isset( $the_options['cookie_usage_for'] ) ) {
 					switch ( $the_options['cookie_usage_for'] ) {
 						case 'both':
@@ -4478,6 +4642,7 @@ class Gdpr_Cookie_Consent_Admin {
 							update_option( 'wpl_bypass_script_blocker', 0 );
 							break;
 						case 'ccpa':
+						case 'us_state_laws':
 							update_option( 'wpl_bypass_script_blocker', 1 );
 							break;
 					}
@@ -4667,13 +4832,13 @@ class Gdpr_Cookie_Consent_Admin {
 												<span v-html ="gdpr_message"></span>
 												<?php elseif ( $the_options['cookie_usage_for'] === 'lgpd' ) : ?>
 												<span v-html ="lgpd_message"></span>
-												<?php elseif ( $the_options['cookie_usage_for'] === 'ccpa' ) : ?>
+												<?php elseif ( $the_options['cookie_usage_for'] === 'us_state_laws' ) : ?>
 												<span v-html ="ccpa_message"></span>
 												<?php elseif ( $the_options['cookie_usage_for'] === 'eprivacy' ) : ?>
 												<span v-html ="eprivacy_message"></span>
 											<?php endif; ?>
 											<a style = "<?php echo esc_attr($readmore_style_attr); ?>" >
-												<?php if ( $the_options['cookie_usage_for'] === 'ccpa' ) : ?>
+												<?php if ( $the_options['cookie_usage_for'] === 'us_state_laws' ) : ?>
 													{{ opt_out_text }}
 												<?php else : ?>
 													{{ button_readmore_text }}
@@ -4682,7 +4847,7 @@ class Gdpr_Cookie_Consent_Admin {
 										</p>
 									</div>
 									
-									<?php if ( $the_options['cookie_usage_for'] !== 'ccpa' ) : ?>
+									<?php if ( $the_options['cookie_usage_for'] !== 'us_state_laws' ) : ?>
 										<div class="cookie_notice_buttons <?php echo esc_attr($template['static-settings']['layout']) . '-buttons';?>">
 											<div class="left_buttons">
 												<?php if($template["decline_button"]["is_on"]) : ?><a style="<?php echo esc_attr( $decline_style_attr ); ?>">{{ decline_text }}</a><?php endif;?>
@@ -4796,13 +4961,13 @@ class Gdpr_Cookie_Consent_Admin {
 												<span v-html ="gdpr_message"></span>
 												<?php elseif ( $the_options['cookie_usage_for'] === 'lgpd' ) : ?>
 												<span v-html ="lgpd_message"></span>
-												<?php elseif ( $the_options['cookie_usage_for'] === 'ccpa' ) : ?>
+												<?php elseif ( $the_options['cookie_usage_for'] === 'us_state_laws' ) : ?>
 												<span v-html ="ccpa_message"></span>
 												<?php elseif ( $the_options['cookie_usage_for'] === 'eprivacy' ) : ?>
 												<span v-html ="eprivacy_message"></span>
 											<?php endif; ?>
 											<a style = "<?php echo esc_attr($readmore_style_attr); ?>" >
-												<?php if ( $the_options['cookie_usage_for'] === 'ccpa' ) : ?>
+												<?php if ( $the_options['cookie_usage_for'] === 'us_state_laws' ) : ?>
 													{{ opt_out_text }}
 												<?php else : ?>
 													{{ button_readmore_text }}
@@ -4811,7 +4976,7 @@ class Gdpr_Cookie_Consent_Admin {
 										</p>
 									</div>
 									
-									<?php if ( $the_options['cookie_usage_for'] !== 'ccpa' ) : ?>
+									<?php if ( $the_options['cookie_usage_for'] !== 'us_state_laws' ) : ?>
 										<div class="cookie_notice_buttons <?php echo esc_attr($template['static-settings']['layout']) . '-buttons';?>">
 											<div class="left_buttons">
 												<?php if($template["decline_button"]["is_on"]) : ?><a style="<?php echo esc_attr( $decline_style_attr ); ?>">{{ decline_text }}</a><?php endif;?>
@@ -4931,7 +5096,7 @@ class Gdpr_Cookie_Consent_Admin {
 	public function wpl_cookie_template() {
 		$the_options = Gdpr_Cookie_Consent::gdpr_get_settings();
 		?>
-			<c-card v-show="is_gdpr || is_lgpd || is_ccpa || is_eprivacy">
+			<c-card v-show="is_gdpr || is_lgpd || is_us_state_laws || is_eprivacy">
 					<c-row>
 						<c-col class="col-sm-32"><div id="gdpr-cookie-consent-settings-cookie-notice"><?php esc_attr_e( 'Cookie Bar Template', 'gdpr-cookie-consent' ); ?></div></c-col>
 					</c-row>
@@ -5069,7 +5234,21 @@ class Gdpr_Cookie_Consent_Admin {
 				}
 			}
 
+			$law_selection_mode = isset( $_POST['gcc-law-selection-mode'] )
+				? sanitize_text_field( wp_unslash( $_POST['gcc-law-selection-mode'] ) )
+				: 'manual';
 
+			if ( ! in_array( $law_selection_mode, array( 'auto', 'manual' ), true ) ) {
+				$law_selection_mode = 'manual';
+			}
+
+			$is_free_tier = $this->gdpr_is_free_tier();
+
+			if ( $is_free_tier && 'auto' === $law_selection_mode ) {
+				$law_selection_mode = 'manual';
+			}
+
+			update_option( 'gdpr_law_selection_mode', $law_selection_mode );
 
 			// $the_options['lang_selected'] = isset( $_POST['select-banner-lan'] ) ? sanitize_text_field( wp_unslash( $_POST['select-banner-lan'] ) ) : 'en';
 			//check if new consent version number is greater than the one in db, if yes, update the time stamp.
@@ -5115,6 +5294,12 @@ class Gdpr_Cookie_Consent_Admin {
 			
 			
 			$the_options['cookie_usage_for']                   = isset( $_POST['gcc-gdpr-policy'] ) ? sanitize_text_field( wp_unslash( $_POST['gcc-gdpr-policy'] ) ) : 'gdpr';
+			// Store the canonical code; 'ccpa' / 'both' stay accepted on read.
+			$the_options['cookie_usage_for']                   = $this->migrate_legacy_law_code( $the_options['cookie_usage_for'] );
+			// Free installs cannot persist a Pro law code, however the POST was built.
+			if ( $is_free_tier && in_array( $the_options['cookie_usage_for'], $this->gdpr_pro_only_law_codes(), true ) ) {
+				$the_options['cookie_usage_for'] = 'gdpr';
+			}
 			$the_options['cookie_bar_as']                      = isset( $_POST['show-cookie-as'] ) ? sanitize_text_field( wp_unslash( $_POST['show-cookie-as'] ) ) : 'banner';
 			$the_options['cookie_bar_as1']        			   = isset( $_POST['show-cookie-as1'] ) ? sanitize_text_field( wp_unslash( $_POST['show-cookie-as1'] ) ) : 'banner';
 			$the_options['cookie_bar_as2']        			   = isset( $_POST['show-cookie-as2'] ) ? sanitize_text_field( wp_unslash( $_POST['show-cookie-as2'] ) ) : 'banner';
@@ -5705,22 +5890,22 @@ class Gdpr_Cookie_Consent_Admin {
 				$the_options['select_pages'] = $selected_pages;
 			}
 			if ( ! get_option( 'wpl_pro_active' ) ) {
-				// script blocker.
-				// enable safe mode.
-
-				// consent forwarding.
-				$selected_sites                 = array();
-				$selected_sites                 = isset( $_POST['gcc-selected-sites'] ) ? explode( ',', sanitize_text_field( wp_unslash( $_POST['gcc-selected-sites'] ) ) ) : '';
-				$the_options['consent_forward'] = isset( $_POST['gcc-consent-forward'] ) && ( true === $_POST['gcc-consent-forward'] || 'true' === $_POST['gcc-consent-forward'] ) ? 'true' : 'false';
-				$the_options['select_sites']    = $selected_sites;
-				$selected_countries             = array();
-				$selected_countries             = isset( $_POST['gcc-selected-countries'] ) ? explode( ',', sanitize_text_field( wp_unslash( $_POST['gcc-selected-countries'] ) ) ) : '';
-				// storing id of pages in database.
-				$the_options['select_countries'] = $selected_countries;
-				$selected_countries_ccpa             = array();
-				$selected_countries_ccpa             = isset( $_POST['gcc-selected-countries-ccpa'] ) ? explode( ',', sanitize_text_field( wp_unslash( $_POST['gcc-selected-countries-ccpa'] ) ) ) : '';
-				// storing id of pages in database.
-				$the_options['select_countries_ccpa'] = $selected_countries_ccpa;
+				
+				$the_options['select_countries'] = isset( $_POST['gcc-selected-countries'] ) ? explode( ',', sanitize_text_field( wp_unslash( $_POST['gcc-selected-countries'] ) ) ) : array();
+				
+				//For Law Region
+				if ( isset( $_POST['gcc-region-enable'] ) ) {
+					if ( 'no' === $_POST['gcc-region-enable'] || 'false' == $_POST['gcc-region-enable'] ) {
+						$the_options['is_law_region_on'] = 'false';
+					} else {
+						if ( empty( $the_options['is_law_region_on'] ) || 'false' === $the_options['is_law_region_on'] ) {
+							$this->auto_update_maxminddb();
+							$this->download_maxminddb();
+						}
+						$the_options['is_law_region_on'] = 'true';
+					}
+				}
+				
 				// For EU.
 				if ( isset( $_POST['gcc-eu-enable'] ) ) {
 					if ( 'no' === $_POST['gcc-eu-enable'] ) {
@@ -5750,73 +5935,47 @@ class Gdpr_Cookie_Consent_Admin {
 						$the_options['is_ccpa_on'] = 'true';
 					}
 				}
-				// for World wide.
-				if ( isset( $_POST['gcc-worldwide-enable'] ) && ($the_options['cookie_usage_for'] === 'gdpr' || $the_options['cookie_usage_for'] === 'both') ) {
-					if ( filter_var( $the_options['is_worldwide_on'], FILTER_VALIDATE_BOOLEAN ) !==  filter_var( $_POST['gcc-worldwide-enable'], FILTER_VALIDATE_BOOLEAN ) ) {
+				
+				if ( isset( $_POST['gcc-worldwide-enable'] ) ) {
+					if ( filter_var( $the_options['is_worldwide_on'] ?? false, FILTER_VALIDATE_BOOLEAN ) !== filter_var( $_POST['gcc-worldwide-enable'], FILTER_VALIDATE_BOOLEAN ) ) {
 						$is_maxmind_turned_on = filter_var( $_POST['gcc-worldwide-enable'], FILTER_VALIDATE_BOOLEAN ) ? 'Turned Off' : 'Turned On';
-						$data_args = array(
+						$data_args            = array(
 							'Status' => 'Maxmind ' . $is_maxmind_turned_on,
 						);
 						$this->gdpr_send_shared_usage_data( 'GCC Maxmind Status', $data_args );
 					}
-					if ( 'no' === $_POST['gcc-worldwide-enable'] ) {
-						$the_options['is_worldwide_on'] = 'false';
-					} elseif ( 'false' == $_POST['gcc-worldwide-enable'] ) {
+					if ( 'no' === $_POST['gcc-worldwide-enable'] || 'false' == $_POST['gcc-worldwide-enable'] ) {
 						$the_options['is_worldwide_on'] = 'false';
 					} else {
-						if(!$the_options['is_worldwide_on']){
+						if ( empty( $the_options['is_worldwide_on'] ) || 'false' === $the_options['is_worldwide_on'] ) {
 							$this->disable_auto_update_maxminddb();
 						}
 						$the_options['is_worldwide_on'] = 'true';
 					}
 				}
-				// for World wide of CCPA Notice.
-				if ( isset( $_POST['gcc-worldwide-enable-ccpa'] ) && ($the_options['cookie_usage_for'] === 'ccpa' || $the_options['cookie_usage_for'] === 'both') ) {
-					if ( filter_var( $the_options['is_worldwide_on_ccpa'], FILTER_VALIDATE_BOOLEAN ) !==  filter_var( $_POST['gcc-worldwide-enable-ccpa'], FILTER_VALIDATE_BOOLEAN ) ) {
-						$is_maxmind_turned_on = filter_var( $_POST['gcc-worldwide-enable-ccpa'], FILTER_VALIDATE_BOOLEAN ) ? 'Turned Off' : 'Turned On';
-						$data_args = array(
-							'Status' => 'Maxmind ' . $is_maxmind_turned_on,
-						);
-						$this->gdpr_send_shared_usage_data( 'GCC Maxmind Status', $data_args );
-					}
-					if ( 'no' === $_POST['gcc-worldwide-enable-ccpa'] ) {
-						$the_options['is_worldwide_on_ccpa'] = 'false';
-					} elseif ( 'false' == $_POST['gcc-worldwide-enable-ccpa'] ) {
-						$the_options['is_worldwide_on_ccpa'] = 'false';
-					} else {
-						if(!$the_options['is_worldwide_on_ccpa']){
-							$this->disable_auto_update_maxminddb();
-						}
-						$the_options['is_worldwide_on_ccpa'] = 'true';
-					}
-				}
+
 				// For select country dropdown.
 				if ( isset( $_POST['gcc-select-countries-enable'] ) ) {
-					if ( 'no' === $_POST['gcc-select-countries-enable'] ) {
-						$the_options['is_selectedCountry_on'] = 'false';
-					} elseif ( 'false' == $_POST['gcc-select-countries-enable'] ) {
+					if ( 'no' === $_POST['gcc-select-countries-enable'] || 'false' == $_POST['gcc-select-countries-enable'] ) {
 						$the_options['is_selectedCountry_on'] = 'false';
 					} else {
-						if(!$the_options['is_selectedCountry_on']){
+						if ( empty( $the_options['is_selectedCountry_on'] ) || 'false' === $the_options['is_selectedCountry_on'] ) {
 							$this->auto_update_maxminddb();
 							$this->download_maxminddb();
 						}
 						$the_options['is_selectedCountry_on'] = 'true';
 					}
 				}
-				if ( isset( $_POST['gcc-select-countries-enable-ccpa'] ) ) {
-					if ( 'no' === $_POST['gcc-select-countries-enable-ccpa'] ) {
-						$the_options['is_selectedCountry_on_ccpa'] = 'false';
-					} elseif ( 'false' == $_POST['gcc-select-countries-enable-ccpa'] ) {
-						$the_options['is_selectedCountry_on_ccpa'] = 'false';
-					} else {
-						if(!$the_options['is_selectedCountry_on_ccpa']){
-							$this->auto_update_maxminddb();
-							$this->download_maxminddb();
-						}
-						$the_options['is_selectedCountry_on_ccpa'] = 'true';
-					}
+
+				if ( $this->gdpr_is_free_tier() ) {
+					$the_options['is_worldwide_on']       = 'true';
+					$the_options['is_law_region_on']      = 'false';
+					$the_options['is_selectedCountry_on'] = 'false';
+					$the_options['is_eu_on']              = 'false';
 				}
+
+				$the_options['cookie_usage_for'] = $this->migrate_legacy_law_code( $the_options['cookie_usage_for'] );
+
 				if ( isset( $the_options['cookie_usage_for'] ) ) {
 					switch ( $the_options['cookie_usage_for'] ) {
 						case 'both':
@@ -5826,6 +5985,7 @@ class Gdpr_Cookie_Consent_Admin {
 							update_option( 'wpl_bypass_script_blocker', 0 );
 							break;
 						case 'ccpa':
+						case 'us_state_laws':
 							update_option( 'wpl_bypass_script_blocker', 1 );
 							break;
 					}
@@ -6188,9 +6348,31 @@ class Gdpr_Cookie_Consent_Admin {
 				// consent forward .
 				$selected_sites                      = array();
 				$selected_sites                      = isset( $_POST['gcc-selected-sites'] ) ? explode( ',', sanitize_text_field( wp_unslash( $_POST['gcc-selected-sites'] ) ) ) : '';
+		
+				$geo_post_bool = function ( $key, $current ) {
+					if ( ! isset( $_POST[ $key ] ) ) {
+						return filter_var( $current, FILTER_VALIDATE_BOOLEAN ) ? 'true' : 'false';
+					}
+					return ( true === $_POST[ $key ] || 'true' === $_POST[ $key ] ) ? 'true' : 'false';
+				};
+
+				$the_options['is_law_region_on']      = $geo_post_bool( 'gcc-region-enable', $the_options['is_law_region_on'] ?? false );
+				$the_options['is_worldwide_on']       = $geo_post_bool( 'gcc-worldwide-enable', $the_options['is_worldwide_on'] ?? true );
+				$the_options['is_selectedCountry_on'] = $geo_post_bool( 'gcc-select-countries-enable', $the_options['is_selectedCountry_on'] ?? false );
+				if ( isset( $_POST['gcc-selected-countries'] ) ) {
+					$the_options['select_countries'] = array_values( array_filter( array_map( 'trim', explode( ',', sanitize_text_field( wp_unslash( $_POST['gcc-selected-countries'] ) ) ) ), 'strlen' ) );
+				}
 				$the_options['is_eu_on']             = isset( $_POST['gcc-eu-enable'] ) && ( true === $_POST['gcc-eu-enable'] || 'true' === $_POST['gcc-eu-enable'] ) ? 'true' : 'false';
 				$the_options['is_ccpa_on']           = isset( $_POST['gcc-ccpa-enable'] ) && ( true === $_POST['gcc-ccpa-enable'] || 'true' === $_POST['gcc-ccpa-enable'] ) ? 'true' : 'false';
 				$the_options['enable_safe']          = isset( $_POST['gcc-enable-safe'] ) && ( true === $_POST['gcc-enable-safe'] || 'true' === $_POST['gcc-enable-safe'] ) ? 'true' : 'false';
+
+				if ( 'true' === $the_options['enable_safe'] ) {
+					$the_options['is_worldwide_on']       = 'true';
+					$the_options['is_selectedCountry_on'] = 'false';
+					$the_options['is_law_region_on']      = 'false';
+					$the_options['is_eu_on']              = 'false';
+					$the_options['is_ccpa_on']            = 'false';
+				}
 				$the_options['is_script_blocker_on'] = isset( $_POST['gcc-script-blocker-on'] ) && ( true === $_POST['gcc-script-blocker-on'] || 'true' === $_POST['gcc-script-blocker-on'] ) ? 'true' : 'false';
 				//Script Dependency
 				$the_options['is_script_dependency_on'] = isset( $_POST['gcc-script-dependency-on'] ) && ( true === $_POST['gcc-script-dependency-on'] || 'true' === $_POST['gcc-script-dependency-on'] ) ? 'true' : 'false';
@@ -6200,6 +6382,9 @@ class Gdpr_Cookie_Consent_Admin {
 				// consent forward .
 				$the_options['consent_forward'] = isset( $_POST['gcc-consent-forward'] ) && ( true === $_POST['gcc-consent-forward'] || 'true' === $_POST['gcc-consent-forward'] ) ? 'true' : 'false';
 				$the_options['select_sites']    = $selected_sites;
+				
+				$the_options['cookie_usage_for'] = $this->migrate_legacy_law_code( $the_options['cookie_usage_for'] );
+
 				if ( isset( $the_options['cookie_usage_for'] ) ) {
 					switch ( $the_options['cookie_usage_for'] ) {
 						case 'both':
@@ -6209,6 +6394,7 @@ class Gdpr_Cookie_Consent_Admin {
 							update_option( 'wpl_bypass_script_blocker', 0 );
 							break;
 						case 'ccpa':
+						case 'us_state_laws':
 							update_option( 'wpl_bypass_script_blocker', 1 );
 							break;
 					}
@@ -6675,6 +6861,7 @@ class Gdpr_Cookie_Consent_Admin {
 				if ( isset( $the_options['enable_safe'] ) && 'true' === $the_options['enable_safe'] ) {
 					$the_options['is_worldwide_on'] = 'true';
 					$the_options['is_selectedCountry_on'] = 'false';
+					$the_options['is_law_region_on'] = 'false';
 					$the_options['is_eu_on'] = 'false';
 					$the_options['is_ccpa_on'] = 'false';
 					$the_options['is_script_blocker_on'] = false;
@@ -6808,6 +6995,8 @@ class Gdpr_Cookie_Consent_Admin {
 				$the_options['header_dependency'] = isset( $_POST['gcc-header-dependency'] )? sanitize_text_field( wp_unslash( $_POST['gcc-header-dependency'] ) ): '';
 				$the_options['footer_dependency'] = isset( $_POST['gcc-footer-dependency'] )? sanitize_text_field( wp_unslash( $_POST['gcc-footer-dependency'] ) ): '';
 				
+				$the_options['cookie_usage_for'] = $this->migrate_legacy_law_code( $the_options['cookie_usage_for'] );
+
 				if ( isset( $the_options['cookie_usage_for'] ) ) {
 					switch ( $the_options['cookie_usage_for'] ) {
 						case 'both':
@@ -6817,6 +7006,7 @@ class Gdpr_Cookie_Consent_Admin {
 							update_option( 'wpl_bypass_script_blocker', 0 );
 							break;
 						case 'ccpa':
+						case 'us_state_laws':
 							update_option( 'wpl_bypass_script_blocker', 1 );
 							break;
 					}
@@ -6830,6 +7020,8 @@ class Gdpr_Cookie_Consent_Admin {
 				$the_options['header_dependency'] = isset( $_POST['gcc-header-dependency'] )? sanitize_text_field( wp_unslash( $_POST['gcc-header-dependency'] ) ): '';
 				$the_options['footer_dependency'] = isset( $_POST['gcc-footer-dependency'] )? sanitize_text_field( wp_unslash( $_POST['gcc-footer-dependency'] ) ): '';
 				
+				$the_options['cookie_usage_for'] = $this->migrate_legacy_law_code( $the_options['cookie_usage_for'] );
+
 				if ( isset( $the_options['cookie_usage_for'] ) ) {
 					switch ( $the_options['cookie_usage_for'] ) {
 						case 'both':
@@ -6839,6 +7031,7 @@ class Gdpr_Cookie_Consent_Admin {
 							update_option( 'wpl_bypass_script_blocker', 0 );
 							break;
 						case 'ccpa':
+						case 'us_state_laws':
 							update_option( 'wpl_bypass_script_blocker', 1 );
 							break;
 					}
@@ -9147,7 +9340,7 @@ class Gdpr_Cookie_Consent_Admin {
 		return rest_ensure_response(
 			array(
 				'success'							=> true,
-				'cookie_usage_for'					=> $the_options['cookie_usage_for'],
+				'cookie_usage_for'					=> $the_options['cookie_usage_for'] = $this->migrate_legacy_law_code( $the_options['cookie_usage_for'] ),
 				'enable_safe' 						=> $the_options['enable_safe'],
 				'plan'								=> $plan,
 				
@@ -9589,6 +9782,7 @@ class Gdpr_Cookie_Consent_Admin {
 			}
 			
 			$the_options = array_merge($the_options, $save_object);
+			$the_options['cookie_usage_for'] = $this->migrate_legacy_law_code( $the_options['cookie_usage_for'] );
 
 			if ( isset( $the_options['cookie_usage_for'] ) ) {
 				switch ( $the_options['cookie_usage_for'] ) {
@@ -9599,6 +9793,7 @@ class Gdpr_Cookie_Consent_Admin {
 						update_option( 'wpl_bypass_script_blocker', 0 );
 						break;
 					case 'ccpa':
+					case 'us_state_laws':
 						update_option( 'wpl_bypass_script_blocker', 1 );
 						break;
 				}
@@ -9812,7 +10007,7 @@ class Gdpr_Cookie_Consent_Admin {
 				}
 			}
 
-			if ( isset( $geo_target_object['is_ccpa_worldwide_on'] ) && ($the_options['cookie_usage_for'] === 'ccpa' || $the_options['cookie_usage_for'] === 'both') ) {
+			if ( isset( $geo_target_object['is_ccpa_worldwide_on'] ) && ($the_options['cookie_usage_for'] === 'us_state_laws' || $the_options['cookie_usage_for'] === 'both') ) {
 				if ( filter_var( $the_options['is_worldwide_on_ccpa'], FILTER_VALIDATE_BOOLEAN ) !==  filter_var( $geo_target_object['is_ccpa_worldwide_on'], FILTER_VALIDATE_BOOLEAN ) ) {
 					$is_maxmind_turned_on = filter_var( $geo_target_object['is_ccpa_worldwide_on'], FILTER_VALIDATE_BOOLEAN ) ? 'Turned Off' : 'Turned On';
 					$data_args = array(
@@ -9840,6 +10035,7 @@ class Gdpr_Cookie_Consent_Admin {
 					}
 					$the_options['is_eu_on'] = 'true';
 				}
+				$the_options['is_law_region_on'] = $the_options['is_eu_on'];
 			}
 
 			if ( isset( $geo_target_object['is_ccpa_us_on'] ) ) {
@@ -9982,6 +10178,7 @@ class Gdpr_Cookie_Consent_Admin {
 		
 		$the_options['is_worldwide_on'] = 'true';
 		$the_options['is_selectedCountry_on'] = 'false';
+		$the_options['is_law_region_on'] = 'false';
 		$the_options['is_eu_on'] = 'false';
 		$the_options['is_ccpa_on'] = 'false';
 		update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
@@ -11457,7 +11654,7 @@ public function gdpr_support_request_handler() {
 
 		return rest_ensure_response(
 			array(
-				'cookie_usage_for'       => $the_options['cookie_usage_for'],
+				'cookie_usage_for'       => $the_options['cookie_usage_for'] = $this->migrate_legacy_law_code( $the_options['cookie_usage_for'] ),
 				'plan'                   => $plan,
 				'monthly_scan'			 => $monthly_scan,
 				'monthly_scan_limit'	 => $monthly_scan_limit,
@@ -12257,7 +12454,7 @@ public function gdpr_support_request_handler() {
 				'is_gcm_ads_redact'                        => $this->convert_boolean( $the_options['is_gcm_ads_redact'] ),
 				'is_gcm_debug_mode'                        => $this->convert_boolean( $the_options['is_gcm_debug_mode'] ),
 				'is_gcm_advertiser_mode'                   => $this->convert_boolean( $the_options['is_gcm_advertiser_mode'] ),
-				'cookie_usage_for'                         => $the_options['cookie_usage_for'],
+				'cookie_usage_for'                         => $the_options['cookie_usage_for'] = $this->migrate_legacy_law_code( $the_options['cookie_usage_for'] ),
 				'is_worldwide_on_ccpa'                     => $this->convert_boolean( $the_options['is_worldwide_on_ccpa'] ),
 				'is_worldwide_on'                          => $this->convert_boolean( $the_options['is_worldwide_on'] ),
 				'is_eu_on'                                 => $this->convert_boolean( $the_options['is_eu_on'] ),
@@ -14115,6 +14312,7 @@ public function gdpr_support_request_handler() {
 			$translate_text = true;
 		}
 		$the_options = array_merge($the_options, $save_object ?? []);
+		$the_options['cookie_usage_for'] = $this->migrate_legacy_law_code( $the_options['cookie_usage_for'] );
 
 		if ( isset( $the_options['cookie_usage_for'] ) ) {
 			switch ( $the_options['cookie_usage_for'] ) {
@@ -14125,6 +14323,7 @@ public function gdpr_support_request_handler() {
 					update_option( 'wpl_bypass_script_blocker', 0 );
 					break;
 				case 'ccpa':
+				case 'us_state_laws':
 					update_option( 'wpl_bypass_script_blocker', 1 );
 					break;
 			}
@@ -14157,7 +14356,7 @@ public function gdpr_support_request_handler() {
 				}
 			}
 
-			if ( isset( $geo_target_object['is_ccpa_worldwide_on'] ) && ($the_options['cookie_usage_for'] === 'ccpa' || $the_options['cookie_usage_for'] === 'both') ) {
+			if ( isset( $geo_target_object['is_ccpa_worldwide_on'] ) && ($the_options['cookie_usage_for'] === 'us_state_laws' || $the_options['cookie_usage_for'] === 'both') ) {
 				if ( filter_var( $the_options['is_worldwide_on_ccpa'], FILTER_VALIDATE_BOOLEAN ) !==  filter_var( $geo_target_object['is_ccpa_worldwide_on'], FILTER_VALIDATE_BOOLEAN ) ) {
 					$is_maxmind_turned_on = filter_var( $geo_target_object['is_ccpa_worldwide_on'], FILTER_VALIDATE_BOOLEAN ) ? 'Turned Off' : 'Turned On';
 					$data_args = array(
@@ -14185,6 +14384,7 @@ public function gdpr_support_request_handler() {
 					}
 					$the_options['is_eu_on'] = 'true';
 				}
+				$the_options['is_law_region_on'] = $the_options['is_eu_on'];
 			}
 
 			if ( isset( $geo_target_object['is_ccpa_us_on'] ) ) {
