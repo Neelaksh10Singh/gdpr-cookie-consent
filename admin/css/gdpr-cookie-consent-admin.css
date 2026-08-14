@@ -1748,6 +1748,15 @@ body.toplevel_page_gdpr-cookie-consent-settings-page #wpbody-content {
   width: 100%;
   max-width: 1051px;
 }
+.gdpr_disabled_langauge label{
+  color: #b8b8b8 !important;
+}
+.gdpr-gcm-card{
+    padding: 20px;
+    background: #E6EDF6;
+    border-radius: 12px;
+    padding-inline: 24px;
+}
 #gdpr-cookie-consent-settings-app
   .gdpr-cookie-consent-settings-container
   .gdpr-cookie-consent-settings-content
@@ -1880,6 +1889,7 @@ body.toplevel_page_gdpr-cookie-consent-settings-page #wpbody-content {
   border-color: var(--gray-300);
   color: var(--blue-903);
   font-family: "Roboto", sans-serif;
+  border-radius: 6px;
   font-weight: var(--text-regular-font-weight);
   font-size: var(--text-sm-font-size);
   line-height: var(--text-base-line-height);
@@ -9765,6 +9775,7 @@ div#gdpr-scan-history {
   border: 1px solid var(--gray-200);
     border-collapse: collapse;
     padding: 8px;
+    background-color: white;
 }
 .gcm-table button{
   border: none;
