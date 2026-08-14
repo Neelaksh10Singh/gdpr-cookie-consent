@@ -4516,6 +4516,7 @@ var gen = new Vue({
         this.gcm_is_on = false;
         //visitors condition.
         this.gacm_is_on = false;
+        this.do_not_track_on = true;
       } else if (value === "gdpr") {
         this.is_gdpr = true;
         this.button_accept_all_is_on = true;
@@ -4656,6 +4657,16 @@ var gen = new Vue({
         this.cookie_on_frontend = false;
       }
     },
+    onLanguageChange() {
+      this.is_lang_changed = true;
+      this.success_error_message = "Language updated. Please Save Changes to view the updated banner.";
+      j("#gdpr-cookie-consent-save-settings-alert").css(
+            "background-color",
+            "#72b85c"
+      );
+      j("#gdpr-cookie-consent-save-settings-alert").fadeIn(400);
+      j("#gdpr-cookie-consent-save-settings-alert").fadeOut(2500);
+    },
     onSwitchCookieSettingsEnable1(val) {
       this.cookie_settings_on1 = val;
       if (!val) {
@@ -4690,6 +4701,9 @@ var gen = new Vue({
     showCustomCookieAddForm() {
       this.show_custom_form = true;
       this.show_add_custom_button = !this.show_add_custom_button;
+    },
+    onSwitchDntEnable() {
+      this.do_not_track_on = !this.do_not_track_on;
     },
     restoreDefaultSettings() {
       this.ab_testing_enabled = false;
@@ -12216,9 +12230,6 @@ var adv = new Vue({
     onSwitchDeclineReload() {
       this.decline_reload = !this.decline_reload;
     },
-    onSwitchDntEnable() {
-      this.do_not_track_on = !this.do_not_track_on;
-    },
     onSwitchIpAnonymization(){
       this.ip_anonymization_on = !this.ip_anonymization_on;
     },
@@ -13581,74 +13592,7 @@ var scb = new Vue({
   }
 });
 
-var lang = new Vue({
-  el: "#gdpr-cookie-consent-language-settings", 
-  data() {
-    return {
-      labelIcon: {},
-      labelIconNew: {
-        labelOn: "\u2713",
-        labelOff: "\uD83D\uDD12",
-      },
-      save_loading: false,
-      success_error_message: "",
-      is_lang_changed: false,
-      show_language_as: settings_obj.the_options.hasOwnProperty("lang_selected")
-        ? settings_obj.the_options["lang_selected"]
-        : "en",
-      show_language_as_options: settings_obj.show_language_as_options,
-      account_connection: require("../admin/images/account_connection.svg"),
-      pluginBasePath: '/wp-content/plugins/gdpr-cookie-consent/includes/templates/logo_images/',
-      edit_discovered_cookies_img: require("../admin/images/edit-discovered-cookies.svg"),
-    }
-  },
-  methods: {
-    saveLanguageSettings() {
-      this.save_loading = true; 
 
-      var that = this;
-      var dataV = jQuery("#gcc-save-language-settings-form").serialize();
-      jQuery
-        .ajax({
-          type: "POST",
-          url: settings_obj.ajaxurl,
-          data:
-            dataV + "&action=gcc_save_language_settings" + 
-            "&lang_changed=" +
-            that.is_lang_changed
-        })
-        .done(function(data) {
-          that.success_error_message = "Settings Saved";
-          j("#gdpr-cookie-consent-save-settings-alert-lang").css(
-            "background-color",
-            "#72b85c"
-          );
-          j("#gdpr-cookie-consent-save-settings-alert-lang").fadeIn(400);
-          j("#gdpr-cookie-consent-save-settings-alert-lang").fadeOut(2500);
-          
-          if (that.is_lang_changed) {
-            that.is_lang_changed = false;
-            location.reload();
-          }
-
-          that.save_loading = false;
-        })
-        .fail(function() {
-          that.save_loading = false;
-        });
-    },
-    onLanguageChange() {
-      this.is_lang_changed = true;
-      this.success_error_message = "Language updated. Please Save Changes to view the updated banner.";
-      j("#gdpr-cookie-consent-save-settings-alert-lang").css(
-            "background-color",
-            "#72b85c"
-      );
-      j("#gdpr-cookie-consent-save-settings-alert-lang").fadeIn(400);
-      j("#gdpr-cookie-consent-save-settings-alert-lang").fadeOut(2500);
-    },
-  }
-});
 
 var ckm = new Vue({
   el: "#gdpr-cookie-consent-cookie_manager-settings",

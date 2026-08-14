@@ -334,10 +334,7 @@ $site_domain = wp_parse_url($site_url, PHP_URL_HOST);
 								<?php echo esc_html('Policy&nbsp;Data','gdpr-cookie-consent'); ?>
 								</div>
 							
-								<!-- Language Tab  -->
-								<div class="gdpr-cookie-consent-admin-tab gdpr-cookie-consent-admin-language-settings-tab" data-tab="language_settings">
-									<?php echo esc_html('Language','gdpr-cookie-consent'); ?>
-								</div>
+								
 							
 								<!-- Advanced Settings Tab  -->
 								<div class="gdpr-cookie-consent-admin-tab gdpr-cookie-consent-admin-advanced-settings-tab" data-tab="advanced_settings">
@@ -709,11 +706,6 @@ $site_domain = wp_parse_url($site_url, PHP_URL_HOST);
 							<div class="gdpr-cookie-consent-admin-policy-data-content gdpr-cookie-consent-admin-tab-content" id="policy_data">
 								<?php do_action( 'add_policy_data_content' ); ?>
 								<?php require_once plugin_dir_path( __FILE__ ) . 'gdpr-policy-data-tab-template.php'; ?>
-							</div>
-
-							<!-- Language content  -->
-							<div class="gdpr-cookie-consent-admin-language-settings-content gdpr-cookie-consent-admin-tab-content" id="language_settings">
-								<?php require_once plugin_dir_path( __FILE__ ) . 'gdpr-language-settings-tab-template.php'; ?>
 							</div>
 
 							<!-- Advanced Settings content  -->
