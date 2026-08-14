@@ -3079,6 +3079,50 @@ var gen = new Vue({
                 });
             });
     },
+    openConfigurationPanel(panelName) {
+      const panels = [
+        'cookie_bar_settings_open',
+        'cookie_bar_settings_open1',
+        'button_readmore_popup',
+        'revoke_consent_popup',
+        'accept_button_popup',
+        'accept_all_button_popup',
+        'decline_button_popup',
+        'settings_button_popup',
+        'confirm_button_popup',
+        'cancel_button_popup',
+        'opt_out_link_popup',
+        'ccpa_revoke_consent_popup',
+
+        'button_readmore_popup1',
+        'revoke_consent_popup1',
+        'accept_button_popup1',
+        'accept_all_button_popup1',
+        'decline_button_popup1',
+        'settings_button_popup1',
+        'confirm_button_popup1',
+        'cancel_button_popup1',
+        'opt_out_link_popup1',
+        'ccpa_revoke_consent_popup1',
+
+        'button_readmore_popup2',
+        'revoke_consent_popup2',
+        'accept_button_popup2',
+        'accept_all_button_popup2',
+        'decline_button_popup2',
+        'settings_button_popup2',
+        'confirm_button_popup2',
+        'cancel_button_popup2',
+        'opt_out_link_popup2',
+        'ccpa_revoke_consent_popup2'
+      ];
+
+      panels.forEach(panel => {
+        this[panel] = false;
+      });
+
+      this[panelName] = true;
+    },
     generatePopupColors(backgroundColor, acceptAllButtonColor) {
       const parseHex = (color, fallback) => {
         let hex = String(color || '')

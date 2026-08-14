@@ -2192,6 +2192,7 @@ body.toplevel_page_gdpr-cookie-consent-settings-page #wpbody-content {
 #gdpr-cookie-consent-help-app .gdpr-cookie-consent-settings-container .row,
 #gdpr-cookie-consent-cookie_manager-settings .gdpr-cookie-consent-settings-container .row {
   margin-bottom: 1.5rem;
+  align-items: center;
   padding-right: 10px;
 }
 #gdpr-cookie-consent-save-settings-alert,
@@ -2315,7 +2316,7 @@ input[type="search"]:focus {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--gray-200);
-  padding-bottom: 28px;
+  padding-bottom: 14px;
 }
 .advances-setting-tittle,
 .optout-setting-tittle,
@@ -2594,6 +2595,7 @@ input[type="search"]:focus {
   box-shadow: none !important;
   padding: 0 !important;
   background-color: #F4F4F5 !important;
+  margin-bottom: 1rem;
 }
 .gdpr-configure-button:hover{
   padding: 0 !important;
@@ -7907,7 +7909,24 @@ button.btn.gdpr-renew-now-btn.pro,
   display: none;
 }
 .opt-out-link-container .optout-settings-main-container {
-  padding-top: 39px;
+  padding-top: 20px;
+}
+.gdpr-privacy-policy-settings-panel, 
+.gdpr-revoke-consent-settings-panel, 
+.gdpr-accept-button-settings-panel,
+.gdpr-accept-all-button-settings-panel,
+.gdpr-decline-button-settings-panel,
+.gdpr-settings-button-settings-panel,
+.gdpr-confirm-button-settings-panel,
+.gdpr-cancel-button-settings-panel,
+.gdpr-opt-out-link-settings-panel,
+.gdpr-ccpa-revoke-consent-settings-panel{
+  position: absolute;
+  right: calc(-66.6% - 33px);
+  background: white;
+  top: 0;
+  padding: 20px;
+  width: 66.6%;
 }
 .done-button-settings {
   background-color: var(--blue-500);
@@ -12471,4 +12490,13 @@ div#gdpr-scan-history {
 .gcc-radio-disabled {
 	opacity: 0.55;
 	cursor: not-allowed;
+}
+.privacy-policy-row .form-check-label {
+  margin-bottom: 1rem;
+}
+.privacy-policy-row .form-check-label {
+  margin-bottom: 1rem !important;
+}
+.privacy-policy-row .col-sm-6 {
+  padding-right: 0 !important;
 }
