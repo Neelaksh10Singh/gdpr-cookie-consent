@@ -212,7 +212,6 @@ GDPR_CCPA_COOKIE_EXPIRE =
     if (!GDPR_LAW_DEBUG) return;
     var args = Array.prototype.slice.call(arguments);
     args.unshift("[GDPR law]");
-    console.log.apply(console, args);
   }
 
   var gdpr_law_debug = gdpr_cookies_obj.gdpr_law_debug || false;
@@ -591,7 +590,7 @@ GDPR_CCPA_COOKIE_EXPIRE =
         }
       }
     },
-    getSubtleColors(finalColor, buttonColor) {
+    getSubtleColors: function (finalColor, buttonColor) {
         // Use button color for the overlay.
         var color = buttonColor || finalColor;
         var hex = color.replace(/^#/, '');
@@ -649,7 +648,6 @@ GDPR_CCPA_COOKIE_EXPIRE =
           var dataCategories = vendor_data.dataCategories;
 
           var ul = document.querySelector(".vendors-list");
-          console.log(GDPR.settings)
           const color = GDPR.settings['background_active_color' + chosenBanner];
           const opacity = parseFloat(GDPR.settings['opacity' + chosenBanner]);
 
@@ -676,7 +674,7 @@ GDPR_CCPA_COOKIE_EXPIRE =
                   ? GDPR.settings.button_accept_all_link_color
                   : acceptAllBGColor;
 
-          const overlay = GDPR.getSubtleColors(finalColor, cookieSettingsPopupAccentColor);
+          const overlay = GDPR.settings.cookie_settings_overlay_color;
 
           var limit = Math.min(10, vendors.length);
 
@@ -856,6 +854,21 @@ GDPR_CCPA_COOKIE_EXPIRE =
                   privacyP.appendChild(privacyLink);
 
                   vendorWrapper.appendChild(privacyP);
+
+                  var legIntClaim = document.createElement("p");
+                  legIntClaim.className = "gdpr-vendor-privacy-link";
+
+                  
+
+                  var legIntLink = document.createElement("a");
+                  legIntLink.href = vendor.urls[0].legIntClaim;
+                  legIntLink.target = "_blank";
+                  legIntLink.rel = "noopener noreferrer";
+                  legIntLink.textContent = 'Legitimate Interest Claim'
+
+                  legIntClaim.appendChild(legIntLink);
+
+                  vendorWrapper.appendChild(legIntClaim);
               }
 
               var arrow2 = document.createElement("span");
@@ -863,12 +876,16 @@ GDPR_CCPA_COOKIE_EXPIRE =
               arrow2.innerHTML = '<svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.5303 0.53125L5.53027 5.53125L0.530273 0.531251" stroke="currentColor" stroke-width="1.5"/></svg>';
 
               var more_text = document.createElement("span");
+              more_text.className = "gdpr-more-details-text";
               more_text.innerHTML = 'More details';
 
               var moreDetails = document.createElement("p");
               moreDetails.className = "gdpr-more-details"
               moreDetails.appendChild(arrow2)
               moreDetails.appendChild(more_text)
+              moreDetails.setAttribute("role", "button");
+              moreDetails.setAttribute("tabindex", "0");
+              moreDetails.setAttribute("aria-expanded", "false");
 
               vendorWrapper.appendChild(moreDetails);
 
@@ -876,12 +893,49 @@ GDPR_CCPA_COOKIE_EXPIRE =
               detailsWrapper.className = "gdpr-vendor-details-wrapper";
               detailsWrapper.style.display = "none";
 
-              moreDetails.addEventListener("click", function () {
-                  console.log("trying")
-                  var wrapper = this.nextElementSibling;
-                  var isHidden = window.getComputedStyle(wrapper).display === "none";
+              moreDetails.addEventListener("click", function (event) {
+                  event.preventDefault();
 
-                  wrapper.style.display = isHidden ? "block" : "none";
+                  var currentToggle = event.currentTarget;
+                  var wrapper = currentToggle.nextElementSibling;
+
+                  if (
+                      !wrapper ||
+                      !wrapper.classList.contains(
+                          "gdpr-vendor-details-wrapper"
+                      )
+                  ) {
+                      return;
+                  }
+
+                  var isExpanded =
+                      currentToggle.getAttribute("aria-expanded") === "true";
+
+                  var shouldExpand = !isExpanded;
+
+                  wrapper.style.display = shouldExpand
+                      ? "block"
+                      : "none";
+
+                  var textElement = currentToggle.querySelector(
+                      ".gdpr-more-details-text"
+                  );
+
+                  if (textElement) {
+                      textElement.textContent = shouldExpand
+                          ? "Less details"
+                          : "More details";
+                  }
+
+                  currentToggle.classList.toggle(
+                      "is-expanded",
+                      shouldExpand
+                  );
+
+                  currentToggle.setAttribute(
+                      "aria-expanded",
+                      shouldExpand ? "true" : "false"
+                  );
               });
 
               /* DATA RETENTION */

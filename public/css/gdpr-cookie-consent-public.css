@@ -303,7 +303,7 @@
 #gdpr-ccpa-gdprmodal .gdprmodal-content {
   padding: 1rem 2rem;
   text-align: center;
-  height: 350px;
+  height: fit-content;
   box-sizing: border-box;
 	width:680px;
 }
@@ -1144,11 +1144,8 @@ Bootstrap CSS for frontend UI
   font-weight: 700;
   margin-bottom: 0;
 }
-#gdpr-cookie-consent-bar.ccpa{
-  padding-top:25px !important;
-}
 @media(min-width: 550px){
-  #gdpr-cookie-consent-bar.ccpa{
+  #gdpr-cookie-consent-bar.us_state_laws{
     padding-bottom: 35px !important;
   }
 }
@@ -1328,6 +1325,9 @@ Bootstrap CSS for frontend UI
   position: relative;
   margin-right: 6px;
 }
+.gdpr-more-details.is-expanded .gdpr-dropdown-arrow svg {
+    transform: rotate(-90deg);
+}
 .gdpr-more-details{
   margin: 0 0 0 0;
   cursor: pointer;
@@ -1455,6 +1455,7 @@ Bootstrap CSS for frontend UI
   display: flex;
   column-gap: 24px;
   margin: 0;
+  padding-inline-start: 0px;
 }
 .gdpr_messagebar_detail.layout-default .gdpr-iab-navbar {
   flex-direction: column;
@@ -2688,4 +2689,8 @@ Bootstrap CSS for frontend UI
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.gdpr-notice-content-body p a#vendor-link{
+  color: var(--vendor-link-color);
 }

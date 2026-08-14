@@ -73,108 +73,9 @@ if ( ! defined( 'ABSPATH' ) ) {
     } else {
         $cookieSettingsPopupAccentColor = $acceptAllBGColor;
     }
-	if(!function_exists('getSubtleColors')){
-	function getSubtleColors($finalColor,  $buttonColor = null) {
-		$parseColor = function ($color) {
-			$hex = ltrim(trim($color), '#');
-
-			// Support #RGB and #RGBA.
-			if (strlen($hex) === 3 || strlen($hex) === 4) {
-				$hex = substr($hex, 0, 3);
-				$hex = $hex[0] . $hex[0]
-					. $hex[1] . $hex[1]
-					. $hex[2] . $hex[2];
-			} else {
-				// Ignore alpha from #RRGGBBAA.
-				$hex = substr($hex, 0, 6);
-			}
-
-			if (strlen($hex) !== 6 || !ctype_xdigit($hex)) {
-				$hex = '000000';
-			}
-
-			return [
-				hexdec(substr($hex, 0, 2)),
-				hexdec(substr($hex, 2, 2)),
-				hexdec(substr($hex, 4, 2)),
-			];
-		};
-
-		$buttonColor = $buttonColor ?: $finalColor;
-
-		list($r, $g, $b) = $parseColor($finalColor);
-		list($buttonR, $buttonG, $buttonB) = $parseColor($buttonColor);
-
-		// Very light tint: 6% button color and 94% white.
-		$tintStrength = 0.06;
-
-		$overlayR = round(255 - ((255 - $buttonR) * $tintStrength));
-		$overlayG = round(255 - ((255 - $buttonG) * $tintStrength));
-		$overlayB = round(255 - ((255 - $buttonB) * $tintStrength));
-
-		$overlay = sprintf(
-			'#%02x%02x%02x',
-			$overlayR,
-			$overlayG,
-			$overlayB
-		);
-
-		// Relative luminance of the background color.
-		$luminance = (0.299 * $r) + (0.587 * $g) + (0.114 * $b);
-
-		$max = max($r, $g, $b);
-		$min = min($r, $g, $b);
-		$saturation = ($max == 0) ? 0 : (($max - $min) / $max);
-
-		// Neutral background border.
-		if ($saturation < 0.12) {
-			if ($luminance > 200) {
-				$border = '#d9d9d9';
-			} elseif ($luminance < 70) {
-				$border = '#5c5c5c';
-			} else {
-				$border = ($luminance > 128)
-					? '#b8b8b8'
-					: '#777777';
-			}
-
-			return [
-				'border'  => $border,
-				'overlay' => $overlay,
-			];
-		}
-
-		// Colored background border.
-		$borderAdjust = ($luminance > 128) ? -30 : 30;
-
-		$borderR = max(0, min(255, $r + $borderAdjust));
-		$borderG = max(0, min(255, $g + $borderAdjust));
-		$borderB = max(0, min(255, $b + $borderAdjust));
-
-		$gray  = ($borderR + $borderG + $borderB) / 3;
-		$blend = 0.25;
-
-		$borderR = round($borderR * (1 - $blend) + $gray * $blend);
-		$borderG = round($borderG * (1 - $blend) + $gray * $blend);
-		$borderB = round($borderB * (1 - $blend) + $gray * $blend);
-
-		$border = sprintf(
-			'#%02x%02x%02x',
-			$borderR,
-			$borderG,
-			$borderB
-		);
-
-		return [
-			'border'  => $border,
-			'overlay' => $overlay,
-		];
-	}}
-
-	$colors = getSubtleColors( $finalColor, $cookieSettingsPopupAccentColor );
-
-	$border_color  = $colors['border'];
-	$overlay_color = $colors['overlay'];
+	
+	$border_color  = isset($the_options['cookie_settings_border_color']) ? $the_options['cookie_settings_border_color'] : '#e1e1e1';
+	$overlay_color = isset($the_options['cookie_settings_overlay_color']) ? $the_options['cookie_settings_overlay_color'] : '#ffffff';
 
 ?>
 
@@ -824,17 +725,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 														
 													</div>
 												</div>
-												<div class="description-container hide" style=" border-color: <?php echo esc_attr( $border_color ); ?>;">
+												<div class="description-container iab-description hide" style=" border-color: <?php echo esc_attr( $border_color ); ?>;">
 																<ul class="category-group  vendor-group tabContainer">
 																
-																<?php foreach ( $gacm_data as $vendor ) {
+																<?php foreach ( $gacm_data as $key=>$vendor ) {
 																	if($vendor[0] != null) {
 																		?>
-																		<li class="category-item">
-																		<hr style="
-                                                                            margin-top: 10px;
-                                                                            border-top: 1px solid <?php echo esc_attr( $border_color ); ?>;
-                                                                        ">
+																		<li class="category-item" style="background: <?php echo $key % 2 == 0 ? esc_attr($finalColor) : esc_attr($overlay_color); ?>;">
 																				
 																				
 																		<div class="inner-gdpr-column gdpr-category-toggle <?php echo esc_html( $the_options['template_parts'] ); ?>">
@@ -1083,7 +980,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <?php } 
 
-if( $the_options['cookie_usage_for'] === "ccpa" || $the_options['cookie_usage_for'] === "both" ) { ?>
+if( $the_options['cookie_usage_for'] === "ccpa" || $the_options['cookie_usage_for'] === "us_state_laws" ) { ?>
 
 <div class="gdprmodal gdprfade" id="gdpr-ccpa-gdprmodal" role="dialog" data-keyboard="false" data-backdrop="<?php echo esc_html( $cookie_data['backdrop'] ); ?>">
 	<div class="gdprmodal-dialog gdprmodal-dialog-centered">
@@ -1162,7 +1059,7 @@ if( $the_options['cookie_usage_for'] === "ccpa" || $the_options['cookie_usage_fo
 					</p>
 				<?php endif; ?>
 				<div class="gdprmodal-footer-buttons">
-					<button id="cookie_action_cancel" type="button" class="<?php echo esc_html( $the_options['button_cancel_classes'] ); ?>" data-gdpr_action="cancel" data-dismiss="gdprmodal"
+					<?php if( $us_state_law_variant !== 'default_opt_out' ) { ?><button id="cookie_action_cancel" type="button" class="<?php echo esc_html( $the_options['button_cancel_classes'] ); ?>" data-gdpr_action="cancel" data-dismiss="gdprmodal"
 					style="
 						background-color: <?php
 							echo esc_html(( $ab_options['ab_testing_enabled'] === true || $ab_options['ab_testing_enabled'] === 'true')
@@ -1196,7 +1093,7 @@ if( $the_options['cookie_usage_for'] === "ccpa" || $the_options['cookie_usage_fo
 						); ?>px;
 						padding: 12px 29px;
 						width: 100%;
-					"><?php echo esc_html__( $the_options['button_cancel_text1'], 'gdpr-cookie-consent' );//phpcs:ignore ?></button>
+					"><?php echo esc_html__( $the_options['button_cancel_text1'], 'gdpr-cookie-consent' );//phpcs:ignore ?></button> <?php } ?>
 					<button id="cookie_action_confirm" type="button" class="<?php echo esc_html( $the_options['button_confirm_classes'] ); ?>" data-gdpr_action="confirm" data-dismiss="gdprmodal"
 					style="
 						background-color: <?php

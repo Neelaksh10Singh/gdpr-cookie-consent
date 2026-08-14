@@ -29,6 +29,44 @@ jQuery(document).ready(function () {
       $(this).toggleClass("open-tab");
     })
   });
+  jQuery(function ($) {
+    $(document).on('click', '.gdpr-vendor-details-toggle', function (event) {
+      event.preventDefault();
+
+      const $toggle = $(this);
+      const detailsId = $toggle.attr('aria-controls');
+      const $details = $('#' + detailsId);
+
+      if (!$details.length) {
+        return;
+      }
+
+      const isExpanded = $toggle.attr('aria-expanded') === 'true';
+      const shouldExpand = !isExpanded;
+
+      $toggle.attr('aria-expanded', shouldExpand ? 'true' : 'false');
+
+      $details.stop(true, true).slideToggle(200, function () {
+        $details.prop('hidden', !shouldExpand);
+      });
+
+      $toggle
+        .find('.gdpr-vendor-details-toggle-text')
+        .text(
+          shouldExpand
+            ? $toggle.data('less-text')
+            : $toggle.data('more-text')
+        );
+
+      $toggle
+        .find('.gdpr-details-down-icon')
+        .prop('hidden', shouldExpand);
+
+      $toggle
+        .find('.gdpr-details-up-icon')
+        .prop('hidden', !shouldExpand);
+    });
+  });
 
   
   // Hide all tab contents initially except the first one
@@ -406,13 +444,11 @@ jQuery(document).ready(function () {
    * Add an event listener to listen for messages sent from the server.
    */
   window.addEventListener("message", function (event) {
-    console.log("Received message from server:", event.data);
     // Check if the event is originated on server and not successful
     if (event.isTrusted && event.origin === gdpr_localize_data.gdpr_app_url) {
       if (!event.data.success) {
         const scanBtn = jQuery(".scan-now-btn");
         const popup = jQuery("#popup-site-excausted");
-        console.log("popup", popup);
         const cancelButton = jQuery(".popup-image");
 
         popup.fadeIn();
@@ -1679,13 +1715,11 @@ document.addEventListener('DOMContentLoaded', function () {
   document.addEventListener('DOMContentLoaded', function () {
     var closeBtns = document.querySelectorAll('.connect-info-close');
 
-    console.log('closeBtns found:', closeBtns.length);
 
     closeBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         var targetId = btn.getAttribute('data-target');
         var container = document.getElementById(targetId);
-        console.log('closing', targetId, container);
         if (container) {
           container.style.display = 'none';
         }
