@@ -3009,7 +3009,9 @@ var gen = new Vue({
       isCategoryActive: true,
       isFeaturesActive: false,
       isVendorsActive: false,
-      cookieSettingsPopupAccentColor: ''
+      cookieSettingsPopupAccentColor: '',
+      cookie_bar_settings_open: false,
+      cookie_bar_settings_open1: false,
     };
   },
   computed: {
