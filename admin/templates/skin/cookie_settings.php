@@ -71,7 +71,10 @@ if ( ! defined( 'ABSPATH' ) ) {
           : `${cookie_bar_border_radius}px`,
 			'border-color': ab_testing_enabled 
           ? this[`cookie_border_color${active_test_banner_tab}`] 
-          : cookie_border_color
+          : cookie_border_color,
+         'backdrop-filter': cookie_bar_blur > 0 
+          ? `blur(${cookie_bar_blur * 20}px)` 
+          : undefined,
          }">
             <div class="gdprmodal-header">
                <p>Preferences</p>
@@ -119,7 +122,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                   'padding': '12px 29px',
                   }" >Save My Prefernces</button>
 
-                  <button type="button" class="ccpa-popup-save" data-gdpr_action="decline" data-dismiss="gdprmodal"
+                  <button v-if="!((!is_auto_mode && is_us_state_laws && us_state_laws_edit_law === 'default_opt_out') || (is_auto_mode && banner_edit_law === 'us_state_laws' && us_state_laws_edit_law === 'default_opt_out'))" type="button" class="ccpa-popup-save" data-gdpr_action="decline" data-dismiss="gdprmodal"
                :style="{
                   'background-color': ab_testing_enabled
                   ? this[`cancel_background_color${active_test_banner_tab}`]
@@ -186,7 +189,10 @@ if ( ! defined( 'ABSPATH' ) ) {
           : `${cookie_bar_border_radius}px`,
 			'border-color': ab_testing_enabled 
           ? this[`cookie_border_color${active_test_banner_tab}`] 
-          : cookie_border_color
+          : cookie_border_color,
+         'backdrop-filter': cookie_bar_blur > 0 
+          ? `blur(${cookie_bar_blur * 20}px)` 
+          : undefined,
          }">
 			<div class="gdprmodal-header">
             <p>Preferences</p>
