@@ -859,7 +859,7 @@ class Gdpr_Cookie_Consent {
 			'button_readmore_button_border_color'    => '#074FA8',
 			'button_readmore_button_border_radius'   => '0', // in pixel.
 
-			'button_decline_text'                    => 'Decline',
+			'button_decline_text'                    => 'Reject All',
 			'button_decline_url'                     => '#',
 			'button_decline_action'                  => '#cookie_action_close_header_reject',
 			'button_decline_link_color'              => '#ffffff',
@@ -874,7 +874,7 @@ class Gdpr_Cookie_Consent {
 			'button_decline_button_border_color'     => '#074FA8',
 			'button_decline_button_border_radius'    => '0', // in pixel.
 
-			'button_settings_text'                   => 'Cookie Settings',
+			'button_settings_text'                   => 'Preferences',
 			'button_settings_url'                    => '#',
 			'button_settings_action'                 => '#cookie_action_settings',
 			'button_settings_link_color'             => '#074FA8',
@@ -986,7 +986,7 @@ class Gdpr_Cookie_Consent {
 			'button_readmore_button_border_color1'    => '#074FA8',
 			'button_readmore_button_border_radius1'   => '0', // in pixel.
 
-			'button_decline_text1'                    => 'Decline',
+			'button_decline_text1'                    => 'Reject All',
 			'button_decline_url1'                     => '#',
 			'button_decline_action1'                  => '#cookie_action_close_header_reject',
 			'button_decline_link_color1'              => '#074FA8',
@@ -1001,7 +1001,7 @@ class Gdpr_Cookie_Consent {
 			'button_decline_button_border_color1'     => '#074FA8',
 			'button_decline_button_border_radius1'    => '0', // in pixel.
 
-			'button_settings_text1'                   => 'Cookie Settings',
+			'button_settings_text1'                   => 'Preferences',
 			'button_settings_url1'                    => '#',
 			'button_settings_action1'                 => '#cookie_action_settings',
 			'button_settings_link_color1'             => '#074FA8',
@@ -1095,7 +1095,7 @@ class Gdpr_Cookie_Consent {
 			'button_readmore_button_border_color2'    => '#074FA8',
 			'button_readmore_button_border_radius2'   => '0', // in pixel.
 
-			'button_decline_text2'                    => 'Decline',
+			'button_decline_text2'                    => 'Reject All',
 			'button_decline_url2'                     => '#',
 			'button_decline_action2'                  => '#cookie_action_close_header_reject',
 			'button_decline_link_color2'              => '#074FA8',
@@ -1110,7 +1110,7 @@ class Gdpr_Cookie_Consent {
 			'button_decline_button_border_color2'     => '#074FA8',
 			'button_decline_button_border_radius2'    => '0', // in pixel.
 
-			'button_settings_text2'                   => 'Cookie Settings',
+			'button_settings_text2'                   => 'Preferences',
 			'button_settings_url2'                    => '#',
 			'button_settings_action2'                 => '#cookie_action_settings',
 			'button_settings_link_color2'             => '#074FA8',
@@ -1241,9 +1241,15 @@ class Gdpr_Cookie_Consent {
 			'notify_animate_hide'                    => true,
 			'notify_animate_show'                    => false,
 			'notify_message'                         => addslashes( "We use cookies to optimize your experience, analyze traffic, and personalize ads. Please choose whether you accept our use of non-essential cookies." ),
-			'notify_message_lgpd'                    => addslashes( "This website uses cookies for technical and other purposes as specified in the cookie policy. We'll assume you're ok with this, but you can opt-out if you wish." ),
+			'notify_message_uk_gdpr'                 => addslashes( 'We use cookies to improve our site, analyze performance, and serve personalized marketing. Please select your cookie preferences.' ),
+			'notify_message_pdpl'                    => addslashes( 'We utilize cookies to analyze traffic and customize your experience in compliance with KSA PDPL. Please provide your consent for non-essential tracking.' ),
+			'notify_message_pipeda'                  => addslashes( 'We use cookies to analyze performance and power our site. For details on how we protect your privacy or to adjust your choices, view our Cookie Policy.' ),
+			'notify_message_app'                     => addslashes( 'We collect data via tracking technologies to optimize our site and deliver marketing. To review your options or opt-out of sharing, view our Privacy Policy.' ),
+			'notify_message_lgpd'                    => addslashes( "This website uses cookies to provide a better browsing experience. You can select your cookie preferences or accept all tracking categories below." ),
 			'notify_message_eprivacy'                => addslashes( "This website uses cookies to improve your experience. We'll assume you're ok with this, but you can opt-out if you wish." ),
 			'notify_message_ccpa'                    => addslashes( "We use tracking tools to provide targeted advertising. Under state law, you have the right to opt-out of the sharing or sale of your personal information." ),
+			'notify_message_default_opt_out'     	 => addslashes( 'We use cookies and similar technologies for targeted advertising. You have the right to opt-out of the sale or processing of your personal data.' ),
+			'notify_message_pure_opt_out'     	 	 => addslashes( 'We collect personal data via tracking technologies for analytics and marketing. To exercise your right to opt-out of this processing, choose below.' ),
 			'optout_text'                            => addslashes( 'We use third-party cookies that help us analyse how you use this website, store your preferences, and provide the content and advertisements that are relevant to you. However, you can opt out of these cookies by checking "Do Not Sell or Share My Personal Information" and clicking the "Save My Preferences" button. Once you opt out, you can opt in again at any time by unchecking "Do Not Sell or Share My Personal Information" and clicking the "Save My Preferences" button.' ),
 			'notify_div_id'                          => '#gdpr-cookie-consent-bar',
 			'notify_position_vertical'               => 'bottom', // 'top' = header | 'bottom' = footer.
@@ -1425,6 +1431,12 @@ class Gdpr_Cookie_Consent {
 			case 'notify_message_lgpd':
 			case 'notify_message_eprivacy':
 			case 'notify_message_ccpa':
+			case 'notify_message_uk_gdpr':
+			case 'notify_message_pdpl':
+			case 'notify_message_pipeda':
+			case 'notify_message_app':
+			case 'notify_message_default_opt_out':
+			case 'notify_message_pure_opt_out':
 			case 'optout_text':
 			case 'bar_heading_text':
 			case 'bar_heading_lgpd_text':
@@ -2562,24 +2574,27 @@ class Gdpr_Cookie_Consent {
 	}
 
 	/**
+	 * Which of the three US state-law notice messages a state's group maps to.
+	 */
+	public static function resolve_us_state_law_variant( $state_code ) {
+		$variants = array(
+			1 => 'ccpa',
+			2 => 'default_opt_out',
+			3 => 'pure_opt_out',
+		);
+		$group = self::get_us_state_law_group( $state_code );
+
+		return isset( $variants[ $group ] ) ? $variants[ $group ] : 'ccpa';
+	}
+
+	/**
 	 * Placeholder notice text for a law that has no copy of its own yet.
+	 *
+	 * Every law resolve_law_for_country() can return now has real copy
+	 * (see cookie-notice.php), so this always returns ''. Kept for any future
+	 * law added ahead of its own banner copy.
 	 */
 	public static function get_law_placeholder_message( $law, $state_code = '' ) {
-		$labels = array(
-			'uk_gdpr' => 'UK GDPR',
-			'pipeda'  => 'PIPEDA',
-			'au_app'  => 'AU APP',
-			'sa_pdpl' => 'SA PDPL',
-		);
-
-		if ( isset( $labels[ $law ] ) ) {
-			return $labels[ $law ] . ' TO BE IMPLEMENTED';
-		}
-
-		if ( in_array( $law, array( 'us_state_laws', 'ccpa' ), true ) ) {
-			return 'US STATE LAW BANNER ' . self::get_us_state_law_group( $state_code ) . ' TO BE IMPLEMENTED';
-		}
-
 		return '';
 	}
 }
