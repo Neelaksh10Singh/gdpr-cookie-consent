@@ -880,6 +880,23 @@ class Gdpr_Cookie_Consent_Public {
 				$the_options['confirm_button'] = __( 'Confirm', 'gdpr-cookie-consent' );
 				$the_options['cancel_button']  = __( 'Cancel', 'gdpr-cookie-consent' );
 			}
+			// The four newest laws render their own banner copy rather than
+			// borrowing GDPR's — get_content_law() above still maps them to 'gdpr'
+			// for the about-message / cookie-categories / settings-modal sections,
+			// which they intentionally share with GDPR.
+			$uk_gdpr_message = stripslashes( nl2br( $the_options['notify_message_uk_gdpr'] ) );
+			$pdpl_message    = stripslashes( nl2br( $the_options['notify_message_pdpl'] ) );
+			$pipeda_message  = stripslashes( nl2br( $the_options['notify_message_pipeda'] ) );
+			$app_message     = stripslashes( nl2br( $the_options['notify_message_app'] ) );
+
+			// The three US state-law notices share one settings modal (ccpa_notify
+			// above), but the banner text differs by which of the three notice
+			// groups the visitor's state belongs to. Manual mode has no per-visitor
+			// state to resolve, so it always shows the CCPA/CPRA notice.
+			$us_state_law_variant = ( $this->gdpr_is_auto_mode() || ( 'us_state_laws' === $the_options['cookie_usage_for'] && ( $the_options['is_worldwide_on'] === false || $the_options['is_worldwide_on'] === 'false' || $the_options['is_worldwide_on'] === 0 ) ) )
+				? Gdpr_Cookie_Consent::resolve_us_state_law_variant( $this->gdpr_get_visitor_state() )
+				: 'ccpa';
+
 			$about_message      = stripslashes( nl2br( $the_options['about_message'] ) );
 			$about_message_lgpd = stripslashes( nl2br( $the_options['about_message_lgpd'] ) );
 			$gcm_about_message  = stripslashes( nl2br( $the_options['gcm_about_message'] ) );
@@ -1198,6 +1215,11 @@ class Gdpr_Cookie_Consent_Public {
 				$cookie_data['dash_notify_message'] = $the_options['notify_message'];
 				$cookie_data['dash_button_settings_text'] = $the_options['button_settings_text'];
 				$cookie_data['dash_notify_message_ccpa'] = $the_options['notify_message_ccpa'];
+				$cookie_data['dash_notify_message_uk_gdpr'] = $the_options['notify_message_uk_gdpr'];
+				$cookie_data['dash_notify_message_pdpl'] = $the_options['notify_message_pdpl'];
+				$cookie_data['dash_notify_message_pipeda'] = $the_options['notify_message_pipeda'];
+				$cookie_data['dash_notify_message_app'] = $the_options['notify_message_app'];
+				$cookie_data['dash_notify_message_us_state'] = $the_options[ 'notify_message_' . $us_state_law_variant ];
 				$cookie_data['dash_button_donotsell_text'] = $the_options['button_donotsell_text'];
 				$cookie_data['dash_button_confirm_text'] = $the_options['button_confirm_text'];
 				$cookie_data['dash_button_cancel_text'] = $the_options['button_cancel_text'];
@@ -1299,6 +1321,11 @@ class Gdpr_Cookie_Consent_Public {
 				$cookie_data['dash_notify_message'] = $the_options['notify_message'];
 				$cookie_data['dash_button_settings_text'] = $the_options['button_settings_text'];
 				$cookie_data['dash_notify_message_ccpa'] = $the_options['notify_message_ccpa'];
+				$cookie_data['dash_notify_message_uk_gdpr'] = $the_options['notify_message_uk_gdpr'];
+				$cookie_data['dash_notify_message_pdpl'] = $the_options['notify_message_pdpl'];
+				$cookie_data['dash_notify_message_pipeda'] = $the_options['notify_message_pipeda'];
+				$cookie_data['dash_notify_message_app'] = $the_options['notify_message_app'];
+				$cookie_data['dash_notify_message_us_state'] = $the_options[ 'notify_message_' . $us_state_law_variant ];
 				$cookie_data['dash_button_donotsell_text'] = $the_options['button_donotsell_text'];
 				$cookie_data['dash_button_confirm_text'] = $the_options['button_confirm_text'];
 				$cookie_data['dash_button_cancel_text'] = $the_options['button_cancel_text'];

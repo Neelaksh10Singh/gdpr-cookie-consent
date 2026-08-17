@@ -212,7 +212,6 @@ GDPR_CCPA_COOKIE_EXPIRE =
     if (!GDPR_LAW_DEBUG) return;
     var args = Array.prototype.slice.call(arguments);
     args.unshift("[GDPR law]");
-    console.log.apply(console, args);
   }
 
   var gdpr_law_debug = gdpr_cookies_obj.gdpr_law_debug || false;
@@ -590,6 +589,54 @@ GDPR_CCPA_COOKIE_EXPIRE =
           window.dispatchEvent(event);
         }
       }
+    },
+    getSubtleColors: function (finalColor, buttonColor) {
+        // Use button color for the overlay.
+        var color = buttonColor || finalColor;
+        var hex = color.replace(/^#/, '');
+
+        // Ignore alpha from #RRGGBBAA.
+        if (hex.length === 8) {
+            hex = hex.substring(0, 6);
+        }
+
+        // Expand #RGB into #RRGGBB.
+        if (hex.length === 3) {
+            hex = hex
+                .split('')
+                .map(function (character) {
+                    return character + character;
+                })
+                .join('');
+        }
+
+        var r = parseInt(hex.substring(0, 2), 16);
+        var g = parseInt(hex.substring(2, 4), 16);
+        var b = parseInt(hex.substring(4, 6), 16);
+
+        // Keep 6% of the button color and mix in 94% white.
+        var tintStrength = 0.06;
+
+        var overlayR = Math.round(
+            255 - (255 - r) * tintStrength
+        );
+
+        var overlayG = Math.round(
+            255 - (255 - g) * tintStrength
+        );
+
+        var overlayB = Math.round(
+            255 - (255 - b) * tintStrength
+        );
+
+        return (
+            '#' +
+            [overlayR, overlayG, overlayB]
+                .map(function (value) {
+                    return value.toString(16).padStart(2, '0');
+                })
+                .join('')
+        );
     },
     render_vendor_list: function () {
       if (!vendor_data || !vendor_data.vendors || current_vendor_index >= vendor_data.vendors.length) return;
