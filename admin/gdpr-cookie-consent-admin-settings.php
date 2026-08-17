@@ -1499,7 +1499,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 
 						<!-- law selectors for editing -->
 						<c-row v-show="is_auto_mode">
-							<c-col class="col-sm-4"><label><?php esc_attr_e( 'Select a law to edit corresponding banner message', 'gdpr-cookie-consent' ); ?></label></c-col>
+							<c-col class="col-sm-4"><label><?php esc_attr_e( 'Select a privacy law', 'gdpr-cookie-consent' ); ?><tooltip text="<?php esc_html_e( 'Select the privacy law whose banner message you want to customize.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
 							<c-col class="col-sm-8">
 								<v-select class="form-group" id="gdpr-cookie-bar-edit-law" :reduce="label => label.code" :options="policy_options" :selectable="option => isOptionSelectable(option)" label="label" v-model="banner_edit_law">
 									<template #option="option">
@@ -1514,7 +1514,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 							</c-col>
 						</c-row>
 						<c-row v-show="(!is_auto_mode && is_us_state_laws) || (is_auto_mode && banner_edit_law === 'us_state_laws')">
-							<c-col class="col-sm-4"><label><?php esc_attr_e( 'Select a law to edit corresponding banner message', 'gdpr-cookie-consent' ); ?></label></c-col>
+							<c-col class="col-sm-4"><label><?php esc_attr_e( 'Select a banner type', 'gdpr-cookie-consent' ); ?><tooltip text="<?php esc_html_e( 'Choose which type of opt-out banner you want to customize.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
 							<c-col class="col-sm-8">
 								<v-select class="form-group" id="gdpr-cookie-bar-edit-law" :reduce="label => label.code" :options="us_policy_options" v-model="us_state_laws_edit_law">
 								</v-select>
@@ -2933,7 +2933,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 						<!-- NEWLY ADDED -->
 								
 						<c-row v-show="is_auto_mode">
-							<c-col class="col-sm-4"><label><?php esc_attr_e( 'Select a law to edit corresponding banner message', 'gdpr-cookie-consent' ); ?></label></c-col>
+							<c-col class="col-sm-4"><label><?php esc_attr_e( 'Select a privacy law', 'gdpr-cookie-consent' ); ?><tooltip text="<?php esc_html_e( 'Select the privacy law whose banner message you want to customize.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
 							<c-col class="col-sm-8">
 								<v-select class="form-group" id="gdpr-cookie-bar-edit-law" :reduce="label => label.code" :options="policy_options" :selectable="option => isOptionSelectable(option)" label="label" v-model="banner_edit_law">
 									<template #option="option">
@@ -2948,7 +2948,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 							</c-col>
 						</c-row>
 						<c-row v-show="(!is_auto_mode && is_us_state_laws) || (is_auto_mode && banner_edit_law === 'us_state_laws')">
-							<c-col class="col-sm-4"><label><?php esc_attr_e( 'Select a law to edit corresponding banner message', 'gdpr-cookie-consent' ); ?></label></c-col>
+							<c-col class="col-sm-4"><label><?php esc_attr_e( 'Select a banner type', 'gdpr-cookie-consent' ); ?><tooltip text="<?php esc_html_e( 'Choose which type of opt-out banner you want to customize.', 'gdpr-cookie-consent' ); ?>"></tooltip></label></c-col>
 							<c-col class="col-sm-8">
 								<v-select class="form-group" id="gdpr-cookie-bar-edit-law" :reduce="label => label.code" :options="us_policy_options" v-model="us_state_laws_edit_law">
 								</v-select>
