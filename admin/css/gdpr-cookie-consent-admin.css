@@ -1901,6 +1901,10 @@ body.toplevel_page_gdpr-cookie-consent-settings-page #wpbody-content {
   .tab-content
   #gdpr-cookie-consent-design .card {
     max-width: 100%;
+    position: unset;
+}
+#gdpr-cookie-consent-settings-app .gdpr-cookie-consent-settings-container .gdpr-cookie-consent-settings-content .gdpr-cookie-consent-settings-nav .tab-content #gdpr-cookie-consent-design .card.desgin_card {
+  position:unset !important;
 }
 #gdpr-cookie-consent-settings-app
   .gdpr-cookie-consent-settings-container
@@ -2589,6 +2593,9 @@ input[type="search"]:focus {
   top: 4px;
   left: 4px;
 }
+.btn.gdpr-cookie-bar-settings-icon{
+  color: #828282 !important;
+}
 .gdpr-configure-button {
   display: inline-block;
   font-weight: var(--text-regular-font-weight);
@@ -2605,6 +2612,7 @@ input[type="search"]:focus {
   box-shadow: none !important;
   padding: 0 !important;
   background-color: #F4F4F5 !important;
+  color: #828282 !important;
   margin-bottom: 1rem;
 }
 .gdpr-configure-button:hover{
@@ -3951,6 +3959,7 @@ a .export-btn:hover {
 .wpl-whitelist-add-new-container {
   display: flex;
   flex-direction: column;
+  padding-bottom: 30px;
 }
 .wpl-panel .wpl-slide-panel .wpl-toggle-active {
   width: 100%;
@@ -7932,11 +7941,11 @@ button.btn.gdpr-renew-now-btn.pro,
 .gdpr-opt-out-link-settings-panel,
 .gdpr-ccpa-revoke-consent-settings-panel{
   position: absolute;
-  right: calc(-66.6% - 33px);
+  right: calc(-66.6% - 2px);
   background: white;
   top: 0;
   padding: 20px;
-  width: 66.6%;
+  width: 64.6%;
 }
 .done-button-settings {
   background-color: var(--blue-500);
@@ -8052,8 +8061,10 @@ button.btn.gdpr-renew-now-btn.pro,
 .gdpr-cookie-consent-banner-tabs {
   display: flex;
   /* padding: 1rem; */
-  padding-top: 28px;
+  padding-top: 19px;
   margin-left: 19px;
+  position: absolute;
+  right: 37%;
 }
 .gdpr-cookie-consent-banner-tabs .gdpr-cookie-consent-banner-tab {
   display: flex;
@@ -8065,7 +8076,7 @@ button.btn.gdpr-renew-now-btn.pro,
     cursor: pointer;
     border-radius: 0;
     /* flex: 1; */
-    width: 234px;
+    width: 170px;
     color: var(--gray-700, var(--gray-700));
     font-size: var(--text-sm-font-size);
     font-style: normal;
@@ -11489,6 +11500,7 @@ div#gdpr-scan-history {
   .scan_history_card 
   .card-body {
   width: 100%;
+  padding-bottom: 30px;
 }
 
 #dashboard-tab {
@@ -12442,15 +12454,16 @@ div#gdpr-scan-history {
 .gdpr-design-left-column {
     flex: 0 0 60%;
     min-width: 0;
+    position: relative;
 }
 .gdpr-design-right-column {
     flex: 1;
     min-width: 0;
 }
 .cookie-bar-settings-close {
-    position: absolute;
-    top: 30px;
-    right: 15px;
+    margin-left: auto;
+    scale: 1.5;
+    margin-bottom: 5px;
     padding: 0;
     border: none;
     background: transparent;

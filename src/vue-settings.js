@@ -3013,8 +3013,8 @@ var gen = new Vue({
       isFeaturesActive: false,
       isVendorsActive: false,
       cookieSettingsPopupAccentColor: '',
-      cookie_bar_settings_open: false,
-      cookie_bar_settings_open1: false,
+      cookie_bar_settings_open: true,
+      cookie_bar_settings_open1: true,
     };
   },
   computed: {
@@ -3120,6 +3120,21 @@ var gen = new Vue({
       panels.forEach(panel => {
         this[panel] = false;
       });
+      // If it ends in 1 or 2, also open its paired variant.
+      if (panelName.endsWith('1') || panelName.endsWith('2')) {
+        const baseName = panelName.slice(0, -1);
+
+        const panel1 = `${baseName}1`;
+        const panel2 = `${baseName}2`;
+
+        if (panels.includes(panel1)) {
+          this[panel1] = true;
+        }
+
+        if (panels.includes(panel2)) {
+          this[panel2] = true;
+        }
+      }
 
       this[panelName] = true;
     },
