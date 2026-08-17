@@ -12,9 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<div id="gdpr-cookie-consent-updating-settings-alert-adv">Updating Setting</div>
 
 				<div class="gdpr-preview-publish-btn gdpr-preview-publish-btn-adv">
-						<c-button :disabled="save_loading" class="gdpr-publish-btn" @click="saveAdvancedCookieSettings">{{ save_loading ? '<?php esc_html_e( 'Saving...', 'gdpr-cookie-consent' ); ?>' : '<?php esc_html_e( 'Save Changes', 'gdpr-cookie-consent' ); ?>' }}</c-button>
+						<c-button :disabled="save_loading" class="gdpr-publish-btn" @click="saveCookieSettings">{{ save_loading ? '<?php esc_html_e( 'Saving...', 'gdpr-cookie-consent' ); ?>' : '<?php esc_html_e( 'Save Changes', 'gdpr-cookie-consent' ); ?>' }}</c-button>
 				</div> 
-                <c-tabs variant="pills" ref="active_tab" class="gdpr-cookie-consent-settings-nav">
+                <c-tabs variant="pills" ref="active_tab_adv" class="gdpr-cookie-consent-settings-nav">
 					<!-- Consent Settings Start -->
                     <c-tab href="#advanced_settings#consent" class="consent-settings" title="<?php esc_attr_e( 'Consent Settings', 'gdpr-cookie-consent' ); ?>" id="gdpr-cookie-consent-consent-settings" >   
 						<c-card class="consent_card">
