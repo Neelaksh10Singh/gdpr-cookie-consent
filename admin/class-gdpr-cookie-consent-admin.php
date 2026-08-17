@@ -5282,6 +5282,9 @@ class Gdpr_Cookie_Consent_Admin {
 			if ( $is_free_tier && 'auto' === $law_selection_mode ) {
 				$law_selection_mode = 'manual';
 			}
+			$old_law_selection_mode = get_option('gdpr_law_selection_mode', 'manual');
+			if($old_law_selection_mode !== $law_selection_mode) $changeLanguage = true;
+			else $changeLanguage = false;
 
 			update_option( 'gdpr_law_selection_mode', $law_selection_mode );
 
