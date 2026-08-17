@@ -4025,9 +4025,9 @@ class Gdpr_Cookie_Consent_Admin {
 	 */
 	public function get_us_state_laws_for_options() {
 		$options = array(
-			__( 'CCPA/CPRA', 'gdpr-cookie-consent' )    => 'ccpa',
-			__( 'Default', 'gdpr-cookie-consent' )        => 'default_opt_out',
-			__( 'Pure', 'gdpr-cookie-consent' )        => 'pure_opt_out',
+			__( 'CCPA-Style', 'gdpr-cookie-consent' )    => 'ccpa',
+			__( 'Standard Opt-Out', 'gdpr-cookie-consent' )        => 'default_opt_out',
+			__( 'Opt-Out Only', 'gdpr-cookie-consent' )        => 'pure_opt_out',
 		);
 		
 		$options = apply_filters( 'gdprcookieconsent_cookie_usage_for_options', $options );
@@ -5327,7 +5327,7 @@ class Gdpr_Cookie_Consent_Admin {
 
 			$the_options['is_on']                              = isset( $_POST['gcc-cookie-enable'] ) && ( true === $_POST['gcc-cookie-enable'] || 'true' === $_POST['gcc-cookie-enable'] ) ? 'true' : 'false';
 
-			if($the_options['cookie_usage_for'] !== 'gdpr' && $_POST['gcc-gdpr-policy'] === 'gdpr') $changeLanguage = true;
+			if( $the_options['cookie_usage_for'] !== $_POST['gcc-gdpr-policy'] ) $changeLanguage = true;
 			else $changeLanguage = false;
 			
 			$the_options['cookie_usage_for']                   = isset( $_POST['gcc-gdpr-policy'] ) ? sanitize_text_field( wp_unslash( $_POST['gcc-gdpr-policy'] ) ) : 'gdpr';
