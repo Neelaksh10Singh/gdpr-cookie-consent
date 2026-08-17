@@ -5282,9 +5282,9 @@ class Gdpr_Cookie_Consent_Admin {
 			if ( $is_free_tier && 'auto' === $law_selection_mode ) {
 				$law_selection_mode = 'manual';
 			}
+			$changeLanguage = false;
 			$old_law_selection_mode = get_option('gdpr_law_selection_mode', 'manual');
 			if($old_law_selection_mode !== $law_selection_mode) $changeLanguage = true;
-			else $changeLanguage = false;
 
 			update_option( 'gdpr_law_selection_mode', $law_selection_mode );
 
@@ -5331,7 +5331,6 @@ class Gdpr_Cookie_Consent_Admin {
 			$the_options['is_on']                              = isset( $_POST['gcc-cookie-enable'] ) && ( true === $_POST['gcc-cookie-enable'] || 'true' === $_POST['gcc-cookie-enable'] ) ? 'true' : 'false';
 
 			if( $the_options['cookie_usage_for'] !== $_POST['gcc-gdpr-policy'] ) $changeLanguage = true;
-			else $changeLanguage = false;
 			
 			$the_options['cookie_usage_for']                   = isset( $_POST['gcc-gdpr-policy'] ) ? sanitize_text_field( wp_unslash( $_POST['gcc-gdpr-policy'] ) ) : 'gdpr';
 			// Store the canonical code; 'ccpa' / 'both' stay accepted on read.
