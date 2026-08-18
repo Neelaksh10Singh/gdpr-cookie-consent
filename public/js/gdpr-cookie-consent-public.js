@@ -1240,8 +1240,6 @@ banner.style.display = "none";
             var cookieData = JSON.parse(gdpr_cookiebar_settings);
             var cookie_for = cookieData["cookie_usage_for"];
 
-            
-
             // In auto ("Detect Automatically") mode the applicable law is resolved
             // per visitor on the server, so the stored cookie_usage_for is only a
             // fallback. Prefer the law from the geo response; render_law is the
@@ -2183,6 +2181,7 @@ banner.style.display = "none";
         $(
           ".gdpr_messagebar_detail .gdpr-iab-navbar .gdpr-iab-navbar-button.active"
         ).css("color", GDPR.settings.button_accept_button_color);
+        
         $(".gdpr-iab-navbar-button").removeClass("active");
         $(".gdpr-iab-navbar-button").css("color", "inherit");
         $(".tabContainer").css("display", "none");
@@ -2194,7 +2193,25 @@ banner.style.display = "none";
           GDPR.settings.button_accept_button_color
         );
         $("#gdprIABTabVendors .gdpr-iab-navbar-button").addClass("active");
-        // switch (this.id) {
+        $(
+          ".gdpr_messagebar_detail .gdpr-iab-navbar #gdprIABTabFeatures .gdpr-iab-navbar-button"
+        ).css("border-color", 'transparent');
+        $(
+          ".gdpr_messagebar_detail .gdpr-iab-navbar #gdprIABTabCategory .gdpr-iab-navbar-button"
+        ).css("border-color", 'transparent');
+        $(
+          ".gdpr_messagebar_detail .gdpr-iab-navbar #gdprIABTabVendors .gdpr-iab-navbar-button"
+        ).css("border-width", '2px');
+        $(
+          ".gdpr_messagebar_detail .gdpr-iab-navbar #gdprIABTabVendors .gdpr-iab-navbar-button"
+        ).css("border-style", 'solid');
+        $(
+          ".gdpr_messagebar_detail .gdpr-iab-navbar #gdprIABTabVendors .gdpr-iab-navbar-button"
+        ).css(
+          "border-color",
+          "transparent transparent " + GDPR.settings.button_accept_button_color + " transparent"
+        );
+        // // switch (this.id) {
         //   case "gdprIABTabCategory":
         //     $(".cat").css("display", "block");
         //     break;

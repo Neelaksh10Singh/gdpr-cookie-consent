@@ -5284,7 +5284,13 @@ class Gdpr_Cookie_Consent_Admin {
 			}
 			$changeLanguage = false;
 			$old_law_selection_mode = get_option('gdpr_law_selection_mode', 'manual');
-			if($old_law_selection_mode !== $law_selection_mode) $changeLanguage = true;
+			if($old_law_selection_mode !== $law_selection_mode) {
+				$changeLanguage = true;
+				if($law_selection_mode === 'auto'){
+					$this->auto_update_maxminddb();
+					$this->download_maxminddb();
+				}
+			}
 
 			update_option( 'gdpr_law_selection_mode', $law_selection_mode );
 
