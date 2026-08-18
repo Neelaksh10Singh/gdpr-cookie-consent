@@ -336,9 +336,9 @@ $site_domain = wp_parse_url($site_url, PHP_URL_HOST);
 							
 								
 							
-								<!-- Advanced Settings Tab  -->
+								<!-- Advanced Tab  -->
 								<div class="gdpr-cookie-consent-admin-tab gdpr-cookie-consent-admin-advanced-settings-tab" data-tab="advanced_settings">
-									<?php echo esc_html('Advanced&nbsp;Settings','gdpr-cookie-consent'); ?>
+									<?php echo esc_html('Advanced','gdpr-cookie-consent'); ?>
 								</div>
 								<?php
 								if ( $pro_is_activated ) {
