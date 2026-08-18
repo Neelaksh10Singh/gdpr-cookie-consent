@@ -234,6 +234,7 @@ var gen = new Vue({
           "1" === settings_obj.the_options["is_gcm_on"])
           ? true
           : false,
+      ad_tech_expanded: this.iabtcf_is_on || this.gcm_is_on,
       gcm_wait_for_update_duration: settings_obj.the_options.hasOwnProperty(
         "gcm_wait_for_update_duration"
       )
@@ -3674,6 +3675,9 @@ var gen = new Vue({
     },
     onSwitchGCMEnable(){
       this.gcm_is_on = !this.gcm_is_on;
+    },
+    onSwitchAdTechExpanded(){
+      this.ad_tech_expanded = !this.ad_tech_expanded;
     },
     onSwitchGCMUrlPass(){
       this.gcm_url_passthrough = !this.gcm_url_passthrough;
