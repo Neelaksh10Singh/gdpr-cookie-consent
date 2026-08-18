@@ -234,6 +234,7 @@ var gen = new Vue({
           "1" === settings_obj.the_options["is_gcm_on"])
           ? true
           : false,
+      ad_tech_expanded: this.iabtcf_is_on || this.gcm_is_on,
       gcm_wait_for_update_duration: settings_obj.the_options.hasOwnProperty(
         "gcm_wait_for_update_duration"
       )
@@ -3013,8 +3014,8 @@ var gen = new Vue({
       isFeaturesActive: false,
       isVendorsActive: false,
       cookieSettingsPopupAccentColor: '',
-      cookie_bar_settings_open: false,
-      cookie_bar_settings_open1: false,
+      cookie_bar_settings_open: true,
+      cookie_bar_settings_open1: true,
     };
   },
   computed: {
@@ -3120,6 +3121,21 @@ var gen = new Vue({
       panels.forEach(panel => {
         this[panel] = false;
       });
+      // If it ends in 1 or 2, also open its paired variant.
+      if (panelName.endsWith('1') || panelName.endsWith('2')) {
+        const baseName = panelName.slice(0, -1);
+
+        const panel1 = `${baseName}1`;
+        const panel2 = `${baseName}2`;
+
+        if (panels.includes(panel1)) {
+          this[panel1] = true;
+        }
+
+        if (panels.includes(panel2)) {
+          this[panel2] = true;
+        }
+      }
 
       this[panelName] = true;
     },
@@ -3659,6 +3675,9 @@ var gen = new Vue({
     },
     onSwitchGCMEnable(){
       this.gcm_is_on = !this.gcm_is_on;
+    },
+    onSwitchAdTechExpanded(){
+      this.ad_tech_expanded = !this.ad_tech_expanded;
     },
     onSwitchGCMUrlPass(){
       this.gcm_url_passthrough = !this.gcm_url_passthrough;
