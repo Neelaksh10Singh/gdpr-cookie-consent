@@ -1420,6 +1420,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 										<div id="gcm-advertiser-mode-container-loader"></div>
 									<?php endif; ?>
 								</c-row>
+								</div>
 								<c-row>
 									<c-col class="col-sm-4"><label><?php esc_attr_e( 'Select the Type of Law', 'gdpr-cookie-consent' ); ?></label></c-col>
 									<c-col class="col-sm-8">
@@ -2350,7 +2351,6 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 
 							</c-card-body>
 						</c-card>
-					</c-card>
 					</div>
 					<div class="gdpr-design-right-column">
 					<c-card  v-if="cookie_bar_settings_open" v-show="!ab_testing_enabled && gdpr_policy != 'both'" class="desgin_card">
@@ -9759,7 +9759,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 												<c-input type="hidden" name="gdpr-cookie-bar-logo-url-holder" id="gdpr-cookie-bar-logo-url-holder"  class="regular-text"> </c-input>
 									</c-col>
 								</c-row>
-								<!-- </c-card-body> -->
+								</c-card-body>
 
 								</c-card>
 							<c-card class="desgin_card" v-show="!ab_testing_enabled && gdpr_policy == 'both' && active_default_multiple_legislation === 'gdpr'">
@@ -10923,9 +10923,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 								</c-card-body>
 								
 										
-						</c-card-body>	
 							</c-card>
-					</c-card>
 					
 						<!-- Desgin Banner preview if A/B Testing is enabled  and GDPR&CCPA both are not selected-->
 		<div class="gdpr-design-tab-layout" :class="{ 'panel-open': cookie_bar_settings_open }">
@@ -11620,7 +11618,6 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 
 						</c-card-body>
 					</c-card>
-					</c-card-body>		
 				</c-card>
 
 			</div>
@@ -11893,8 +11890,6 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 
 			</div>
 		</div>
-			</c-card-body>
-			</c-card>
 				</c-tab>
 
 			<!-- CUSTOM CSS START -->
