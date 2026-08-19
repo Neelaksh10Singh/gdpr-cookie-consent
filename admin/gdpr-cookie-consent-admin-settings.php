@@ -315,8 +315,9 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 			'padding-block': show_cookie_as == 'banner' ? this[`cookie_bar_vertical_padding${active_test_banner_tab}`] + 'px' : undefined,
 			'gap': this[`cookie_bar_spacing${active_test_banner_tab}`] + 'px',
 			'backdrop-filter': cookie_bar_blur > 0 ? `blur(${this[`cookie_bar_blur${active_test_banner_tab}`] * 20}px)` : undefined,
-			'box-shadow': `${this[`cookie_bar_shadow_size${active_test_banner_tab}`]}px ${this[`cookie_bar_shadow_size${active_test_banner_tab}`]}px ${this[`cookie_bar_shadow_size${active_test_banner_tab}`]*2}px ${this[`cookie_bar_shadow_color${active_test_banner_tab}`]}${Math.floor(0.5 * 255).toString(16).toUpperCase()}`
-		  }"
+			'box-shadow': `${this[`cookie_bar_shadow_size${active_test_banner_tab}`]}px ${this[`cookie_bar_shadow_size${active_test_banner_tab}`]}px ${this[`cookie_bar_shadow_size${active_test_banner_tab}`]*2}px ${this[`cookie_bar_shadow_color${active_test_banner_tab}`]}${Math.floor(0.5 * 255).toString(16).toUpperCase()}`,
+			'padding-bottom' : is_us_state_laws ? '35px' : undefined
+			}"
 		>
 			
 			<span v-if="this[`bypass_button_is_on${active_test_banner_tab}`]" :style="{ 'border': 'none', 'cursor': 'pointer', 'display':'inline-flex','justify-content': 'center', 'align-items': 'center', 'height':'20px', 'width': '20px', 'position': 'absolute', 'top': '5px', 'right': (parseInt(this[`cookie_bar_border_radius${active_test_banner_tab}`])/3 + 10) + 'px', 'border-radius': '50%','color': this[`bypass_button_text_color${active_test_banner_tab}`], 'background-color':'transparent', 'scale': this[`bypass_button_size${active_test_banner_tab}`] == 'lg' ? '110%' : this[`bypass_button_size${active_test_banner_tab}`] == 'sm' ? '90%' : '100%' }" @click="turnOffPreviewBanner">
@@ -469,7 +470,8 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 				'padding-block': show_cookie_as == 'banner' ? cookie_bar_vertical_padding + 'px' : undefined,
 				'gap': cookie_bar_spacing + 'px',
 				'backdrop-filter': cookie_bar_blur > 0 ? `blur(${cookie_bar_blur * 20}px)` : undefined,
-				'box-shadow': `${cookie_bar_shadow_size}px ${cookie_bar_shadow_size}px ${cookie_bar_shadow_size*2}px ${cookie_bar_shadow_color}${Math.floor(0.5 * 255).toString(16).toUpperCase()}`
+				'box-shadow': `${cookie_bar_shadow_size}px ${cookie_bar_shadow_size}px ${cookie_bar_shadow_size*2}px ${cookie_bar_shadow_color}${Math.floor(0.5 * 255).toString(16).toUpperCase()}`,
+				'padding-bottom' : is_us_state_laws ? '35px' : undefined
 			}"
 		>
 			
@@ -1053,7 +1055,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 											<?php echo esc_html__( "Shows the right banner for each visitor's state — covers CCPA/CPRA (California), VCDPA (Virginia), CPA (Colorado), CTDPA (Connecticut), and UCPA (Utah).", 'gdpr-cookie-consent' ); ?>
 										</p>
 										<div class="cookie-notice-readmore-container">
-											<a class="cookie-notice-readmore" href="<?php echo esc_url( 'https://wplegalpages.com/blog/ccpa/' ); ?>" target="_blank">
+											<a class="cookie-notice-readmore" href="<?php echo esc_url( 'https://wplegalpages.com/blog/complete-guide-to-us-state-privacy-laws/' ); ?>" target="_blank">
 												<?php echo esc_html__( 'Learn more about setting up a US State Laws notice', 'gdpr-cookie-consent' ); ?>
 											</a>
 										</div>
@@ -1066,6 +1068,27 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 										<div class="cookie-notice-readmore-container">
 											<a class="cookie-notice-readmore" href="https://wplegalpages.com/blog/eprivacy-directive-vs-gdpr/" target="_blank">
 												<?php esc_attr_e( 'Learn more about setting up an ePrivacy notice', 'gdpr-cookie-consent' ); ?>
+											</a>
+										</div>
+									</c-col>
+								</c-row>
+
+								<c-row class="gdpr-cookie-consent-laws-type" v-show="law_selection_mode === 'manual' && is_lgpd">
+									<c-col class="col-sm-4"></c-col>
+									<c-col class="col-sm-8">
+										<div class="cookie-notice-readmore-container">
+											<a class="cookie-notice-readmore" href="https://wplegalpages.com/lgpd-compliance/" target="_blank">
+												<?php esc_attr_e( 'Learn more about setting up an LGPD notice', 'gdpr-cookie-consent' ); ?>
+											</a>
+										</div>
+									</c-col>
+								</c-row>
+								<c-row class="gdpr-cookie-consent-laws-type" v-show="law_selection_mode === 'manual' && is_pipeda">
+									<c-col class="col-sm-4"></c-col>
+									<c-col class="col-sm-8">
+										<div class="cookie-notice-readmore-container">
+											<a class="cookie-notice-readmore" href="https://wplegalpages.com/blog/pipeda/" target="_blank">
+												<?php esc_attr_e( 'Learn more about setting up a PIPEDA notice', 'gdpr-cookie-consent' ); ?>
 											</a>
 										</div>
 									</c-col>
