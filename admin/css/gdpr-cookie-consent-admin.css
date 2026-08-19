@@ -11625,7 +11625,8 @@ div#gdpr-scan-history {
 
 #gdpr-cookie-consent-consent-settings,
 #gdpr-cookie-consent-additional-settings,
-#gdpr-cookie-consent-export-import-settings {
+#gdpr-cookie-consent-export-import-settings,
+#gdpr-cookie-consent-connection-settings {
   margin-top: -30px;
 }
 
