@@ -122,7 +122,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                   'padding': '12px 29px',
                   }" >Save My Prefernces</button>
 
-                  <button type="button" class="ccpa-popup-save" data-gdpr_action="decline" data-dismiss="gdprmodal"
+                  <button v-if="!((!is_auto_mode && is_us_state_laws && us_state_laws_edit_law === 'default_opt_out') || (is_auto_mode && banner_edit_law === 'us_state_laws' && us_state_laws_edit_law === 'default_opt_out'))" type="button" class="ccpa-popup-save" data-gdpr_action="decline" data-dismiss="gdprmodal"
                :style="{
                   'background-color': ab_testing_enabled
                   ? this[`cancel_background_color${active_test_banner_tab}`]
@@ -208,8 +208,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="gdprmodal-body" :style="'scrollbar-color: ' + cookieSettingsPopupAccentColor + ' transparent;'">
 				<div class="gdpr-details-content">
 				<div class="gdpr-groups-container">
-                     <div class="gdpr-about-cookies"><?php echo esc_html( $the_options['about_message'] ); ?></div>
-                     <div class="gdpr-about-cookies iabtcf"><?php echo esc_html( $the_options['about_message'] ); ?></div>
+                     <div class="gdpr-about-cookies" v-html="gdpr_about_cookie_message"></div>
+                     <div class="gdpr-about-cookies iabtcf" v-html="gdpr_about_cookie_message"></div>
                      <div v-if="gcm_is_on" class="gdpr-about-cookies-gcm">
                           <?php echo esc_html($the_options['gcm_about_message']); ?>
                               <a :style="{'color': cookieSettingsPopupAccentColor}" 

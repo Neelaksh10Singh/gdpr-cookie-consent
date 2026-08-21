@@ -1657,8 +1657,6 @@ body.toplevel_page_gdpr-cookie-consent-settings-page #wpbody-content {
   min-height: 750px;
   color: var(--blue-903);
 }
-#gdpr-cookie-consent-settings-app.gdpr-cookie-consent-app-container button,
-#gdpr-cookie-consent-settings-app.gdpr-cookie-consent-app-container a,
 #gdpr-cookie-consent-script_blocker-settings.gdpr-cookie-consent-app-container button,
 #gdpr-cookie-consent-script_blocker-settings.gdpr-cookie-consent-app-container a,
 #gdpr-cookie-consent-abtesting-settings.gdpr-cookie-consent-app-container a ,
@@ -8049,7 +8047,7 @@ button.btn.gdpr-renew-now-btn.pro,
   border-bottom: 1px solid var(--gray-200) !important;
 }
 .gdpr-eu_visitors_message-gdpr,
-.gdpr-law_region_visitors_message-gdpr
+.gdpr-law_region_visitors_message-gdpr,
 .gdpr-gacm_message-gdpr,
 .gdpr-gcm_message-gdpr,
 .gdpr-cookie-scanning-limit-exhaust-monthly-free-notice,
@@ -8105,7 +8103,7 @@ display: block !important;
   
 }
 .gdpr-eu_visitors_message-gdpr,
-.gdpr-law_region_visitors_message-gdpr
+.gdpr-law_region_visitors_message-gdpr,
 .gdpr-eu_visitors_message-ccpa,
 .gdpr-eu_visitors_message-both,
 .gdpr-eu_visitors_message-both-ccpa,

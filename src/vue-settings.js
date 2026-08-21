@@ -80,9 +80,6 @@ var gen = new Vue({
         }
     }
 
-    console.log(settings_obj.law_selection_mode);
-    console.log(this.law_selection_mode);
-
     const c5Buttons = Array.isArray(bannerStructure?.c5)
         ? bannerStructure.c5
         : ["accept_all", "accept", "settings"];
@@ -97,6 +94,13 @@ var gen = new Vue({
     const visibleC6Items1 = c6Buttons.filter((item) => isButtonVisible(item, settings_obj.the_options, '1'));
     const visibleC5Items2 = c5Buttons.filter((item) => isButtonVisible(item, settings_obj.the_options, '2'));
     const visibleC6Items2 = c6Buttons.filter((item) => isButtonVisible(item, settings_obj.the_options, '2'));
+
+    const lawCode = settings_obj.the_options.hasOwnProperty("cookie_usage_for")
+      ? settings_obj.the_options["cookie_usage_for"]
+      : "gdpr";
+    // 'ccpa' and 'both' are legacy codes kept readable indefinitely.
+    const isUsStateLaws = lawCode === "us_state_laws" || lawCode === "ccpa" || lawCode === "both";
+
     return {
       labelIcon: {},
       labelIconNew: {
@@ -105,7 +109,8 @@ var gen = new Vue({
       },
 
       isGdprProActive: "1" === settings_obj.is_pro_active,
-      pro_only_law_codes: ['sa_pdpl', 'pipeda', 'au_app'],
+      // Keep in sync with gdpr_pro_only_law_codes() in class-gdpr-cookie-consent-admin.php.
+      pro_only_law_codes: ['uk_gdpr', 'sa_pdpl', 'pipeda', 'au_app'],
       disableSwitch: false,
       is_template_changed: false,
       is_auto_template_generated: false,
@@ -295,29 +300,21 @@ var gen = new Vue({
       banner_preview_is_on:
         false,
       policy_options: settings_obj.policies,
+      law_selection_mode: settings_obj.law_selection_mode || 'manual',
       us_policy_options: settings_obj.us_policies,
-      law_selection_mode: settings_obj.law_selection_mode || 'auto',
       disabled_for_free: Boolean(Number(settings_obj.disabled_for_free)),
-      gdpr_policy: settings_obj.the_options.hasOwnProperty("cookie_usage_for")
-        ? settings_obj.the_options["cookie_usage_for"]
-        : "gdpr",
-      is_gdpr:
-        this.gdpr_policy === "gdpr" || this.gdpr_policy === "both"
-          ? true
-          : false,
-      is_us_state_laws:
-        this.gdpr_policy === "ccpa" || this.gdpr_policy === "both"
-          ? true
-          : false,
-      is_lgpd: this.gdpr_policy === "lgpd" ? true : false,
-      is_eprivacy: this.gdpr_policy === "eprivacy" ? true : false,
+      gdpr_policy: lawCode,
+      is_gdpr: lawCode === "gdpr" || lawCode === "both",
+      is_us_state_laws: isUsStateLaws,
+      is_lgpd: lawCode === "lgpd",
+      is_eprivacy: lawCode === "eprivacy",
 
       banner_edit_law: "gdpr",
       us_state_laws_edit_law: "ccpa",
-      is_uk_gdpr: this.gdpr_policy === "uk_gdpr" ? true : false,
-      is_pipeda: this.gdpr_policy === "pipeda" ? true : false,
-      is_au_app: this.gdpr_policy === "au_app" ? true : false,
-      is_sa_pdpl: this.gdpr_policy === "sa_pdpl" ? true : false,
+      is_uk_gdpr: lawCode === "uk_gdpr",
+      is_pipeda: lawCode === "pipeda",
+      is_au_app: lawCode === "au_app",
+      is_sa_pdpl: lawCode === "sa_pdpl",
       eprivacy_message: settings_obj.the_options.hasOwnProperty(
         "notify_message_eprivacy"
       )
@@ -1165,7 +1162,7 @@ var gen = new Vue({
         "button_decline_text"
       )
         ? settings_obj.the_options["button_decline_text"]
-        : "Decline",
+        : "Reject All",
       decline_text_color: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color"
       )
@@ -1268,7 +1265,7 @@ var gen = new Vue({
         "button_settings_text"
       )
         ? settings_obj.the_options["button_settings_text"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color"
       )
@@ -1765,7 +1762,7 @@ var gen = new Vue({
         "button_decline_text1"
       )
         ? settings_obj.the_options["button_decline_text1"]
-        : "Decline",
+        : "Reject All",
       decline_text_color1: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color1"
       )
@@ -1839,7 +1836,7 @@ var gen = new Vue({
         "button_settings_text1"
       )
         ? settings_obj.the_options["button_settings_text1"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color1: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color1"
       )
@@ -2262,7 +2259,7 @@ var gen = new Vue({
         "button_decline_text2"
       )
         ? settings_obj.the_options["button_decline_text2"]
-        : "Decline",
+        : "Reject All",
       decline_text_color2: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color2"
       )
@@ -2337,7 +2334,7 @@ var gen = new Vue({
         "button_settings_text2"
       )
         ? settings_obj.the_options["button_settings_text2"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color2: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color2"
       )
@@ -2982,7 +2979,7 @@ var gen = new Vue({
           : false,
       is_law_region_on:
         settings_obj.the_options.hasOwnProperty("is_law_region_on") &&
-        (true === settings_obj.the_options["is_law_region_onis_worldwide_on"] ||
+        (true === settings_obj.the_options["is_law_region_on"] ||
           1 === settings_obj.the_options["is_law_region_on"])
           ? true
           : false, 
@@ -3286,42 +3283,123 @@ var gen = new Vue({
 
       return decodedCSS;
     },
+    applyLawFlags(code) {
+      // 'ccpa' and 'both' are legacy codes kept readable indefinitely.
+      const isUsStateLaws =
+        code === "us_state_laws" || code === "ccpa" || code === "both";
+      const known = [
+        "gdpr",
+        "both",
+        "us_state_laws",
+        "ccpa",
+        "lgpd",
+        "eprivacy",
+        "uk_gdpr",
+        "pipeda",
+        "au_app",
+        "sa_pdpl",
+      ].includes(code);
+
+      this.is_us_state_laws = isUsStateLaws;
+      this.is_gdpr = code === "gdpr" || code === "both" || !known;
+      this.is_lgpd = code === "lgpd";
+      this.is_eprivacy = code === "eprivacy";
+      this.is_uk_gdpr = code === "uk_gdpr";
+      this.is_pipeda = code === "pipeda";
+      this.is_au_app = code === "au_app";
+      this.is_sa_pdpl = code === "sa_pdpl";
+    },
     setValues() {
-      if (this.gdpr_policy === "both") {
-        this.is_us_state_laws = true;
-        this.is_gdpr = true;
-        this.is_eprivacy = false;
-        this.is_lgpd = false;
-        this.show_visitor_conditions = true;
-        this.show_revoke_card = true;
-      } else if (this.gdpr_policy === "ccpa") {
-        this.is_us_state_laws = true;
-        this.is_eprivacy = false;
-        this.is_gdpr = false;
-        this.is_lgpd = false;
-        this.show_visitor_conditions = true;
-        this.show_revoke_card = false;
-      } else if (this.gdpr_policy === "gdpr") {
+      this.applyLawFlags(this.gdpr_policy);
+
+      if (this.gdpr_policy === "gdpr") {
         this.is_gdpr = true;
         this.is_us_state_laws = false;
         this.is_eprivacy = false;
         this.is_lgpd = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
         this.show_revoke_card = true;
         this.show_visitor_conditions = true;
+      } else if (this.gdpr_policy === "us_state_laws") {
+        this.is_us_state_laws = true;
+        this.is_gdpr = false;
+        this.is_eprivacy = false;
+        this.is_lgpd = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
+        this.show_visitor_conditions = true;
+        this.show_revoke_card = false;
       } else if (this.gdpr_policy === "lgpd") {
         this.is_gdpr = false;
         this.is_us_state_laws = false;
         this.is_lgpd = true;
         this.is_eprivacy = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
         this.show_revoke_card = true;
         this.show_visitor_conditions = false;
-      } else {
+      } else if (this.gdpr_policy === "eprivacy") {
         this.is_eprivacy = true;
         this.is_gdpr = false;
         this.is_us_state_laws = false;
         this.is_lgpd = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
         this.show_visitor_conditions = false;
         this.show_revoke_card = true;
+      } else if (this.gdpr_policy === "uk_gdpr") {
+        this.is_uk_gdpr = true;
+        this.is_gdpr = false;
+        this.is_us_state_laws = false;
+        this.is_lgpd = false;
+        this.is_eprivacy = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
+        this.show_revoke_card = true;
+        this.show_visitor_conditions = true;
+      } else if (this.gdpr_policy === "pipeda") {
+        this.is_pipeda = true;
+        this.is_gdpr = false;
+        this.is_us_state_laws = false;
+        this.is_lgpd = false;
+        this.is_eprivacy = false;
+        this.is_uk_gdpr = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
+        this.show_revoke_card = true;
+        this.show_visitor_conditions = true;
+      } else if (this.gdpr_policy === "au_app") {
+        this.is_au_app = true;
+        this.is_gdpr = false;
+        this.is_us_state_laws = false;
+        this.is_lgpd = false;
+        this.is_eprivacy = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_sa_pdpl = false;
+        this.show_revoke_card = true;
+        this.show_visitor_conditions = true;
+      } else if (this.gdpr_policy === "sa_pdpl") {
+        this.is_sa_pdpl = true;
+        this.is_gdpr = false;
+        this.is_us_state_laws = false;
+        this.is_lgpd = false;
+        this.is_eprivacy = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.show_revoke_card = true;
+        this.show_visitor_conditions = true;
       }
       for (let i = 0; i < this.list_of_contents.length; i++) {
         if (
@@ -3407,11 +3485,6 @@ var gen = new Vue({
       for (let i = 0; i < this.list_of_countries.length; i++) {
         if (this.select_countries.includes(this.list_of_countries[i].code)) {
           this.select_countries_array.push(this.list_of_countries[i]);
-        }
-      }
-      for (let i = 0; i < this.list_of_countries.length; i++) {
-        if (this.select_countries_ccpa.includes(this.list_of_countries[i].code)) {
-          this.select_countries_array_ccpa.push(this.list_of_countries[i]);
         }
       }
 
@@ -3641,30 +3714,28 @@ var gen = new Vue({
       this.selectedRadioWorldWide = "yes";
       this.selectedRadioCountry = false;
       this.is_worldwide_on = true;
-      this.is_eu_on = false;
+      this.is_law_region_on = false;
       this.is_selectedCountry_on = false;
     },
     onSwitchRegionEnable(isChecked) {
+      this.is_law_region_on = isChecked;
       if (isChecked) {
-        this.is_law_region_on = true;
-        this.selectedRadioWorldWide = false; 
+        this.selectedRadioWorldWide = false;
         this.is_worldwide_on = false;
       } else if (this.is_selectedCountry_on !== true) {
-        this.selectedRadioWorldWide = 'yes'; // fall back to worldwide, same pattern as your existing onSwitchEUEnable
+        this.selectedRadioWorldWide = "yes";
+        this.is_worldwide_on = true;
       }
     },
     onSwitchSelectedCountryEnable(isChecked) {
+      this.is_selectedCountry_on = isChecked;
+      this.selectedRadioCountry = isChecked;
       if (isChecked) {
-        this.is_selectedCountry_on = true;
-        this.selectedRadioCountry = true;
         this.selectedRadioWorldWide = false;
         this.is_worldwide_on = false;
-      } else {
-        this.is_selectedCountry_on = false;
-        this.selectedRadioCountry = false;
-        if (this.is_eu_on != true) {
-          this.selectedRadioWorldWide = "yes";
-        }
+      } else if (this.is_law_region_on !== true) {
+        this.selectedRadioWorldWide = "yes";
+        this.is_worldwide_on = true;
       }
     },
     onCountrySelect(value) {
@@ -3960,7 +4031,6 @@ var gen = new Vue({
     },
     onTemplateChange(value) {
       this.template = value;
-      console.log(value);
       let selectedTemplate
       if(value == "new_default"){
         selectedTemplate = this.default_template_json;
@@ -4367,36 +4437,39 @@ var gen = new Vue({
       return true;
     },
     onLawModeChange() {
-      this.is_auto_mode = this.law_selection_mode === 'auto';
-      console.log("Law mode changed to: ", this.law_selection_mode);
-      console.log("Disabled for free: ", this.disabled_for_free);
-      console.log("Is auto mode: ", this.is_auto_mode);
+      // is_auto_mode is a computed derived from law_selection_mode — assigning to
+      // it here would be a write to a setter-less computed.
+      this.reload_onSelect_law = true;
       this.success_error_message = "Law selection mode updated. Save changes please before progressing further.";
       j("#gdpr-cookie-consent-save-settings-alert").css("background-color", "#72b85c");
       j("#gdpr-cookie-consent-save-settings-alert").fadeIn(400);
       j("#gdpr-cookie-consent-save-settings-alert").fadeOut(5000);
+
+      if (this.law_selection_mode === "auto" && this.is_law_region_on) {
+        this.onSwitchRegionEnable(false);
+      }
     },
     cookiePolicyChange(value) {
       this.onSwitchReloadLaw();
       if (this.gdpr_policy) {
         value = this.gdpr_policy;
       }
+
+      this.applyLawFlags(value);
       if (value === "us_state_laws") {
         this.is_us_state_laws = true;
         this.is_eprivacy = false;
         this.is_gdpr = false;
         this.is_lgpd = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
         this.show_visitor_conditions = true;
         this.show_revoke_card = false;
         this.iabtcf_is_on = false;
         this.gcm_is_on = false;
         //visitors condition.
-        this.selectedRadioWorldWide = "yes";
-        this.is_worldwide_on = true;
-        this.is_worldwide_on_ccpa = true;
-        this.is_eu_on = false;
-        this.selectedRadioCountry = false;
-        this.is_selectedCountry_on = false;
         this.gacm_is_on = false;
       } else if (value === "gdpr") {
         this.is_gdpr = true;
@@ -4415,19 +4488,21 @@ var gen = new Vue({
         this.is_us_state_laws = false;
         this.is_eprivacy = false;
         this.is_lgpd = false;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
         this.show_revoke_card = true;
         this.show_visitor_conditions = true;
-        this.selectedRadioWorldWide = "yes";
-        this.is_worldwide_on = true;
-        this.is_worldwide_on_ccpa = true;
-        this.is_eu_on = false;
-        this.selectedRadioCountry = false;
-        this.is_selectedCountry_on = false;
       } else if (value === "lgpd") {
         this.is_us_state_laws = false;
         this.is_eprivacy = false;
         this.is_gdpr = false;
         this.is_lgpd = true;
+        this.is_uk_gdpr = false;
+        this.is_pipeda = false;
+        this.is_au_app = false;
+        this.is_sa_pdpl = false;
         this.show_revoke_card = true;
         this.show_visitor_conditions = true;
         this.iabtcf_is_on = false;
@@ -4476,19 +4551,16 @@ var gen = new Vue({
         this.is_pipeda = false;
         this.is_au_app = false;
         this.is_sa_pdpl = true;
-      } else {
-        this.is_eprivacy = true;
-        this.is_gdpr = false;
-        this.is_us_state_laws = false;
-        this.is_lgpd = false;
-        this.is_uk_gdpr = false;
-        this.is_pipeda = false;
-        this.is_au_app = false;
-        this.is_sa_pdpl = false;
+      } else if (value === "eprivacy") {
+        // Matched by name, not used as a catch-all: an unrecognised code must not
+        // silently become ePrivacy. applyLawFlags() above already defaulted it.
         this.show_visitor_conditions = false;
         this.show_revoke_card = true;
         this.iabtcf_is_on = false;
         this.gacm_is_on = false;
+      } else {
+        this.show_revoke_card = true;
+        this.show_visitor_conditions = true;
       }
       if (this.iabtcf_is_on) {
         this.gdpr_message = `We and our <a id = "vendor-link" href = "#" data-toggle = "gdprmodal" data-target = "#gdpr-gdprmodal">836 partners</a> use cookies and other tracking technologies to improve your experience on our website. We may store and/or access information on a device and process personal data, such as your IP address and browsing data, for personalised advertising and content, advertising and content measurement, audience research and services development. Additionally, we may utilize precise geolocation data and identification through device scanning.\n\nPlease note that your consent will be valid across all our subdomains. You can change or withdraw your consent at any time by clicking the “Cookie Settings” button at the bottom of your screen. We respect your choices and are committed to providing you with a transparent and secure browsing experience.`;
@@ -4508,6 +4580,10 @@ var gen = new Vue({
       );
       j("#gdpr-cookie-consent-save-settings-alert").fadeIn(400);
       j("#gdpr-cookie-consent-save-settings-alert").fadeOut(5000);
+
+      if (!this.region_label && this.is_law_region_on) {
+        this.onSwitchRegionEnable(false);
+      }
     },
 
     onSwitchDefaultCookieBar() {
@@ -4624,12 +4700,12 @@ var gen = new Vue({
       this.button_readmore_wp_page2 = false;
       this.button_readmore_page2 = "0";
 
-      this.decline_text = "Decline";
+      this.decline_text = "Reject All";
       this.decline_url = "#";
       this.decline_action = "#cookie_action_settings";
       this.open_decline_url = false;
       this.decline_as_button = true;
-      this.settings_text = "Cookie Settings";
+      this.settings_text = "Preferences";
       this.settings_as_button = true;
       this.cookie_on_frontend = true;
       this.opt_out_text = "Do Not Sell My Personal Information";
@@ -4646,12 +4722,12 @@ var gen = new Vue({
       this.accept_all_action1 = "#cookie_action_close_header";
       this.accept_all_new_win1 = false;
       this.accept_all_as_button1 = true;
-      this.decline_text1 = "Decline";
+      this.decline_text1 = "Reject All";
       this.decline_url1 = "#";
       this.decline_action1 = "#cookie_action_settings";
       this.open_decline_url1 = false;
       this.decline_as_button1 = true;
-      this.settings_text1 = "Cookie Settings";
+      this.settings_text1 = "Preferences";
       this.settings_as_button1 = true;
       this.cookie_on_frontend1 = true;
       this.opt_out_text1 = "Do Not Sell My Personal Information";
@@ -4668,12 +4744,12 @@ var gen = new Vue({
       this.accept_all_action2 = "#cookie_action_close_header";
       this.accept_all_new_win2 = false;
       this.accept_all_as_button2 = true;
-      this.decline_text2 = "Decline";
+      this.decline_text2 = "Reject All";
       this.decline_url2 = "#";
       this.decline_action2 = "#cookie_action_settings";
       this.open_decline_url2 = false;
       this.decline_as_button2 = true;
-      this.settings_text2 = "Cookie Settings";
+      this.settings_text2 = "Preferences";
       this.settings_as_button2 = true;
       this.cookie_on_frontend2 = true;
       this.opt_out_text2 = "Do Not Sell My Personal Information";
@@ -6667,7 +6743,7 @@ var app = new Vue({
         "button_decline_text"
       )
         ? settings_obj.the_options["button_decline_text"]
-        : "Decline",
+        : "Reject All",
       decline_text_color: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color"
       )
@@ -6740,7 +6816,7 @@ var app = new Vue({
         "button_settings_text"
       )
         ? settings_obj.the_options["button_settings_text"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color"
       )
@@ -7069,7 +7145,7 @@ var app = new Vue({
         "button_decline_text1"
       )
         ? settings_obj.the_options["button_decline_text1"]
-        : "Decline",
+        : "Reject All",
       decline_text_color1: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color1"
       )
@@ -7143,7 +7219,7 @@ var app = new Vue({
         "button_settings_text1"
       )
         ? settings_obj.the_options["button_settings_text1"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color1: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color1"
       )
@@ -7472,7 +7548,7 @@ var app = new Vue({
         "button_decline_text2"
       )
         ? settings_obj.the_options["button_decline_text2"]
-        : "Decline",
+        : "Reject All",
       decline_text_color2: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color2"
       )
@@ -7546,7 +7622,7 @@ var app = new Vue({
         "button_settings_text2"
       )
         ? settings_obj.the_options["button_settings_text2"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color2: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color2"
       )
@@ -8549,7 +8625,6 @@ var app = new Vue({
       this.banner_preview_is_on = false;
     },
     onTemplateChange(value) {
-      console.log(value);
       this.template = value;
       const selectedTemplate = this.json_templates[value];
       this.cookie_bar_color =                       selectedTemplate['styles']['background-color'];
@@ -9071,7 +9146,7 @@ var app = new Vue({
       this.gcm_advertiser_mode = false;
       this.gcm_url_passthrough = false;
       this.gacm_is_on = false;
-      this.decline_text = "Decline";
+      this.decline_text = "Reject All";
       this.decline_url = "#";
       this.decline_action = "#cookie_action_settings";
       this.decline_text_color = "#ffffff";
@@ -9084,7 +9159,7 @@ var app = new Vue({
       this.decline_style = "none";
       this.decline_border_color = "#333333";
       this.decline_border_radius = "0";
-      this.settings_text = "Cookie Settings";
+      this.settings_text = "Preferences";
       this.settings_text_color = "#ffffff";
       this.settings_background_color = "#333333";
       this.settings_as_button = true;
@@ -10174,7 +10249,7 @@ var adv = new Vue({
         "button_decline_text"
       )
         ? settings_obj.the_options["button_decline_text"]
-        : "Decline",
+        : "Reject All",
       decline_text_color: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color"
       )
@@ -10247,7 +10322,7 @@ var adv = new Vue({
         "button_settings_text"
       )
         ? settings_obj.the_options["button_settings_text"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color"
       )
@@ -10714,7 +10789,7 @@ var adv = new Vue({
         "button_decline_text1"
       )
         ? settings_obj.the_options["button_decline_text1"]
-        : "Decline",
+        : "Reject All",
       decline_text_color1: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color1"
       )
@@ -10788,7 +10863,7 @@ var adv = new Vue({
         "button_settings_text1"
       )
         ? settings_obj.the_options["button_settings_text1"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color1: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color1"
       )
@@ -11211,7 +11286,7 @@ var adv = new Vue({
         "button_decline_text2"
       )
         ? settings_obj.the_options["button_decline_text2"]
-        : "Decline",
+        : "Reject All",
       decline_text_color2: settings_obj.the_options.hasOwnProperty(
         "button_decline_link_color2"
       )
@@ -11286,7 +11361,7 @@ var adv = new Vue({
         "button_settings_text2"
       )
         ? settings_obj.the_options["button_settings_text2"]
-        : "Cookie Settings",
+        : "Preferences",
       settings_text_color2: settings_obj.the_options.hasOwnProperty(
         "button_settings_link_color2"
       )
@@ -12400,12 +12475,12 @@ var adv = new Vue({
       this.button_readmore_wp_page2 = false;
       this.button_readmore_page2 = "0";
 
-      this.decline_text = "Decline";
+      this.decline_text = "Reject All";
       this.decline_url = "#";
       this.decline_action = "#cookie_action_settings";
       this.open_decline_url = false;
       this.decline_as_button = true;
-      this.settings_text = "Cookie Settings";
+      this.settings_text = "Preferences";
       this.settings_as_button = true;
       this.cookie_on_frontend = true;
       this.opt_out_text = "Do Not Sell My Personal Information";
@@ -12422,12 +12497,12 @@ var adv = new Vue({
       this.accept_all_action1 = "#cookie_action_close_header";
       this.accept_all_new_win1 = false;
       this.accept_all_as_button1 = true;
-      this.decline_text1 = "Decline";
+      this.decline_text1 = "Reject All";
       this.decline_url1 = "#";
       this.decline_action1 = "#cookie_action_settings";
       this.open_decline_url1 = false;
       this.decline_as_button1 = true;
-      this.settings_text1 = "Cookie Settings";
+      this.settings_text1 = "Preferences";
       this.settings_as_button1 = true;
       this.cookie_on_frontend1 = true;
       this.opt_out_text1 = "Do Not Sell My Personal Information";
@@ -12444,12 +12519,12 @@ var adv = new Vue({
       this.accept_all_action2 = "#cookie_action_close_header";
       this.accept_all_new_win2 = false;
       this.accept_all_as_button2 = true;
-      this.decline_text2 = "Decline";
+      this.decline_text2 = "Reject All";
       this.decline_url2 = "#";
       this.decline_action2 = "#cookie_action_settings";
       this.open_decline_url2 = false;
       this.decline_as_button2 = true;
-      this.settings_text2 = "Cookie Settings";
+      this.settings_text2 = "Preferences";
       this.settings_as_button2 = true;
       this.cookie_on_frontend2 = true;
       this.opt_out_text2 = "Do Not Sell My Personal Information";
