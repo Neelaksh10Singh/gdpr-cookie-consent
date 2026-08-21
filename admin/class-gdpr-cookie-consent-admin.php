@@ -13360,22 +13360,70 @@ public function gdpr_support_request_handler() {
 		 $image_base64 = $request->get_param('image_base64');
     	$file_name    = sanitize_file_name($request->get_param('file_name'));
 
-    	$upload_dir = wp_upload_dir();
-    	$file_path = $upload_dir['path'] . '/' . $file_name;
+		// Only allow known image extensions — reject everything else up front.
+		$allowed_extensions = array( 'jpg', 'jpeg', 'png', 'gif', 'webp' );
+		$ext = strtolower( pathinfo( $file_name, PATHINFO_EXTENSION ) );
+		if ( ! in_array( $ext, $allowed_extensions, true ) ) {
+			return new WP_Error( 'invalid_file_type', 'Only image files are allowed.', array( 'status' => 400 ) );
+		}
 
-    	$image_data = base64_decode($image_base64);
-    	file_put_contents($file_path, $image_data);
+		$image_data = base64_decode( $image_base64, true );
+		if ( $image_data === false ) {
+			return new WP_Error( 'invalid_base64', 'Invalid file data.', array( 'status' => 400 ) );
+		}
 
-    	$filetype = wp_check_filetype($file_name);
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
 
-    	$attachment = [
-    	    'post_mime_type' => $filetype['type'],
+		// Write to a temp file first so we can inspect real content before it's ever
+		// reachable in wp-content/uploads.
+		$tmp_file = wp_tempnam( $file_name );
+		file_put_contents( $tmp_file, $image_data );
+
+		// Verify the decoded bytes actually are an allowed image type — extension
+		$filetype_check = wp_check_filetype_and_ext( $tmp_file, $file_name );
+		$is_allowed_type = ! empty( $filetype_check['ext'] )
+			&& in_array( $filetype_check['ext'], $allowed_extensions, true )
+			&& ! empty( $filetype_check['type'] )
+			&& strpos( $filetype_check['type'], 'image/' ) === 0;
+
+		if ( ! $is_allowed_type || @getimagesize( $tmp_file ) === false ) {
+			@unlink( $tmp_file );
+			return new WP_Error( 'invalid_file_content', 'File content is not a valid image.', array( 'status' => 400 ) );
+		}
+
+		// Hand off to WP core's own upload handling so filename sanitization and
+		// the core MIME allowlist are enforced the same way as any normal upload.
+		$sideloaded = wp_handle_sideload(
+			array(
+				'name'     => $file_name,
+				'tmp_name' => $tmp_file,
+			),
+			array(
+				'test_form' => false,
+				'mimes'     => array(
+					'jpg|jpeg' => 'image/jpeg',
+					'png'      => 'image/png',
+					'gif'      => 'image/gif',
+					'webp'     => 'image/webp',
+				),
+			)
+		);
+
+		if ( isset( $sideloaded['error'] ) ) {
+			@unlink( $tmp_file );
+			return new WP_Error( 'upload_failed', $sideloaded['error'], array( 'status' => 400 ) );
+		}
+
+		$file_path = $sideloaded['file'];
+
+		$attachment = [
+			'post_mime_type' => $sideloaded['type'],
     	    'post_title'     => pathinfo($file_name, PATHINFO_FILENAME),
     	    'post_status'    => 'inherit'
     	];
 
     	$attach_id = wp_insert_attachment($attachment, $file_path);
-    	require_once ABSPATH . 'wp-admin/includes/image.php';
 
     	wp_update_attachment_metadata(
     	    $attach_id,
