@@ -1760,7 +1760,7 @@ class Gdpr_Cookie_Consent {
 								}
 							},
 							"dataDeclaration": [1, 3, 4, 6, 8, 10, 11],
-							"deviceStorageDisclosureUrl": "https://vdxtv.expo.workers.dev"
+							"deviceStorageDisclosureUrl": ""
 							},
 							{
 							"id": 2,
@@ -1792,7 +1792,7 @@ class Gdpr_Cookie_Consent {
 								}
 							},
 							"dataDeclaration": [1, 2, 4, 6, 11],
-							"deviceStorageDisclosureUrl": "https://static.dp.cpx.to/gvl/deviceStorageDisclosure.json"
+							"deviceStorageDisclosureUrl": ""
 							},
 							{
 							"id": 4,
@@ -1824,7 +1824,7 @@ class Gdpr_Cookie_Consent {
 								}
 							},
 							"dataDeclaration": [1, 2, 3, 4, 5, 6, 8, 9, 11],
-							"deviceStorageDisclosureUrl": "https://roqad-public.s3.eu-central-1.amazonaws.com/tcf-disclosure.json"
+							"deviceStorageDisclosureUrl": ""
 							},
 							{
 							"id": 6,
@@ -1865,7 +1865,7 @@ class Gdpr_Cookie_Consent {
 								}
 							},
 							"dataDeclaration": [1, 2, 3, 4, 6, 8, 10, 11],
-							"deviceStorageDisclosureUrl": "https://help.adspirit.de/deviceStorage.json"
+							"deviceStorageDisclosureUrl": ""
 							}
 						],
 						"allvendors":[1,2,4,6],

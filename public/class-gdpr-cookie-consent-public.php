@@ -242,7 +242,9 @@ class Gdpr_Cookie_Consent_Public {
             dataLayer.push(arguments);
         }
         gtag("consent", "default", {
-			<?php echo $regionParam !== '' ? $regionParam . ',' : ''; ?>
+			<?php if ( $config->region !== 'All' ) : ?>
+				region: <?php echo wp_json_encode( $regions ); ?>,
+			<?php endif; ?>
 			ad_storage: "<?php echo esc_js( $config->ad_storage ); ?>",
 			ad_user_data: "<?php echo esc_js( $config->ad_user_data ); ?>",
 			ad_personalization: "<?php echo esc_js( $config->ad_personalization ); ?>",

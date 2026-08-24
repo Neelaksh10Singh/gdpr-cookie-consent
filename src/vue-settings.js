@@ -5330,7 +5330,8 @@ var gen = new Vue({
               url: settings_obj.ajaxurl,
               data: {
                 data: JSON.stringify(data), 
-                action: "gcc_enable_iab" 
+                action: "gcc_enable_iab",
+                security: settings_obj.gcc_enable_iab_nonce
               },
               dataType: "json",
             })

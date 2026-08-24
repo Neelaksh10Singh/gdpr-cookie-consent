@@ -2,8 +2,8 @@
 Contributors: wplegalpages
 Donate link: https://wplegalpages.com/
 Tags: cookie consent, cookie banner, consent management, cookie scanner, script blocking
-Requires at least: 3.3.1
-Tested up to: 7.0.2
+Requires at least: 5.3
+Tested up to: 7.1
 Stable tag: 4.4.1
 Requires PHP: 7.0
 License: GPLv3

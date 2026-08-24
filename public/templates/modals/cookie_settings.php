@@ -87,7 +87,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="gdprmodal-content" 
         style="
             background-color: <?php 
-				echo $finalColor; ?>;
+				echo esc_attr($finalColor); ?>;
             color: <?php 
 				echo esc_html(( $ab_options['ab_testing_enabled'] === true || $ab_options['ab_testing_enabled'] === 'true')
 			 		? ( $the_options[ 'cookie_text_color' . $chosenBanner ] )
@@ -833,7 +833,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<button id="cookie_action_reject" type="button" class="gdpr_action_button btn" data-gdpr_action="reject" data-dismiss="gdprmodal"
 						style="
 						background-color: <?php 
-							echo $declinefinalColor; ?>;
+							echo esc_attr($declinefinalColor); ?>;
 						color: <?php 
 							echo esc_html(
 								( $ab_options['ab_testing_enabled'] === true || $ab_options['ab_testing_enabled'] === 'true')
@@ -868,7 +868,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<button id="cookie_action_accept_all" type="button" class="gdpr_action_button btn" data-gdpr_action="accept_all" data-dismiss="gdprmodal"
 					style="
 						background-color: <?php 
-							echo $AcceptAllfinalColor; ?>;
+							echo esc_attr($AcceptAllfinalColor); ?>;
 						color: <?php 
 							echo esc_html(
 								( $ab_options['ab_testing_enabled'] === true || $ab_options['ab_testing_enabled'] === 'true')
@@ -907,7 +907,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<button id="cookie_action_save" type="button" class="gdpr_action_button btn" data-gdpr_action="accept" data-dismiss="gdprmodal"
 					style="
 						background-color: <?php 
-							echo $AcceptAllfinalColor; ?>;
+							echo esc_attr($AcceptAllfinalColor); ?>;
 						color: <?php 
 							echo esc_html(
 								( $ab_options['ab_testing_enabled'] === true || $ab_options['ab_testing_enabled'] === 'true')
@@ -987,7 +987,7 @@ if( $the_options['cookie_usage_for'] === "ccpa" || $the_options['cookie_usage_fo
 		<div class="gdprmodal-content"
 		style="
             background-color: <?php 
-				echo  $finalColor
+				echo  esc_attr($finalColor)
 				?>;
             color: <?php 
 				echo esc_html(( $ab_options['ab_testing_enabled'] === true || $ab_options['ab_testing_enabled'] === 'true')

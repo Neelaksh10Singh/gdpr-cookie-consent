@@ -3374,6 +3374,7 @@ class Gdpr_Cookie_Consent_Admin {
 			'settings_obj',
 			array(
 				'nonce'   						   => wp_create_nonce( 'wpl_save_script_nonce' ), // Generate nonce
+				'gcc_enable_iab_nonce'			   => wp_create_nonce( 'gcc_enable_iab' ),
 				'the_options'                      => $settings,
 				'templates'     				   => $this -> templates_json,
 				'default_template_json'			   => get_option('gdpr_default_template_object'),
@@ -7295,8 +7296,83 @@ class Gdpr_Cookie_Consent_Admin {
 	 * Function to enable IAB and download vendor list
 	 */
 	public function gdpr_cookie_consent_ajax_enable_iab(){
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'You do not have permission to perform this action.', 'gdpr-cookie-consent' ),
+				),
+				403
+			);
+		}
+		if ( ! check_ajax_referer( 'gcc_enable_iab', 'security', false ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Security check failed.', 'gdpr-cookie-consent' ),
+				),
+				403
+			);
+		}
+		if ( ! isset( $_POST['data'] ) || ! is_string( $_POST['data'] ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid vendor data.', 'gdpr-cookie-consent' ),
+				),
+				400
+			);
+		}
+		$raw_data = wp_unslash( $_POST['data'] );
+		$received_data = json_decode( $raw_data );
+
+		if (
+			JSON_ERROR_NONE !== json_last_error() ||
+			! is_object( $received_data )
+		) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid vendor data.', 'gdpr-cookie-consent' ),
+				),
+				400
+			);
+		}
+		$required_properties = array(
+			'vendors',
+			'allvendors',
+			'allLegintVendors',
+			'features',
+			'featureVendorCount',
+			'dataCategories',
+			'purposes',
+			'allPurposes',
+			'purposeVendorCount',
+			'allLegintPurposes',
+			'legintPurposeVendorCount',
+			'specialFeatures',
+			'allSpecialFeatures',
+			'specialFeatureVendorCount',
+			'specialPurposes',
+			'specialPurposeVendorCount',
+			'purposeVendorMap',
+		);
+
+		foreach ( $required_properties as $property ) {
+			if ( ! property_exists( $received_data, $property ) ) {
+				wp_send_json_error(
+					array(
+						'message' => __( 'Invalid vendor data structure.', 'gdpr-cookie-consent' ),
+					),
+					400
+				);
+			}
+		}
 		$received_data = json_decode(stripslashes($_POST['data']));
 		update_option(GDPR_COOKIE_CONSENT_SETTINGS_VENDOR, $received_data);
+
+		wp_send_json_success(
+			array(
+				'message' => __( 'IAB vendor data updated successfully.', 'gdpr-cookie-consent' ),
+			)
+		);
 	}
 
 	/**
@@ -10522,13 +10598,13 @@ class Gdpr_Cookie_Consent_Admin {
     	    );
     	}
 
-		$username = sanitize_text_field( $request->get_param( 'username' ) );
+		$username = sanitize_email( $request->get_param( 'username' ) );
+
+		if ( ! is_email( $username ) ) {
+			return new WP_Error( 'invalid_email', 'A valid email address is required.', [ 'status' => 400 ] );
+		}
 
     	$user = get_user_by( 'email', $username );
-
-    	if ( ! $user ) {
-    	    $user = get_user_by( 'login', $username );
-    	}
 
     	if ( ! $user ) {
     	    return new WP_Error(
@@ -10576,6 +10652,25 @@ class Gdpr_Cookie_Consent_Admin {
 		$code = wp_remote_retrieve_response_code($validate);
 		if ( $code !== 200 ) {
 			return new WP_Error('invalid_token', 'Token validation failed.', ['status' => 401]);
+		}
+		$parts = explode( '.', $token );
+		if ( count( $parts ) !== 3 ) {
+			return new WP_Error( 'malformed_token', 'Unauthorized.', [ 'status' => 401 ] );
+		}
+
+		$payload = json_decode(
+			base64_decode( strtr( $parts[1], '-_', '+/' ) )
+		);
+
+		if ( ! $payload ) {
+			return new WP_Error( 'malformed_token', 'Unauthorized.', [ 'status' => 401 ] );
+		}
+
+		// Tmeister's plugin nests it here
+		$saas_user_id = $payload->data->user->id ?? 0;
+		$stored_user_id = $this->settings->get( 'account', 'id' );
+		if($saas_user_id !== $stored_user_id){
+			return new WP_Error('token_validation_failed', 'Not the owner of the website!', ['status' => 401]);
 		}
 		// 3. Extract master_key from the request body
 		$body = $request->get_json_params();

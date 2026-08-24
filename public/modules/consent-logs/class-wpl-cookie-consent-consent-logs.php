@@ -409,7 +409,7 @@ class Gdpr_Cookie_Consent_Consent_Logs {
 	public static function format_data($data)
 	{
 		$enc  = mb_detect_encoding($data, 'UTF-8, ISO-8859-1', true);
-		$data = ($enc == 'UTF-8') ? $data : utf8_encode($data);
+		$data = ( $enc === 'UTF-8' ) ? $data : mb_convert_encoding( $data, 'UTF-8', 'ISO-8859-1' );
 		return $data;
 	}
 
