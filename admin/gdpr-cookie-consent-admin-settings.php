@@ -316,7 +316,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 			'gap': this[`cookie_bar_spacing${active_test_banner_tab}`] + 'px',
 			'backdrop-filter': cookie_bar_blur > 0 ? `blur(${this[`cookie_bar_blur${active_test_banner_tab}`] * 20}px)` : undefined,
 			'box-shadow': `${this[`cookie_bar_shadow_size${active_test_banner_tab}`]}px ${this[`cookie_bar_shadow_size${active_test_banner_tab}`]}px ${this[`cookie_bar_shadow_size${active_test_banner_tab}`]*2}px ${this[`cookie_bar_shadow_color${active_test_banner_tab}`]}${Math.floor(0.5 * 255).toString(16).toUpperCase()}`,
-			'padding-bottom' : is_us_state_laws ? '35px' : undefined
+			...(is_us_state_laws ? { 'padding-bottom': '35px' } : {})
 			}"
 		>
 			
@@ -471,7 +471,7 @@ $remaining_percentage_scan_limit = ( get_option( 'gdpr_no_of_page_scan' ) / $tot
 				'gap': cookie_bar_spacing + 'px',
 				'backdrop-filter': cookie_bar_blur > 0 ? `blur(${cookie_bar_blur * 20}px)` : undefined,
 				'box-shadow': `${cookie_bar_shadow_size}px ${cookie_bar_shadow_size}px ${cookie_bar_shadow_size*2}px ${cookie_bar_shadow_color}${Math.floor(0.5 * 255).toString(16).toUpperCase()}`,
-				'padding-bottom' : is_us_state_laws ? '35px' : undefined
+				...(is_us_state_laws ? { 'padding-bottom': '35px' } : {})
 			}"
 		>
 			

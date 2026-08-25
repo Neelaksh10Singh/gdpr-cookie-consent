@@ -509,7 +509,7 @@ class Gdpr_Cookie_Consent_Consent_Logs {
 		$wpl_total_page_views = get_option('wpl_total_page_views');
 		if($wpl_total_page_views === false){
 			add_option("wpl_total_page_views", 0);
-			$wpl_page_views = 0;
+			$wpl_total_page_views = 0;
 		}
     	// Check if the key exists in the $wpl_page_views array
 		if (isset($wpl_page_views[$key])) {
