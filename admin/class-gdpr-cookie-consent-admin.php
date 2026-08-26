@@ -145,7 +145,7 @@ class Gdpr_Cookie_Consent_Admin {
 			add_action('wp_ajax_install_plugin', array($this, 'gdpr_wplp_install_plugin_ajax_handler'));
 			add_action('wp_ajax_gdpr_support_request', array($this, 'gdpr_support_request_handler'));
 			add_action('wp_ajax_nopriv_gdpr_support_request', array($this, 'gdpr_support_request_handler'));
-				
+			add_action( 'appwplp_secret_key_generated', array($this, 'appwplp_register_secret_key_with_server'));
 
 		}
 		
@@ -10632,7 +10632,7 @@ class Gdpr_Cookie_Consent_Admin {
 			header( 'Access-Control-Allow-Origin: ' . esc_url_raw($origin));
 			header( 'Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS' );
 			header( 'Access-Control-Allow-Credentials: true' );
-			header( 'Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Nonce, Origin, X-Requested-With, Accept' );
+			header( 'Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Nonce, Origin, X-Requested-With, Accept, X-WPLP-Timestamp, X-WPLP-Signature' );
 
 			// Handle preflight requests
 			if ( $_SERVER['REQUEST_METHOD'] === 'OPTIONS' ) {
@@ -10645,6 +10645,62 @@ class Gdpr_Cookie_Consent_Admin {
 		}, 10, 4);
 	}
 
+	/**
+	 * PHASE 2: Shared HMAC signature verification helper.
+	 *
+	 * Called from all three permission callbacks. Verifies the incoming
+	 * request carries a valid X-WPLP-Timestamp + X-WPLP-Signature pair,
+	 * proving the caller holds this site's confirmed secret key - without
+	 * the key itself ever being transmitted.
+	 *
+	 * Returns true on success, or a WP_Error describing the failure.
+	 */
+	public function appwplp_verify_hmac_signature( WP_REST_Request $request ) {
+		$secret_key = get_option( APPWPLP_SECRET_KEY_OPTION );
+		$key_status = get_option( APPWPLP_SECRET_KEY_STATUS_OPTION );
+		if ( empty( $secret_key ) ) {
+			// This site hasn't completed phase-1 registration yet.
+			return new WP_Error(
+				'secret_key_not_configured',
+				'Secret key not configured on this site.',
+				array( 'status' => 401 )
+			);
+		}
+
+		$timestamp = $request->get_header( 'X-WPLP-Timestamp' );
+		$signature = $request->get_header( 'X-WPLP-Signature' );
+		if ( empty( $timestamp ) || empty( $signature ) ) {
+			return new WP_Error(
+				'missing_signature',
+				'Signature missing.',
+				array( 'status' => 401 )
+			);
+		}
+
+		// Replay protection: reject requests older than 5 minutes.
+		if ( abs( time() - (int) $timestamp ) > 300 ) {
+			return new WP_Error(
+				'stale_request',
+				'Request expired.',
+				array( 'status' => 401 )
+			);
+		}
+
+		$expected_signature = hash_hmac(
+			'sha256',
+			$timestamp . '|' . $request->get_body(),
+			$secret_key
+		);
+		if ( ! hash_equals( $expected_signature, $signature ) ) {
+			return new WP_Error(
+				'invalid_signature',
+				'Signature mismatch.',
+				array( 'status' => 401 )
+			);
+		}
+
+		return true;
+	}
 	public function permission_callback_for_wplp_connect_site(WP_REST_Request $request) {
 		$auth_header = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
@@ -10710,7 +10766,11 @@ class Gdpr_Cookie_Consent_Admin {
     	        [ 'status' => 403 ]
     	    );
     	}
-
+		// NEW: secret key signature check.
+		$signature_check = $this->appwplp_verify_hmac_signature( $request );
+		if ( is_wp_error( $signature_check ) ) {
+			return $signature_check;
+		}
     	return true;
 	}
 
@@ -10770,6 +10830,13 @@ class Gdpr_Cookie_Consent_Admin {
 		if ( !hash_equals( $master_key, $incoming_key ) ) {
 			return new WP_Error('invalid_master_key', 'Master key mismatch.', ['status' => 401]);
 		}
+
+		// NEW: secret key signature check.
+		$signature_check = $this->appwplp_verify_hmac_signature( $request );
+		if ( is_wp_error( $signature_check ) ) {
+			return $signature_check;
+		}
+
 		return true; // All good → allow callback
 	}
 
@@ -10786,7 +10853,11 @@ class Gdpr_Cookie_Consent_Admin {
 		if ( !hash_equals( $master_key, $incoming_key )) {
 			return new WP_Error('invalid_master_key', 'Master key mismatch.', ['status' => 401]);
 		}
-
+		// NEW: secret key signature check.
+		$signature_check = $this->appwplp_verify_hmac_signature( $request );
+		if ( is_wp_error( $signature_check ) ) {
+			return $signature_check;
+		}
 		return true; // All good → allow callback
 	}
 	// Register the REST API route for data from plugin to the saas appwplp server 
@@ -11252,7 +11323,43 @@ class Gdpr_Cookie_Consent_Admin {
 				)
 			);
 		}
+		register_rest_route(
+			$appwplp_namespace, 
+			'/verify_connection', 
+			array(
+				'methods'             => 'GET',
+				'callback'            => array($this, 'appwplp_verify_connection'),
+				'permission_callback' => '__return_true', 
+				) 
+		);
 	}
+
+	function appwplp_verify_connection( WP_REST_Request $request ) {
+		$challenge = $request->get_param( 'challenge' );
+		$secret    = get_option( APPWPLP_SECRET_KEY_OPTION );
+		if ( empty( $challenge ) || empty( $secret ) ) {
+			return new WP_Error( 'invalid_request', 'Missing parameters.', array( 'status' => 400 ) );
+		}
+	
+		$response_hash = hash_hmac( 'sha256', $challenge, $secret );
+		return rest_ensure_response( array( 'response' => $response_hash ) );
+	}
+
+	function wplp_gdpr_generate_api_secret() {
+	    // Check if secret already exists
+	    if ( get_option('wplegalpages_api_secret') ) {
+	        return get_option('wplegalpages_api_secret');
+	    }
+
+	    // Generate a 32-character alphanumeric secret
+	    $secret = wp_generate_password(32, false);
+	
+	    // Store it in WP options
+	    update_option('wplegalpages_api_secret', $secret);
+
+	    return $secret;
+	}
+	
 
 	
 
@@ -13692,12 +13799,10 @@ public function gdpr_support_request_handler() {
 	}
 
 	public function wplp_connect_plugin_to_wplp_compliance( WP_REST_Request $request ) {
-		
 		global $wcam_lib_gdpr;
 
 		$data_key = $wcam_lib_gdpr->data_key;
 		$instance_key = $data_key . '_instance';
-    
     	$instance_id      = get_option( $instance_key );
     	$object           = str_ireplace( array( 'http://', 'https://' ), '', home_url() );
     	$software_version = $wcam_lib_gdpr->software_version;
@@ -13710,12 +13815,10 @@ public function gdpr_support_request_handler() {
 			'software_version'	=> rawurldecode( $software_version ),
 		);
 
-
 		return rest_ensure_response( $response );
 	}
 
 	public function rest_store_auth_key( WP_REST_Request $request ) {		
-		
 		$data			= $request->get_param( 'response' );
     	$origin			= $request->get_param( 'origin' ) ? esc_url_raw( $request->get_param( 'origin' ) ) : false;
     	$no_of_scans	= $request->get_param( 'no_of_scans' );
@@ -13792,6 +13895,31 @@ public function gdpr_support_request_handler() {
 
 		return new WP_REST_Response( [ 'status' => 'success', 'message' => 'Scanning Started' ], 200 );
 	}
+	
+	function appwplp_register_secret_key_with_server( $site_key ) {
+		$site_url = site_url();
+		$response = wp_remote_post(
+			'https://app.wplegalpages.com/wp-json/appwplp/v1/register_secret_key',
+			array(
+				'timeout' => 15,
+				'headers' => array(
+					'Content-Type' => 'application/json'
+				),
+				'body'    => wp_json_encode( array(
+					'site_key' => $site_key,
+					'site_url' => $site_url,
+				) ),
+			)
+		);
+	
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			update_option( APPWPLP_SECRET_KEY_STATUS_OPTION, 'registration_failed', false );
+			return;
+		}
+	
+		update_option( APPWPLP_SECRET_KEY_STATUS_OPTION, 'confirmed', false );
+	}
+
 
 	public function get_gcm_scan_result( WP_REST_Request $request ) {
 		if ( get_transient( 'wpl_gcm_check_is_scanning' ) ) {
