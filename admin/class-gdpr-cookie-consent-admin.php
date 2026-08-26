@@ -131,7 +131,6 @@ class Gdpr_Cookie_Consent_Admin {
 			add_action('refresh_gacm_vendor_list_event', array($this,'get_gacm_data'));
 			add_action( 'rest_api_init', array($this, 'allow_cors_for_react_app'));
 			add_action('rest_api_init', array($this, 'register_gdpr_dashboard_route'));
-			add_action('rest_api_init', array($this, 'wplp_gdpr_generate_api_secret'));
 			//For Import CSV option on Policy data page
 			add_action( 'admin_menu', array($this,'register_gdpr_policies_import_page') );
 			add_action('admin_menu', array($this,'gdpr_reorder_admin_menu'), 999);
@@ -9540,7 +9539,6 @@ class Gdpr_Cookie_Consent_Admin {
 				'user_email_id'					   => $user_email_id,
 				'location_status'				   => $locationStatus,
 				'client_site_name'				   => $client_site_name,
-				'api_secret' 					   => get_option('wplegalpages_api_secret'),
 			)
 		);
 	}
@@ -11256,20 +11254,7 @@ class Gdpr_Cookie_Consent_Admin {
 		}
 	}
 
-	function wplp_gdpr_generate_api_secret() {
-	    // Check if secret already exists
-	    if ( get_option('wplegalpages_api_secret') ) {
-	        return get_option('wplegalpages_api_secret');
-	    }
-
-	    // Generate a 32-character alphanumeric secret
-	    $secret = wp_generate_password(32, false);
 	
-	    // Store it in WP options
-	    update_option('wplegalpages_api_secret', $secret);
-
-	    return $secret;
-	}
 
 	/**
 	 * REST API callback to update and store the subscription payment status.
