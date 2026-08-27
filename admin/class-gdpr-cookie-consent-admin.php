@@ -3425,6 +3425,7 @@ class Gdpr_Cookie_Consent_Admin {
 			'settings_obj',
 			array(
 				'nonce'   						   => wp_create_nonce( 'wpl_save_script_nonce' ), // Generate nonce
+				'rest_nonce'					   => wp_create_nonce( 'wp_rest' ), // REST API cookie-auth nonce (X-WP-Nonce).
 				'gcc_enable_iab_nonce'			   => wp_create_nonce( 'gcc_enable_iab' ),
 				'the_options'                      => $settings,
 				'templates'     				   => $this -> templates_json,
@@ -8622,6 +8623,7 @@ class Gdpr_Cookie_Consent_Admin {
 			$this->plugin_name . '-main',
 			'settings_obj',
 			array(
+				'rest_nonce'                       => wp_create_nonce( 'wp_rest' ), // REST API cookie-auth nonce (X-WP-Nonce).
 				'the_options'                      => $settings,
 				'templates'     				   => $this -> templates_json,
 				'ajaxurl'                          => admin_url( 'admin-ajax.php' ),
@@ -10868,6 +10870,20 @@ class Gdpr_Cookie_Consent_Admin {
 		$this->settings = new GDPR_Cookie_Consent_Settings();
 		
 		$is_user_connected = $this->settings->is_connected();
+
+
+		register_rest_route(
+			'custom/v1',
+			'/gdpr-data',
+			array(
+				'methods'  => 'GET',
+				'callback' => array( $this, 'gdpr_get_settings_new' ),
+				'permission_callback' => function () {
+					// return true;
+					return current_user_can('manage_options');
+				}
+			)
+		);
 
 		register_rest_route(
 			'wplp-react-gdpr/v1',
@@ -13670,23 +13686,7 @@ public function gdpr_support_request_handler() {
     	    'url' => wp_get_attachment_url($attach_id)
     	];
 	}
-	/**
-	 * Registered rest end point to get the current banner options form database.
-	 */
-	public function gdpr_cookie_data_endpoint() {
-		register_rest_route(
-			'custom/v1',
-			'/gdpr-data/',
-			array(
-				'methods'  => 'GET',
-				'callback' => array( $this, 'gdpr_get_settings_new' ),
-				'permission_callback' => function () {
-					return current_user_can('manage_options');
-				}
-			)
-		);
-	}
-
+	
 	/**
 	 * Fetch Settings from database.
 	 *

@@ -286,7 +286,6 @@ class Gdpr_Cookie_Consent {
 			$this->loader->add_action( 'admin_init', $plugin_admin, 'gdpr_ab_testing_complete' );
 			// Register translation strings for extraction only
 			$this->loader->add_action( 'admin_init', $plugin_admin, 'gdpr_cookie_consent_register_translation_strings' );
-			$this->loader->add_action( 'rest_api_init', $plugin_admin, 'gdpr_cookie_data_endpoint' );
 		
 		}
 	}
