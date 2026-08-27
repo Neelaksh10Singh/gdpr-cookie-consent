@@ -12121,10 +12121,25 @@ var adv = new Vue({
     exportsettings() {
       const siteAddress = window.location.origin;
 
-      // Make an AJAX request to fetch data from the custom endpoint
-      fetch(siteAddress + "/wp-json/custom/v1/gdpr-data/")
+      // Make an AJAX request to fetch data from the custom endpoint.
+      // The endpoint checks current_user_can( 'manage_options' ), so the REST
+      // nonce has to be sent for WordPress to authenticate the cookie session.
+      fetch(siteAddress + "/wp-json/custom/v1/gdpr-data/", {
+        credentials: "same-origin",
+        headers: {
+          "X-WP-Nonce": settings_obj.rest_nonce,
+        },
+      })
         .then((response) => {
           if (!response.ok) {
+            // A page left open past the nonce lifetime sends an expired
+            // wp_rest nonce, so WordPress rejects the request as
+            // unauthenticated (401) or with rest_cookie_invalid_nonce (403).
+            if (response.status === 401 || response.status === 403) {
+              const staleSession = new Error("Export session expired");
+              staleSession.expiredNonce = true;
+              throw staleSession;
+            }
             throw new Error("Network response was not ok");
           }
           return response.json();
@@ -12200,6 +12215,15 @@ var adv = new Vue({
         })
         .catch((error) => {
           console.error("There was a problem with the fetch operation:", error);
+          this.success_error_message = error.expiredNonce
+            ? "Your session has expired. Please refresh the page and try exporting again."
+            : "There was a problem exporting the settings. Please try again.";
+          j("#gdpr-cookie-consent-save-settings-alert-adv").css(
+            "background-color",
+            "#e55353"
+          );
+          j("#gdpr-cookie-consent-save-settings-alert-adv").fadeIn(400);
+          j("#gdpr-cookie-consent-save-settings-alert-adv").fadeOut(5000);
         });
     },
     importsettings() {
