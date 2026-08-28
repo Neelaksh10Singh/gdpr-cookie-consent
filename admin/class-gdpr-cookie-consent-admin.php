@@ -13746,13 +13746,8 @@ public function gdpr_support_request_handler() {
 			'post_status'    => 'inherit',
 		);
 
-		$attach_id = wp_insert_attachment( $attachment, $upload['file'] );
-		if ( is_wp_error( $attach_id ) || ! $attach_id ) {
-			wp_delete_file( $upload['file'] );
-			return new WP_Error( 'upload_failed', 'Could not create the attachment.', array( 'status' => 500 ) );
-		}
-
-		require_once ABSPATH . 'wp-admin/includes/image.php';
+    	$attach_id = wp_insert_attachment($attachment, $file_path);
+    	require_once ABSPATH . 'wp-admin/includes/image.php';
 
 		wp_update_attachment_metadata(
 			$attach_id,
