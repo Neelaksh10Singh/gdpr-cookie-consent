@@ -10820,7 +10820,7 @@ class Gdpr_Cookie_Consent_Admin {
 		// Tmeister's plugin nests it here
 		$saas_user_id = $payload->data->user->id ?? 0;
 		$stored_user_id = $this->settings->get( 'account', 'id' );
-		if($saas_user_id !== $stored_user_id){
+		if ( (string) $saas_user_id !== (string) $stored_user_id ) {
 			return new WP_Error('token_validation_failed', 'Not the owner of the website!', ['status' => 401]);
 		}
 		// 3. Extract master_key from the request body
