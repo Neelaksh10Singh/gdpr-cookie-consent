@@ -1207,7 +1207,7 @@ class Gdpr_Cookie_Consent_Public {
 				if ( isset( $the_options['lang_selected'] )  && in_array( $the_options['lang_selected'], $this->supported_languages ) ) {
 
 					// Load and decode translations from JSON file.
-					$translations_file = GDPR_COOKIE_CONSENT_PLUGIN_PATH . 'public/translations/translations.json';
+					$translations_file = GDPR_COOKIE_CONSENT_PLUGIN_PATH . 'public/translations/public-translations.json';
 
 					$translations = wp_json_file_decode(
 						$translations_file,
