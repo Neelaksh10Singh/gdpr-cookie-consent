@@ -1144,12 +1144,7 @@ class Gdpr_Cookie_Consent_Public {
 				$categories_json_data[] = $category;
 			}
 
-			// Checking, if post value is set by user or not 
-			if(isset($_POST['iabtcfConsentData'])) 
-			{ 
-				$iabtcfConsentData = $_POST['iabtcfConsentData']; 
-				update_option( 'iabtcfConsent', $iabtcfConsentData );
-			} 
+			
 			//check for translations if dynamic translation is off, becuase when it is on code for automatic translation will translate it.
 			if ( (!isset($the_options["is_dynamic_lang_on"]) || $this->convert_boolean($the_options["is_dynamic_lang_on"]) === false) && true === $the_options['button_settings_is_on'] || true === $the_options['button_accept_all_is_on'] || true === $the_options['button_accept_is_on'] ) {
 				$cookie_data                      = array();
