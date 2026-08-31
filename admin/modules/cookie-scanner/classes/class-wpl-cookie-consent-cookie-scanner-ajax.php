@@ -922,34 +922,33 @@ class Gdpr_Cookie_Consent_Cookie_Scanner_Ajax extends Gdpr_Cookie_Consent_Cookie
 		$the_options    = get_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD );
 		$restrict_posts = isset( $the_options['restrict_posts'] ) ? array_map( 'absint', (array) $the_options['restrict_posts'] ) : array();
 
+		if ( empty( $post_types ) ) {
+			return $out;
+		}
+
 		$post_type_placeholders = implode( ',', array_fill( 0, count( $post_types ), '%s' ) );
 		$restrict_placeholders  = empty( $restrict_posts ) ? '' : implode( ',', array_fill( 0, count( $restrict_posts ), '%d' ) );
 
-		if ( empty( $restrict_posts ) ) {
-			$sql = $wpdb->prepare(
-				"SELECT post_name, post_title, post_type, ID FROM $post_table WHERE post_type IN ($post_type_placeholders) AND post_status = 'publish'",
-				$post_types
-			);
-		} else {
-			$sql = $wpdb->prepare(
-				"SELECT post_name, post_title, post_type, ID FROM $post_table WHERE post_type IN ($post_type_placeholders) AND post_status = 'publish' AND ID NOT IN ($restrict_placeholders)",
-				array_merge( $post_types, $restrict_posts )
-			);
-		}
-
 		if ( 0 === $total ) {
 			if ( empty( $restrict_posts ) ) {
-				$sql1 = $wpdb->prepare(
-					"SELECT COUNT(*) as ttnum FROM ( SELECT 1 FROM $post_table WHERE post_type IN ($post_type_placeholders) AND post_status = 'publish' LIMIT %d, %d ) AS T",
-					array_merge( $post_types, array( $offset, $mxdata ) )
-				);
+				$total_rows = $wpdb->get_row(
+					$wpdb->prepare(
+						// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name and placeholder list are generated internally, all values are bound.
+						"SELECT COUNT(*) as ttnum FROM ( SELECT 1 FROM $post_table WHERE post_type IN ($post_type_placeholders) AND post_status = 'publish' LIMIT %d, %d ) AS T",
+						...array_merge( $post_types, array( $offset, $mxdata ) )
+					),
+					ARRAY_A
+				); // db call ok; no-cache ok.
 			} else {
-				$sql1 = $wpdb->prepare(
-					"SELECT COUNT(*) as ttnum FROM ( SELECT 1 FROM $post_table WHERE post_type IN ($post_type_placeholders) AND post_status = 'publish' AND ID NOT IN ($restrict_placeholders) LIMIT %d, %d ) AS T",
-					array_merge( $post_types, $restrict_posts, array( $offset, $mxdata ) )
-				);
+				$total_rows = $wpdb->get_row(
+					$wpdb->prepare(
+						// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name and placeholder lists are generated internally, all values are bound.
+						"SELECT COUNT(*) as ttnum FROM ( SELECT 1 FROM $post_table WHERE post_type IN ($post_type_placeholders) AND post_status = 'publish' AND ID NOT IN ($restrict_placeholders) LIMIT %d, %d ) AS T",
+						...array_merge( $post_types, $restrict_posts, array( $offset, $mxdata ) )
+					),
+					ARRAY_A
+				); // db call ok; no-cache ok.
 			}
-			$total_rows   = $wpdb->get_row( $sql1, ARRAY_A );
 			$total        = $total_rows ? $total_rows['ttnum'] + 1 : 1; // always add 1 because home url is there.
 			$out['total'] = $total;
 		}
@@ -961,7 +960,25 @@ class Gdpr_Cookie_Consent_Cookie_Scanner_Ajax extends Gdpr_Cookie_Consent_Cookie
 		}
 
 		// Creating sql for fetching data.
-		$data = $wpdb->get_results( $sql, ARRAY_A );
+		if ( empty( $restrict_posts ) ) {
+			$data = $wpdb->get_results(
+				$wpdb->prepare(
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name and placeholder list are generated internally, all values are bound.
+					"SELECT post_name, post_title, post_type, ID FROM $post_table WHERE post_type IN ($post_type_placeholders) AND post_status = 'publish'",
+					...$post_types
+				),
+				ARRAY_A
+			); // db call ok; no-cache ok.
+		} else {
+			$data = $wpdb->get_results(
+				$wpdb->prepare(
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name and placeholder lists are generated internally, all values are bound.
+					"SELECT post_name, post_title, post_type, ID FROM $post_table WHERE post_type IN ($post_type_placeholders) AND post_status = 'publish' AND ID NOT IN ($restrict_placeholders)",
+					...array_merge( $post_types, $restrict_posts )
+				),
+				ARRAY_A
+			); // db call ok; no-cache ok.
+		}
 		if ( ! empty( $data ) ) {
 			foreach ( $data as $value ) {
 				$permalink = get_permalink( $value['ID'] );
