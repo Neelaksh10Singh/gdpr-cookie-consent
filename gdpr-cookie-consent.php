@@ -150,9 +150,11 @@ function activate_gdpr_cookie_consent() {
  *
  * @return string
  */
-function appwplp_generate_secret_key() {
-	// random_bytes(16) -> 32 hex characters. Cryptographically secure.
-	return bin2hex( random_bytes( 16 ) );
+if ( ! function_exists( 'appwplp_generate_secret_key' ) ) {
+	function appwplp_generate_secret_key() {
+		// random_bytes(16) -> 32 hex characters. Cryptographically secure.
+		return bin2hex( random_bytes( 16 ) );
+	}
 }
 /**
  * Generates and stores a local secret key for this site, if one doesn't
@@ -160,34 +162,36 @@ function appwplp_generate_secret_key() {
  * step 3, triggered separately after this runs.
  */
 
-function appwplp_maybe_generate_secret_key() {
-	$existing_key    = get_option( APPWPLP_SECRET_KEY_OPTION );
-	$existing_status = get_option( APPWPLP_SECRET_KEY_STATUS_OPTION );
+if ( ! function_exists( 'appwplp_maybe_generate_secret_key' ) ) {
+	function appwplp_maybe_generate_secret_key() {
+		$existing_key    = get_option( APPWPLP_SECRET_KEY_OPTION );
+		$existing_status = get_option( APPWPLP_SECRET_KEY_STATUS_OPTION );
 
-	if ( ! empty( $existing_key ) && 'confirmed' === $existing_status ) {
-		$timestamp = wp_next_scheduled( 'appwplp_secret_key_retry_event' );
-		if ( $timestamp ) {
-			wp_clear_scheduled_hook( 'appwplp_secret_key_retry_event' );
+		if ( ! empty( $existing_key ) && 'confirmed' === $existing_status ) {
+			$timestamp = wp_next_scheduled( 'appwplp_secret_key_retry_event' );
+			if ( $timestamp ) {
+				wp_clear_scheduled_hook( 'appwplp_secret_key_retry_event' );
+			}
+			return;
 		}
-		return;
-	}
 
-	if ( ! empty( $existing_key ) ) {
-		update_option( APPWPLP_SECRET_KEY_STATUS_OPTION, 'pending', false );
-		do_action( 'appwplp_secret_key_generated', $existing_key );
-	} else {
-		 /*
-         * First installation - generate the key.
-         */
-		$new_key = appwplp_generate_secret_key();
-		update_option( APPWPLP_SECRET_KEY_OPTION, $new_key, false );
-		update_option( APPWPLP_SECRET_KEY_STATUS_OPTION, 'pending', false );
+		if ( ! empty( $existing_key ) ) {
+			update_option( APPWPLP_SECRET_KEY_STATUS_OPTION, 'pending', false );
+			do_action( 'appwplp_secret_key_generated', $existing_key );
+		} else {
+			/*
+			* First installation - generate the key.
+			*/
+			$new_key = appwplp_generate_secret_key();
+			update_option( APPWPLP_SECRET_KEY_OPTION, $new_key, false );
+			update_option( APPWPLP_SECRET_KEY_STATUS_OPTION, 'pending', false );
 
-		do_action( 'appwplp_secret_key_generated', $new_key );
-		
-	}
-	if ( ! wp_next_scheduled( 'appwplp_secret_key_retry_event' ) ) {
-		wp_schedule_event( time() + ( 15 * MINUTE_IN_SECONDS ), 'appwplp_fifteen_minutes', 'appwplp_secret_key_retry_event' );
+			do_action( 'appwplp_secret_key_generated', $new_key );
+			
+		}
+		if ( ! wp_next_scheduled( 'appwplp_secret_key_retry_event' ) ) {
+			wp_schedule_event( time() + ( 15 * MINUTE_IN_SECONDS ), 'appwplp_fifteen_minutes', 'appwplp_secret_key_retry_event' );
+		}
 	}
 }
 
