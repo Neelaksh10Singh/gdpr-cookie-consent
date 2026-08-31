@@ -371,6 +371,10 @@ function gdpr_display_user_mirgation_notice() {
 }
 // Added for plugin tour
 function gdpr_complete_tour() {
+    check_ajax_referer( 'gdpr-cookie-consent', '_ajax_nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( esc_html__( 'You do not have permission to perform this action.', 'gdpr-cookie-consent' ), 403 );
+    }
     update_option('gdpr_first_time_installed', false);
     wp_send_json_success();
 }
