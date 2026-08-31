@@ -62,9 +62,6 @@ class Gdpr_Cookie_Consent_Deactivator {
 		$the_options['is_ccpa_on'] = 'false';
 		update_option( GDPR_COOKIE_CONSENT_SETTINGS_FIELD, $the_options );
 		$wplp_plugin_name = 'wplegalpages/wplegalpages.php';
-		if ( ! function_exists( 'is_plugin_active' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		}
 		if ( ! is_plugin_active( $wplp_plugin_name ) ) {
 			$timestamp = wp_next_scheduled( 'appwplp_secret_key_retry_event' );
 			if ( $timestamp ) {
