@@ -64,7 +64,7 @@ if ( ! defined( 'FS_CHMOD_FILE' ) ) {
  * Check if the constant GDPR_APP_URL is not already defined.
 */
 if ( ! defined( 'GDPR_APP_URL' ) ) {
-	define( 'GDPR_APP_URL', 'https://app.wplegalpages.com' );
+	define( 'GDPR_APP_URL', 'https://testingapp.wplegalpages.com' );
 }
 if ( ! defined( 'GDPR_API_URL' ) ) {
 	define( 'GDPR_API_URL', 'https://app.wplegalpages.com/wp-json/gdpr/v2/' );
@@ -73,6 +73,13 @@ if ( ! defined( 'GDPR_API_URL' ) ) {
  
 if ( ! defined( 'APPWPLP_SECRET_KEY_FEATURE_VERSION' ) ) {
 	define( 'APPWPLP_SECRET_KEY_FEATURE_VERSION', '4.4.2' );
+}
+
+/**
+ * How long a successful bearer-token verdict stays cached, in seconds.
+ */
+if ( ! defined( 'APPWPLP_JWT_CACHE_TTL' ) ) {
+	define( 'APPWPLP_JWT_CACHE_TTL', 15 * MINUTE_IN_SECONDS );
 }
 
 if ( ! defined( 'APPWPLP_SECRET_KEY_OPTION' ) ) {
@@ -157,13 +164,53 @@ if ( ! function_exists( 'appwplp_generate_secret_key' ) ) {
 	}
 }
 /**
+ * Single-flight guard shared by WP Cookie Consent and WPLegalPages.
+ *
+ * Both plugins listen on `appwplp_secret_key_generated` and post the very same
+ * key to the very same endpoint, and each one triggers the routine on its own
+ * activation and version upgrade. Without a shared claim a single site ends up
+ * registering the key several times over.
+ *
+ * Only the first caller wins - inside one request through the static flag, and
+ * across requests through a lock that expires shortly before the 15 minute
+ * retry cron is due, so a genuine retry is never blocked.
+ *
+ * The function is defined once, by whichever of the two plugins loads first, so
+ * both share the same static flag and the same lock.
+ *
+ * @return bool True when the caller owns this registration attempt.
+ */
+if ( ! function_exists( 'appwplp_claim_secret_key_registration' ) ) {
+	function appwplp_claim_secret_key_registration() {
+		static $claimed = false;
+
+		// A second listener in the same request - the key is already going out.
+		if ( $claimed ) {
+			return false;
+		}
+
+		// An attempt from another request is still inside the current retry window.
+		if ( get_transient( 'appwplp_secret_key_registration_lock' ) ) {
+			return false;
+		}
+
+		$claimed = true;
+
+		// One minute short of the retry interval so the cron tick always gets through.
+		set_transient( 'appwplp_secret_key_registration_lock', time(), 14 * MINUTE_IN_SECONDS );
+
+		return true;
+	}
+}
+
+/**
  * Generates and stores a local secret key for this site, if one doesn't
  * already exist. Does NOT register it with the server - that happens in
  * step 3, triggered separately after this runs.
  */
-
 if ( ! function_exists( 'appwplp_maybe_generate_secret_key' ) ) {
 	function appwplp_maybe_generate_secret_key() {
+		error_log("Running appwplp_maybe_generate_secret_key");
 		$existing_key    = get_option( APPWPLP_SECRET_KEY_OPTION );
 		$existing_status = get_option( APPWPLP_SECRET_KEY_STATUS_OPTION );
 
@@ -177,11 +224,13 @@ if ( ! function_exists( 'appwplp_maybe_generate_secret_key' ) ) {
 
 		if ( ! empty( $existing_key ) ) {
 			update_option( APPWPLP_SECRET_KEY_STATUS_OPTION, 'pending', false );
+			error_log("key exists");
 			do_action( 'appwplp_secret_key_generated', $existing_key );
 		} else {
 			/*
 			* First installation - generate the key.
 			*/
+			error_log("key doesnot exist");
 			$new_key = appwplp_generate_secret_key();
 			update_option( APPWPLP_SECRET_KEY_OPTION, $new_key, false );
 			update_option( APPWPLP_SECRET_KEY_STATUS_OPTION, 'pending', false );
@@ -216,10 +265,11 @@ add_action( 'appwplp_secret_key_retry_event', 'appwplp_maybe_generate_secret_key
  * @return void
  */
 function appwplp_secret_key_version_check() {
+	error_log("Running appwplp_secret_key_version_check");
 	if ( APPWPLP_SECRET_KEY_FEATURE_VERSION === get_option( APPWPLP_SECRET_KEY_VERSION_OPTION ) ) {
 		return;
 	}
-
+	error_log("Version mismatch");
 	appwplp_maybe_generate_secret_key();
 
 	update_option( APPWPLP_SECRET_KEY_VERSION_OPTION, APPWPLP_SECRET_KEY_FEATURE_VERSION, false );
@@ -233,6 +283,7 @@ add_action( 'admin_init', 'appwplp_secret_key_version_check' );
  * @return void
  */
 function appwplp_secret_key_activate() {
+	error_log("Running appwplp_secret_key_activate");
 	appwplp_maybe_generate_secret_key();
 	update_option( APPWPLP_SECRET_KEY_VERSION_OPTION, APPWPLP_SECRET_KEY_FEATURE_VERSION, false );
 }
