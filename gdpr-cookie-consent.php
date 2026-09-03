@@ -64,7 +64,7 @@ if ( ! defined( 'FS_CHMOD_FILE' ) ) {
  * Check if the constant GDPR_APP_URL is not already defined.
 */
 if ( ! defined( 'GDPR_APP_URL' ) ) {
-	define( 'GDPR_APP_URL', 'https://testingapp.wplegalpages.com' );
+	define( 'GDPR_APP_URL', 'https://app.wplegalpages.com' );
 }
 if ( ! defined( 'GDPR_API_URL' ) ) {
 	define( 'GDPR_API_URL', 'https://app.wplegalpages.com/wp-json/gdpr/v2/' );
@@ -72,7 +72,7 @@ if ( ! defined( 'GDPR_API_URL' ) ) {
 
  
 if ( ! defined( 'APPWPLP_SECRET_KEY_FEATURE_VERSION' ) ) {
-	define( 'APPWPLP_SECRET_KEY_FEATURE_VERSION', '4.4.2' );
+	define( 'APPWPLP_SECRET_KEY_FEATURE_VERSION', '4.4.3' );
 }
 
 /**
@@ -93,6 +93,27 @@ if ( ! defined( 'APPWPLP_SECRET_KEY_STATUS_OPTION' ) ) {
 if ( ! defined( 'APPWPLP_SECRET_KEY_VERSION_OPTION' ) ) {
 	define( 'APPWPLP_SECRET_KEY_VERSION_OPTION', 'appwplp_secret_key_feature_version' );
 }
+
+if ( ! defined( 'APPWPLP_SECRET_KEY_ATTEMPTS_OPTION' ) ) {
+	define( 'APPWPLP_SECRET_KEY_ATTEMPTS_OPTION', 'appwplp_secret_key_retry_attempts' );
+}
+
+/**
+ * Total number of registration posts a site will make before giving up.
+ *
+ * Counted as posts, not as retries on top of a first try, so eight means eight
+ * requests and then silence. On a 15 minute loop that is a two hour window.
+ *
+ * Verification runs inside the registration request on the server, so a post
+ * from a site the server cannot reach holds a php-fpm worker there for the full
+ * timeout. Without a cap an unreachable site pays that cost every 15 minutes
+ * forever; with one, each site's total cost is bounded and the traffic stops on
+ * its own.
+ */
+if ( ! defined( 'APPWPLP_SECRET_KEY_MAX_ATTEMPTS' ) ) {
+	define( 'APPWPLP_SECRET_KEY_MAX_ATTEMPTS', 8 );
+}
+
 
 /**
  * Temporay fix for a critical error
@@ -210,11 +231,28 @@ if ( ! function_exists( 'appwplp_claim_secret_key_registration' ) ) {
  */
 if ( ! function_exists( 'appwplp_maybe_generate_secret_key' ) ) {
 	function appwplp_maybe_generate_secret_key() {
-		error_log("Running appwplp_maybe_generate_secret_key");
 		$existing_key    = get_option( APPWPLP_SECRET_KEY_OPTION );
 		$existing_status = get_option( APPWPLP_SECRET_KEY_STATUS_OPTION );
 
 		if ( ! empty( $existing_key ) && 'confirmed' === $existing_status ) {
+			$timestamp = wp_next_scheduled( 'appwplp_secret_key_retry_event' );
+			if ( $timestamp ) {
+				wp_clear_scheduled_hook( 'appwplp_secret_key_retry_event' );
+			}
+			delete_option( APPWPLP_SECRET_KEY_ATTEMPTS_OPTION );
+			return;
+		}
+
+		/*
+		 * Out of attempts - stop the loop for good.
+		 *
+		 * The counter is raised by the listener that actually posts, so an
+		 * attempt is never spent by the second plugin standing down on the
+		 * shared claim. The counter is cleared by the one-time feature version
+		 * check, so the next plugin update allows a fresh set - until then a site
+		 * that was unreachable while these ran out stays stopped.
+		 */
+		if ( (int) get_option( APPWPLP_SECRET_KEY_ATTEMPTS_OPTION, 0 ) >= APPWPLP_SECRET_KEY_MAX_ATTEMPTS ) {
 			$timestamp = wp_next_scheduled( 'appwplp_secret_key_retry_event' );
 			if ( $timestamp ) {
 				wp_clear_scheduled_hook( 'appwplp_secret_key_retry_event' );
@@ -224,13 +262,11 @@ if ( ! function_exists( 'appwplp_maybe_generate_secret_key' ) ) {
 
 		if ( ! empty( $existing_key ) ) {
 			update_option( APPWPLP_SECRET_KEY_STATUS_OPTION, 'pending', false );
-			error_log("key exists");
 			do_action( 'appwplp_secret_key_generated', $existing_key );
 		} else {
 			/*
 			* First installation - generate the key.
 			*/
-			error_log("key doesnot exist");
 			$new_key = appwplp_generate_secret_key();
 			update_option( APPWPLP_SECRET_KEY_OPTION, $new_key, false );
 			update_option( APPWPLP_SECRET_KEY_STATUS_OPTION, 'pending', false );
@@ -255,39 +291,38 @@ add_filter( 'cron_schedules', function ( $schedules ) {
 add_action( 'appwplp_secret_key_retry_event', 'appwplp_maybe_generate_secret_key' );
 
 /**
- * Runs the secret key routine once on existing installs.
+ * Runs the secret key routine once per site, on the first admin load.
  *
- * register_activation_hook() does not fire when WordPress updates a plugin
- * in place, so sites upgrading from a version without this feature would
- * never get a key. A stored feature version is compared against the current
- * one so this runs exactly once per site after the update.
+ * Deliberately not hooked to register_activation_hook(). Core appends the
+ * plugin to `active_plugins` only *after* the activation hook has fired, so a
+ * key posted from there is verified by the server calling straight back into a
+ * WordPress that has not loaded this plugin - /verify_connection is not
+ * registered yet and the handshake 404s. By the first admin_init the plugin is
+ * active and that route answers.
+ *
+ * The activation hook would also miss in-place plugin updates, so a stored
+ * feature version is compared against the current one either way; this runs
+ * exactly once per site per feature version, covering both a fresh activation
+ * and an upgrade from a version without the feature.
  *
  * @return void
  */
 function appwplp_secret_key_version_check() {
-	error_log("Running appwplp_secret_key_version_check");
 	if ( APPWPLP_SECRET_KEY_FEATURE_VERSION === get_option( APPWPLP_SECRET_KEY_VERSION_OPTION ) ) {
 		return;
 	}
-	error_log("Version mismatch");
+
+	/*
+	 * A fresh activation or an upgrade is someone actively trying to get this
+	 * connected, so allow a fresh set of attempts rather than staying capped out.
+	 */
+	delete_option( APPWPLP_SECRET_KEY_ATTEMPTS_OPTION );
+
 	appwplp_maybe_generate_secret_key();
 
 	update_option( APPWPLP_SECRET_KEY_VERSION_OPTION, APPWPLP_SECRET_KEY_FEATURE_VERSION, false );
 }
 add_action( 'admin_init', 'appwplp_secret_key_version_check' );
-
-/**
- * Generates the secret key on activation and stamps the feature version so
- * the upgrade check above does not repeat the work on the next admin load.
- *
- * @return void
- */
-function appwplp_secret_key_activate() {
-	error_log("Running appwplp_secret_key_activate");
-	appwplp_maybe_generate_secret_key();
-	update_option( APPWPLP_SECRET_KEY_VERSION_OPTION, APPWPLP_SECRET_KEY_FEATURE_VERSION, false );
-}
-
 
 /**
  * Redirecting to the wizard page on plguin activation.
@@ -318,7 +353,6 @@ function deactivate_gdpr_cookie_consent() {
 }
 
 register_activation_hook( __FILE__, 'activate_gdpr_cookie_consent' );
-register_activation_hook( __FILE__, 'appwplp_secret_key_activate' );
 register_deactivation_hook( __FILE__, 'deactivate_gdpr_cookie_consent' );
 
 require plugin_dir_path( __FILE__ ) . 'includes/class-gdpr-cookies-read-csv.php';
